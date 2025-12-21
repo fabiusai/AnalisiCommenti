@@ -23,7 +23,6 @@
             --success: #28a745;
             --warning: #ffc107;
             --danger: #dc3545;
-            /* Font richiesto per la legenda */
             --font-legend: 'Avenir Next LT Pro', 'Avenir Next', 'Avenir', 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
@@ -52,22 +51,73 @@
 
         /* CHART & LEGEND */
         .chart-wrapper { position: relative; height: 250px; width: 100%; display: flex; justify-content: center; margin-bottom: 1rem; }
-        .custom-legend { display: flex; justify-content: center; gap: 20px; margin-top: 10px; flex-wrap: wrap; }
+        
+        .custom-legend { display: flex; justify-content: center; gap: 25px; margin-top: 15px; flex-wrap: wrap; }
         .legend-item { text-align: center; font-family: var(--font-legend); }
-        .legend-color { width: 12px; height: 12px; display: inline-block; border-radius: 50%; margin-right: 5px; }
-        .legend-label { font-size: 0.9rem; color: #555; font-weight: 500; display: block; }
-        .legend-percent { font-size: 1.2rem; font-weight: 700; color: var(--text-dark); display: block; margin-top: 2px; }
+        .legend-color { width: 12px; height: 12px; display: inline-block; border-radius: 50%; margin-right: 6px; position: relative; top: 1px;}
+        
+        /* Modifiche richieste alla Legenda */
+        .legend-label { font-size: 1rem; color: #444; font-weight: 400; display: block; margin-bottom: 2px; }
+        .legend-percent { font-size: 1.1rem; font-weight: 400; color: #333; display: block; }
 
-        /* FILTERS TOOLBAR */
-        .filters-toolbar { background: var(--bg-light); padding: 1rem; border-radius: 4px; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
-        .filter-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
+        /* --- LAYOUT FILTRI --- */
+        .filters-container {
+            background: var(--bg-light);
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        /* Riga 1: Ricerca e Dropdown */
+        .filters-row-top {
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr; /* La ricerca prende più spazio */
+            gap: 15px;
+            border-bottom: 1px solid #e1e4e8;
+            align-items: end;
+        }
+
+        @media (max-width: 768px) {
+            .filters-row-top { grid-template-columns: 1fr; }
+        }
+
+        /* Riga 2: Date e Reset */
+        .filters-row-bottom {
+            padding: 10px 1rem;
+            background-color: #eef2f8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-group { display: flex; flex-direction: column; gap: 4px; }
         .filter-group label { font-size: 0.75rem; font-weight: 500; color: #666; text-transform: uppercase; }
-        .filter-select, .filter-input { padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-dark); font-size: 0.85rem; outline: none; width: 100%; }
+        
+        .filter-select, .filter-input { padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-dark); font-size: 0.85rem; outline: none; width: 100%; background: white; }
         .filter-select:focus, .filter-input:focus { border-color: var(--brand-blue); }
-        .date-row { display: flex; gap: 5px; }
+
+        .date-inputs { display: flex; align-items: center; gap: 10px; }
+        .filter-input-date { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.85rem; outline: none; color: var(--text-dark); }
+        .filter-input-date:focus { border-color: var(--brand-blue); }
+
+        .btn-reset {
+            background: none;
+            border: 1px solid var(--brand-blue);
+            color: var(--brand-blue);
+            padding: 5px 10px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-reset:hover { background: var(--brand-blue); color: white; }
 
         /* COMMENTS LIST */
-        .comments-list { background: white; border: 1px solid var(--border-color); border-radius: 4px; max-height: 600px; overflow-y: auto; }
+        .comments-list { background: white; border: 1px solid var(--border-color); border-radius: 4px; max-height: 500px; overflow-y: auto; }
         .comment-item { padding: 1rem; border-bottom: 1px solid var(--bg-light); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
         .comment-item:last-child { border-bottom: none; }
         .comment-content { flex: 1; }
@@ -149,43 +199,50 @@
             <div class="card-box">
                 <h3 class="section-title" style="margin-bottom: 10px;">Feed Commenti</h3>
                 
-                <div class="filters-toolbar">
-                    <div class="filter-group">
-                        <label>Sentiment</label>
-                        <select id="filterSentiment" class="filter-select">
-                            <option value="all">Tutti</option>
-                            <option value="positive">Positivi</option>
-                            <option value="neutral">Neutri</option>
-                            <option value="negative">Negativi</option>
-                        </select>
+                <div class="filters-container">
+                    <div class="filters-row-top">
+                        <div class="filter-group">
+                            <label>Cerca nel testo</label>
+                            <input type="text" id="filterText" class="filter-input" placeholder="Scrivi per cercare...">
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Sentiment</label>
+                            <select id="filterSentiment" class="filter-select">
+                                <option value="all">Tutti</option>
+                                <option value="positive">Positivi</option>
+                                <option value="neutral">Neutri</option>
+                                <option value="negative">Negativi</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Canale</label>
+                            <select id="filterPlatform" class="filter-select">
+                                <option value="all">Tutti</option>
+                                <option value="facebook">Facebook</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="twitter">X (Twitter)</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Ordina per</label>
+                            <select id="sortOrder" class="filter-select">
+                                <option value="dateDesc">Data (Più recenti)</option>
+                                <option value="dateAsc">Data (Meno recenti)</option>
+                                <option value="lenDesc">Lunghezza (Lungo-Corto)</option>
+                                <option value="lenAsc">Lunghezza (Corto-Lungo)</option>
+                            </select>
+                        </div>
                     </div>
                     
-                    <div class="filter-group">
-                        <label>Canale</label>
-                        <select id="filterPlatform" class="filter-select">
-                            <option value="all">Tutti</option>
-                            <option value="facebook">Facebook</option>
-                            <option value="instagram">Instagram</option>
-                            <option value="twitter">X (Twitter)</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label>Ordina per</label>
-                        <select id="sortOrder" class="filter-select">
-                            <option value="dateDesc">Data (Più recenti)</option>
-                            <option value="dateAsc">Data (Meno recenti)</option>
-                            <option value="lenDesc">Lunghezza (Lungo-Corto)</option>
-                            <option value="lenAsc">Lunghezza (Corto-Lungo)</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group" style="flex: 1.5;">
-                        <label>Periodo (Da - A)</label>
-                        <div class="date-row">
-                            <input type="date" id="dateStart" class="filter-input">
-                            <input type="date" id="dateEnd" class="filter-input">
+                    <div class="filters-row-bottom">
+                        <div class="date-inputs">
+                            <label style="font-size: 0.75rem; font-weight: 500; color: #666; text-transform: uppercase;">Periodo:</label>
+                            <input type="date" id="dateStart" class="filter-input-date" placeholder="Da">
+                            <span style="font-size: 0.8rem; color:#666;">-</span>
+                            <input type="date" id="dateEnd" class="filter-input-date" placeholder="A">
                         </div>
+                        <button class="btn-reset" id="resetFiltersBtn">Reset Filtri</button>
                     </div>
                 </div>
 
@@ -197,7 +254,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v1.4.0 Filters & Percent</span>
+    <span class="app-version">v1.6.0 Search & Style</span>
 </footer>
 
 <div id="editorModal" class="modal">
@@ -233,7 +290,7 @@
 <script>
     // --- SETUP & VARS ---
     let allComments = [];
-    let displayedComments = []; // Array filtrato
+    let displayedComments = [];
     let myChart = null;
 
     // DOM Elements
@@ -247,11 +304,13 @@
     const customLegend = document.getElementById('customLegend');
 
     // Filter DOM Elements
+    const filterText = document.getElementById('filterText');
     const filterSentiment = document.getElementById('filterSentiment');
     const filterPlatform = document.getElementById('filterPlatform');
     const sortOrder = document.getElementById('sortOrder');
     const dateStart = document.getElementById('dateStart');
     const dateEnd = document.getElementById('dateEnd');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
     
     // Modal & Editor
     const modal = document.getElementById('editorModal');
@@ -417,17 +476,33 @@
     // --- MAIN UI LOGIC ---
     function updateUI() {
         appContent.classList.remove('hidden');
-        applyFilters(); // Questo chiama sia renderList che renderChart
+        applyFilters(); 
     }
 
+    // Reset Logic
+    resetFiltersBtn.addEventListener('click', () => {
+        filterText.value = '';
+        filterSentiment.value = 'all';
+        filterPlatform.value = 'all';
+        sortOrder.value = 'dateDesc';
+        dateStart.value = '';
+        dateEnd.value = '';
+        applyFilters();
+    });
+
     // Event Listeners sui filtri
-    [filterSentiment, filterPlatform, sortOrder, dateStart, dateEnd].forEach(el => {
+    [filterText, filterSentiment, filterPlatform, sortOrder, dateStart, dateEnd].forEach(el => {
+        el.addEventListener('input', applyFilters); // 'input' cattura anche la digitazione
         el.addEventListener('change', applyFilters);
     });
 
     function applyFilters() {
         // 1. Filtra l'array originale
         displayedComments = allComments.filter(c => {
+            // Text Search
+            const searchText = filterText.value.toLowerCase();
+            if (searchText && !c.message.toLowerCase().includes(searchText)) return false;
+
             // Sentiment
             const s = c.sentiment.toLowerCase();
             const fSent = filterSentiment.value;
@@ -445,7 +520,6 @@
             }
             if (dateEnd.value) {
                 const end = new Date(dateEnd.value);
-                // Imposta fine giornata
                 end.setHours(23,59,59);
                 if (c.dateObj > end) return false;
             }
@@ -466,8 +540,7 @@
         // 3. Aggiorna Vista
         totalCommentsSpan.innerText = displayedComments.length;
         renderCommentsList();
-        renderChart(); // Il grafico ora rispecchia i filtri? Solitamente sì, o si vuole il totale? 
-                       // Assumo che il grafico debba mostrare la statistica dei dati filtrati.
+        renderChart(); 
     }
 
     function renderCommentsList() {
@@ -481,7 +554,6 @@
             if (s.includes('positive')) badgeClass = 'sentiment-positive';
             if (s.includes('negative')) badgeClass = 'sentiment-negative';
 
-            // Icona piccola nel feed
             const iconPath = getPlatformIconPath(comment.platform);
             
             div.innerHTML = `
@@ -505,8 +577,6 @@
         const ctx = document.getElementById('sentimentChart').getContext('2d');
         if (myChart) myChart.destroy();
 
-        // Calcola conteggi sui dati FILTRATI (o totali? Di solito dashboard interattive filtrano tutto)
-        // Userò i dati FILTRATI
         let counts = { Positive: 0, Neutral: 0, Negative: 0 };
         displayedComments.forEach(c => {
             const s = c.sentiment.toLowerCase();
@@ -517,17 +587,14 @@
 
         const total = counts.Positive + counts.Neutral + counts.Negative;
         
-        // Calcola percentuali
         const pPos = total ? Math.round((counts.Positive / total) * 100) : 0;
         const pNeu = total ? Math.round((counts.Neutral / total) * 100) : 0;
         const pNeg = total ? Math.round((counts.Negative / total) * 100) : 0;
 
-        // Colori
         const cPos = '#28a745';
         const cNeu = '#ffc107';
         const cNeg = '#dc3545';
 
-        // Disegna grafico (Senza legenda di default)
         myChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
@@ -543,14 +610,13 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false }, // Nascondiamo legenda default
+                    legend: { display: false },
                     tooltip: { enabled: true }
                 },
-                cutout: '70%' // Ciambella più sottile
+                cutout: '50%' // Foro più stretto (prima era 70%, o default)
             }
         });
 
-        // Genera Legenda HTML Custom
         customLegend.innerHTML = `
             <div class="legend-item">
                 <span class="legend-label"><span class="legend-color" style="background:${cPos}"></span>Positivo</span>
@@ -569,18 +635,16 @@
 
     // --- EDITOR MODAL ---
     function openEditor(index) {
-        // Recupera dall'array visualizzato
         const comment = displayedComments[index];
         
         cardText.innerText = comment.message;
-        cardDate.innerText = formatDate(comment.dateObj); // Include HH:MM
+        cardDate.innerText = formatDate(comment.dateObj);
         cardAuthor.innerText = comment.author;
         
         const path = getPlatformIconPath(comment.platform);
         const pathElem = cardIcon.querySelector('path');
         pathElem.setAttribute('d', path);
         
-        // Colorazione Brandizzata per Editor
         if (comment.platform === 'facebook') pathElem.style.fill = '#1877F2';
         else if (comment.platform === 'instagram') pathElem.style.fill = '#E4405F';
         else if (comment.platform === 'twitter') pathElem.style.fill = '#000000';
