@@ -99,7 +99,6 @@
         .social-card .card-date { font-size: 0.8rem; color: #999; margin-left: auto; white-space: nowrap; }
 
         .social-card .card-body { padding: 10px 25px 20px 25px; font-size: 1.1rem; line-height: 1.5; color: #222; flex-grow: 1; }
-        /* Removed card-media-badge style as requested */
         
         .card-custom-image { width: 100%; height: auto; border-radius: 4px; margin-bottom: 15px; display: block; object-fit: cover; max-height: 250px; }
 
@@ -299,7 +298,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v3.4 No-Labels</span>
+    <span class="app-version">v3.5 Followers-Fixed</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -655,12 +654,17 @@
             }
 
             let likes = parseInt(row['engagement'] || 0);
+            
+            // Logic for specific social followers
             let followers = 0;
-            if (channel === 'Facebook') {
-                 followers = parseInt(row['source_extended_attributes.facebook_followers'] || row['reach'] || 0);
-            } else {
-                 followers = parseInt(row['reach'] || 0);
-            }
+            if (channel === 'Facebook') followers = row['source_extended_attributes.facebook_followers'];
+            else if (channel.includes('X (Twitter)')) followers = row['source_extended_attributes.twitter_followers'];
+            else if (channel === 'Instagram') followers = row['source_extended_attributes.instagram_followers'];
+            else if (channel === 'YouTube') followers = row['source_extended_attributes.youtube_subscribers'] || row['source_extended_attributes.subscribers'];
+            
+            // Fallback
+            if (!followers) followers = row['source_extended_attributes.followers'] || row['reach'] || 0;
+            followers = parseInt(followers);
             
             let retweets = parseInt(row['article_extended_attributes.twitter_retweets'] || 0);
             
@@ -872,6 +876,7 @@
         const showLikes = document.getElementById('showLikesExt').checked;
         const showFollowers = document.getElementById('showFollowersExt').checked;
 
+        // KPI Logic: Hide if < 50
         const actualShowLikes = showLikes && (d.likes >= 50);
         const actualShowFollowers = showFollowers && (d.followers >= 50);
 
