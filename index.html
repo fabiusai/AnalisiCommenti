@@ -7,15 +7,17 @@
     <link rel="icon" href="favicon.ico">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         :root {
             --brand-blue: #0146bc;
             --brand-yellow: #eddc01;
+            --brand-lightblue: #63c2de;
             --text-dark: #333333;
             --text-light: #ffffff;
             --bg-light: #f4f6f9;
@@ -24,190 +26,272 @@
             --warning: #ffc107;
             --danger: #dc3545;
             --font-legend: 'Avenir Next LT Pro', 'Avenir Next', 'Avenir', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --font-main: 'Roboto', sans-serif;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Roboto', sans-serif; background-color: var(--bg-light); color: var(--text-dark); display: flex; flex-direction: column; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        body { font-family: var(--font-main); background-color: var(--bg-light); color: var(--text-dark); display: flex; flex-direction: column; min-height: 100vh; }
 
-        /* HEADER */
         header { background-color: var(--brand-blue); color: var(--text-light); padding: 1rem 2rem; border-bottom: 5px solid var(--brand-yellow); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         header h1 { font-size: 1.5rem; font-weight: 500; }
 
-        /* MAIN */
-        main { flex: 1; padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .tabs-nav { display: flex; background: white; padding: 0 2rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1rem; }
+        .tab-button { padding: 1rem 2rem; border: none; background: none; font-size: 1rem; font-weight: 500; color: var(--text-dark); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s; }
+        .tab-button:hover { background-color: #f0f0f0; }
+        .tab-button.active { color: var(--brand-blue); border-bottom: 3px solid var(--brand-blue); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        main { flex: 1; padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; }
         .section-title { font-size: 1.2rem; color: var(--brand-blue); margin-bottom: 1rem; border-left: 4px solid var(--brand-yellow); padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* UPLOAD */
         .upload-container { background: white; padding: 2rem; border-radius: 4px; border: 1px solid var(--border-color); text-align: center; margin-bottom: 2rem; transition: border-color 0.3s; }
         .upload-container:hover { border-color: var(--brand-blue); }
         input[type="file"] { display: none; }
         .custom-file-upload { display: inline-block; padding: 12px 24px; cursor: pointer; background-color: var(--brand-blue); color: white; font-weight: 500; border-radius: 2px; transition: background 0.3s; }
         .custom-file-upload:hover { opacity: 0.9; }
 
-        /* DASHBOARD */
-        .dashboard { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; margin-bottom: 2rem; }
-        @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
-        .card-box { background: white; padding: 1.5rem; border-radius: 4px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
-
-        /* CHART & LEGEND */
-        .chart-wrapper { position: relative; height: 250px; width: 100%; display: flex; justify-content: center; margin-bottom: 1rem; }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; margin-bottom: 2rem; }
+        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
         
+        .card-box { background: white; padding: 1.5rem; border-radius: 4px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+        .chart-wrapper { position: relative; height: 300px; width: 100%; display: flex; justify-content: center; margin-bottom: 1rem; }
         .custom-legend { display: flex; justify-content: center; gap: 25px; margin-top: 15px; flex-wrap: wrap; }
         .legend-item { text-align: center; font-family: var(--font-legend); }
         .legend-color { width: 12px; height: 12px; display: inline-block; border-radius: 50%; margin-right: 6px; position: relative; top: 1px;}
-        .legend-label { font-size: 1rem; color: #444; font-weight: 400; display: block; margin-bottom: 2px; }
-        .legend-percent { font-size: 1.1rem; font-weight: 400; color: #333; display: block; }
-
-        /* FILTERS */
-        .filters-container { background: var(--bg-light); border-radius: 4px; margin-bottom: 1rem; border: 1px solid var(--border-color); overflow: hidden; }
-        .filters-row-top { padding: 1rem; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 15px; border-bottom: 1px solid #e1e4e8; align-items: end; }
-        @media (max-width: 768px) { .filters-row-top { grid-template-columns: 1fr; } }
-        .filters-row-bottom { padding: 10px 1rem; background-color: #eef2f8; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
         
-        .filter-group { display: flex; flex-direction: column; gap: 4px; }
-        .filter-group label { font-size: 0.75rem; font-weight: 500; color: #666; text-transform: uppercase; }
-        .filter-select, .filter-input { padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-dark); font-size: 0.85rem; outline: none; width: 100%; background: white; }
-        .filter-select:focus, .filter-input:focus { border-color: var(--brand-blue); }
-        .date-inputs { display: flex; align-items: center; gap: 10px; }
-        .filter-input-date { padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.85rem; outline: none; color: var(--text-dark); }
-        .filter-input-date:focus { border-color: var(--brand-blue); }
-        .btn-reset { background: none; border: 1px solid var(--brand-blue); color: var(--brand-blue); padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
-        .btn-reset:hover { background: var(--brand-blue); color: white; }
-
-        /* COMMENTS LIST */
+        .filters-container { background: var(--bg-light); border-radius: 4px; margin-bottom: 1rem; border: 1px solid var(--border-color); overflow: hidden; padding: 1rem; }
+        .filter-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 10px; align-items: end; }
+        .filter-select, .filter-input { padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; width: 100%; font-family: inherit; }
+        
         .comments-list { background: white; border: 1px solid var(--border-color); border-radius: 4px; max-height: 500px; overflow-y: auto; }
         .comment-item { padding: 1rem; border-bottom: 1px solid var(--bg-light); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
-        .comment-item:last-child { border-bottom: none; }
-        .comment-content { flex: 1; }
-        .comment-meta { font-size: 0.85rem; color: #666; margin-bottom: 0.5rem; display: flex; gap: 10px; align-items: center; }
         .sentiment-badge { padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; color: white; }
         .sentiment-positive { background-color: var(--success); }
         .sentiment-neutral { background-color: var(--warning); color: #333; }
         .sentiment-negative { background-color: var(--danger); }
-        .platform-icon-small { width: 14px; height: 14px; fill: #666; margin-right: 4px; vertical-align: middle; }
 
-        /* BUTTONS */
-        .btn { border: none; padding: 8px 16px; font-size: 0.8rem; cursor: pointer; border-radius: 2px; font-weight: 500; transition: all 0.2s; text-transform: uppercase; white-space: nowrap; }
-        .btn-editor { background-color: var(--bg-light); color: var(--brand-blue); border: 1px solid var(--brand-blue); }
-        .btn-editor:hover { background-color: var(--brand-blue); color: white; }
-        .btn-download { background-color: var(--brand-yellow); color: var(--brand-blue); }
-        
-        /* Stile Tasto Copia */
-        .btn-copy { background-color: white; color: var(--brand-blue); border: 1px solid var(--brand-blue); margin-right: 10px; }
-        .btn-copy:hover { background-color: #e6f0ff; }
-
-        /* MODAL */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
         .modal-content { background-color: white; padding: 2rem; border-radius: 4px; width: 90%; max-width: 600px; border-top: 5px solid var(--brand-blue); max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
         .close { font-size: 1.5rem; font-weight: bold; cursor: pointer; color: #aaa; }
-        .close:hover { color: var(--text-dark); }
-        .editor-controls { margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-light); border-radius: 4px; }
-        .control-group { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        
+        #cardPreviewContainer, #previewAreaExt { display: flex; justify-content: center; margin-bottom: 1.5rem; padding: 20px; background-color: #e0e0e0; border-radius: 4px; min-height: 300px; align-items: center; }
+        
+        .social-card { 
+            background: white; 
+            width: 100%; 
+            max-width: 450px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            font-family: 'Roboto', sans-serif; 
+            position: relative; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column;
+            text-align: left;
+        }
+        
+        .social-card .card-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 25px 25px 10px 25px; }
+        .social-card .card-icon { width: 24px; height: 24px; fill: var(--brand-blue); flex-shrink: 0; margin-right: 10px; }
+        .social-card .card-icon-fa { font-size: 24px; color: var(--brand-blue); margin-right: 10px; }
+        .social-card .card-date { font-size: 0.8rem; color: #999; margin-left: auto; white-space: nowrap; }
 
-        /* PREVIEW CARD */
-        #cardPreviewContainer { display: flex; justify-content: center; margin-bottom: 1.5rem; padding: 20px; background-color: #e0e0e0; border-radius: 4px; }
-        .social-card { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-family: 'Roboto', sans-serif; display: flex; flex-direction: column; gap: 15px; position: relative; overflow: hidden; transition: all 0.3s ease; }
+        .social-card .card-body { padding: 10px 25px 20px 25px; font-size: 1.1rem; line-height: 1.5; color: #222; flex-grow: 1; }
+        /* Removed card-media-badge style as requested */
+        
+        .card-custom-image { width: 100%; height: auto; border-radius: 4px; margin-bottom: 15px; display: block; object-fit: cover; max-height: 250px; }
+
+        .social-card .card-footer { 
+            margin-top: auto; 
+            border-top: 1px solid #eee; 
+            padding: 15px 25px; 
+            font-size: 0.9rem; 
+            font-weight: 500; 
+            color: var(--brand-blue); 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
         .social-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background-color: var(--brand-blue); }
-        .card-header { display: flex; align-items: center; justify-content: space-between; }
-        .card-icon { width: 24px; height: 24px; fill: var(--brand-blue); }
-        .card-date { font-size: 0.8rem; color: #999; font-weight: 400; }
-        .card-body { font-size: 1.1rem; line-height: 1.5; color: #222; }
-        .card-footer { margin-top: auto; border-top: 1px solid #eee; padding-top: 10px; font-size: 0.9rem; font-weight: 500; color: var(--brand-blue); min-height: 20px; }
+        .sentiment-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-left: 5px; }
+
+        [contenteditable="true"] { cursor: text; border: 1px dashed transparent; transition: all 0.2s; min-width: 20px; display: inline-block; }
+        [contenteditable="true"]:hover, [contenteditable="true"]:focus { background-color: rgba(237, 220, 1, 0.2); border-color: #999; border-radius: 3px; }
+        .edit-hint { text-align: center; font-size: 0.85rem; color: #666; margin-bottom: 10px; font-style: italic; }
+
+        .btn { border: none; padding: 8px 16px; font-size: 0.8rem; cursor: pointer; border-radius: 2px; font-weight: 500; text-transform: uppercase; transition: all 0.2s; }
+        .btn-editor { background-color: var(--bg-light); color: var(--brand-blue); border: 1px solid var(--brand-blue); }
+        .btn-editor:hover { background-color: var(--brand-blue); color: white; }
+        .btn-download { background-color: var(--brand-yellow); color: var(--brand-blue); }
+        .btn-link { background: none; color: var(--brand-blue); text-decoration: underline; border: none; padding: 0; font-size: 0.9rem; cursor: pointer; }
+        .btn-upload-img { background-color: #e2e6ea; color: #333; margin-right: 10px; }
+        .btn-upload-img:hover { background-color: #dbe0e5; }
+        
+        .nav-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .toggle-group { display: flex; gap: 15px; margin-bottom: 10px; font-size: 0.9rem; flex-wrap: wrap; }
+        .toggle-item { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+
         .hidden { display: none !important; }
 
-        /* Icone */
         .icon-fb path { fill: #1877F2; }
         .icon-ig path { fill: #E4405F; }
         .icon-tw path { fill: #000000; }
-        .icon-generic path { fill: var(--brand-blue); }
-
+        
         footer { margin-top: auto; background-color: white; border-top: 1px solid var(--border-color); padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #888; display: flex; justify-content: space-between; }
-        .app-version { font-family: monospace; background: var(--bg-light); padding: 2px 6px; border-radius: 3px; color: var(--brand-blue); font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Social Sentiment Analyzer</h1>
+    <h1>Social Sentiment Dashboard</h1>
     <div style="width: 40px; height: 40px; background-color: var(--brand-yellow);"></div>
 </header>
 
-<main>
-    <section class="upload-container">
-        <h2 style="margin-bottom: 15px; color: var(--brand-blue);">Importazione Dati</h2>
-        <p style="margin-bottom: 20px; color: #666;">Carica i file <strong>Excel (.xlsx)</strong> o <strong>CSV</strong>.<br>Il sistema cercherà automaticamente il foglio con i commenti.</p>
-        <label for="fileInput" class="custom-file-upload" id="uploadBtnLabel">
-            Seleziona File
-        </label>
-        <input type="file" id="fileInput" accept=".xlsx, .xls, .csv" multiple>
-        <p id="fileCount" style="margin-top: 10px; font-size: 0.9rem; color: var(--brand-blue);"></p>
-        <p id="errorMsg" style="margin-top: 10px; font-size: 0.9rem; color: var(--danger); display:none;"></p>
-    </section>
+<div class="tabs-nav">
+    <button class="tab-button active" onclick="switchTab('proprietary')">Canali social proprietari</button>
+    <button class="tab-button" onclick="switchTab('external')">Web e social esterni</button>
+</div>
 
-    <div id="appContent" class="hidden">
-        <div class="dashboard">
-            <div class="card-box">
-                <h3 class="section-title">Sentiment Overview</h3>
-                <div style="margin-bottom: 1rem;">
-                    <strong>Totale Commenti:</strong> <span id="totalComments">0</span>
+<main>
+    <div id="tab-proprietary" class="tab-content active">
+        <section class="upload-container">
+            <h2 style="margin-bottom: 15px; color: var(--brand-blue);">Importazione Dati Proprietari</h2>
+            <p style="margin-bottom: 20px; color: #666;">Carica file Excel (.xlsx) o CSV. Supporto multi-file.</p>
+            <label for="fileInputProp" class="custom-file-upload" id="uploadLabelProp">Seleziona File</label>
+            <input type="file" id="fileInputProp" accept=".xlsx, .xls, .csv" multiple>
+            <p id="fileCountProp" style="margin-top: 10px; font-size: 0.9rem; color: var(--brand-blue);"></p>
+        </section>
+
+        <div id="appContentProp" class="hidden">
+            <div class="dashboard-grid">
+                <div class="card-box">
+                    <h3 class="section-title">Sentiment Overview</h3>
+                    <div style="margin-bottom: 1rem;"><strong>Totale Commenti:</strong> <span id="totalCommentsProp">0</span></div>
+                    <div class="chart-wrapper">
+                        <canvas id="sentimentChartProp"></canvas>
+                    </div>
+                    <div id="legendProp" class="custom-legend"></div>
                 </div>
-                <div class="chart-wrapper">
-                    <canvas id="sentimentChart"></canvas>
+                
+                <div class="card-box">
+                    <h3 class="section-title" style="margin-bottom: 10px;">Feed Commenti</h3>
+                    <div class="filters-container">
+                        <div class="filter-row">
+                            <div><label>Cerca</label><input type="text" id="filterTextProp" class="filter-input"></div>
+                            <div>
+                                <label>Sentiment</label>
+                                <select id="filterSentimentProp" class="filter-select">
+                                    <option value="all">Tutti</option>
+                                    <option value="positive">Positivi</option>
+                                    <option value="neutral">Neutri</option>
+                                    <option value="negative">Negativi</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Canale</label>
+                                <select id="filterPlatformProp" class="filter-select">
+                                    <option value="all">Tutti</option>
+                                    <option value="facebook">Facebook</option>
+                                    <option value="instagram">Instagram</option>
+                                    <option value="twitter">X (Twitter)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comments-list" id="commentsListProp"></div>
                 </div>
-                <div id="customLegend" class="custom-legend"></div>
             </div>
-            
+        </div>
+    </div>
+
+    <div id="tab-external" class="tab-content">
+        <section class="upload-container">
+            <h2 style="margin-bottom: 15px; color: var(--brand-blue);">Importazione Web & Social Esterni</h2>
+            <p style="margin-bottom: 20px; color: #666;">Carica Export Excel (es. formato standard)</p>
+            <label for="fileInputExt" class="custom-file-upload" id="uploadLabelExt">Carica Export Esterno</label>
+            <input type="file" id="fileInputExt" accept=".xlsx, .xls, .csv">
+        </section>
+
+        <div id="dashboardExt" class="dashboard-grid hidden">
+            <div class="left-column">
+                <div class="card-box" style="margin-bottom: 2rem;">
+                    <h3 class="section-title">Sentiment Analysis</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="sentimentChartExt"></canvas>
+                    </div>
+                    <div id="legendExt" class="custom-legend"></div>
+                </div>
+                <div class="card-box">
+                    <h3 class="section-title">Canali / Sorgenti</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="channelChartExt"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <div class="card-box">
-                <h3 class="section-title" style="margin-bottom: 10px;">Feed Commenti</h3>
+                <h3 class="section-title">Editor Card Evoluto</h3>
                 
                 <div class="filters-container">
-                    <div class="filters-row-top">
-                        <div class="filter-group">
-                            <label>Cerca nel testo</label>
-                            <input type="text" id="filterText" class="filter-input" placeholder="Scrivi per cercare...">
+                    <div class="filter-row" style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <label><i class="fas fa-search"></i> Cerca nel testo</label>
+                            <input type="text" id="searchExt" class="filter-input" placeholder="Cerca parole chiave o autori...">
                         </div>
-                        <div class="filter-group">
-                            <label>Sentiment</label>
-                            <select id="filterSentiment" class="filter-select">
+                    </div>
+                    
+                    <div class="filter-row">
+                        <div><label>Sentiment</label>
+                            <select id="filterSentExt" class="filter-select">
                                 <option value="all">Tutti</option>
                                 <option value="positive">Positivi</option>
                                 <option value="neutral">Neutri</option>
                                 <option value="negative">Negativi</option>
                             </select>
                         </div>
-                        <div class="filter-group">
-                            <label>Canale</label>
-                            <select id="filterPlatform" class="filter-select">
-                                <option value="all">Tutti</option>
-                                <option value="facebook">Facebook</option>
-                                <option value="instagram">Instagram</option>
-                                <option value="twitter">X (Twitter)</option>
+                        <div><label>Canale</label>
+                            <select id="filterChanExt" class="filter-select"><option value="all">Tutti</option></select>
+                        </div>
+                        <div><label>Ordina per</label>
+                            <select id="sortExt" class="filter-select">
+                                <option value="dateDesc">Data (Recenti)</option>
+                                <option value="likesDesc">Engagement (Like/Reaz.)</option>
+                                <option value="followersDesc">Followers (Alti)</option>
+                                <option value="viewsDesc">Page Views</option>
                             </select>
                         </div>
-                        <div class="filter-group">
-                            <label>Ordina per</label>
-                            <select id="sortOrder" class="filter-select">
-                                <option value="dateDesc">Data (Più recenti)</option>
-                                <option value="dateAsc">Data (Meno recenti)</option>
-                                <option value="lenDesc">Lunghezza (Lungo-Corto)</option>
-                                <option value="lenAsc">Lunghezza (Corto-Lungo)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="filters-row-bottom">
-                        <div class="date-inputs">
-                            <label style="font-size: 0.75rem; font-weight: 500; color: #666; text-transform: uppercase;">Periodo:</label>
-                            <input type="date" id="dateStart" class="filter-input-date" placeholder="Da">
-                            <span style="font-size: 0.8rem; color:#666;">-</span>
-                            <input type="date" id="dateEnd" class="filter-input-date" placeholder="A">
-                        </div>
-                        <button class="btn-reset" id="resetFiltersBtn">Reset Filtri</button>
                     </div>
                 </div>
 
-                <div class="comments-list" id="commentsList"></div>
+                <div class="nav-controls">
+                    <button id="prevExt" class="btn btn-editor"><i class="fas fa-chevron-left"></i></button>
+                    <span id="counterExt">0 / 0</span>
+                    <button id="nextExt" class="btn btn-editor"><i class="fas fa-chevron-right"></i></button>
+                </div>
+
+                <div class="toggle-group">
+                    <label class="toggle-item"><input type="checkbox" id="showAuthorExt" checked> Mostra Autore</label>
+                    <label class="toggle-item"><input type="checkbox" id="showOrigAuthorExt" checked> Mostra Fonte Orig.</label>
+                    <label class="toggle-item"><input type="checkbox" id="showLikesExt" checked> Mostra Like</label>
+                    <label class="toggle-item"><input type="checkbox" id="showFollowersExt" checked> Mostra Follower</label>
+                </div>
+
+                <div style="margin-bottom: 10px; display:flex; justify-content: flex-end; align-items:center;">
+                    <label for="imgUploadExt" class="btn btn-upload-img" style="cursor:pointer;"><i class="fas fa-image"></i> Carica Immagine</label>
+                    <input type="file" id="imgUploadExt" accept="image/*" style="display:none;">
+                    <a href="#" id="linkExt" target="_blank" class="btn-link">Apri Post Originale <i class="fas fa-external-link-alt"></i></a>
+                </div>
+
+                <p class="edit-hint"><i class="fas fa-pen"></i> Clicca sui testi dell'anteprima per modificarli</p>
+                <div id="previewAreaExt">
+                    </div>
+
+                <div style="text-align: center; margin-top: 15px;">
+                    <button id="dlBtnExt" class="btn btn-download">Scarica Card</button>
+                </div>
             </div>
         </div>
     </div>
@@ -215,453 +299,641 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v1.7.0 Clipboard</span>
+    <span class="app-version">v3.4 No-Labels</span>
 </footer>
 
-<div id="editorModal" class="modal">
+<div id="editorModalProp" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2 style="color: var(--brand-blue);">Editor Card Social</h2>
-            <span class="close" id="closeModal">&times;</span>
+            <span class="close" id="closeModalProp">&times;</span>
         </div>
-        <div class="editor-controls">
-            <div class="control-group">
-                <input type="checkbox" id="toggleAuthor" checked>
-                <label for="toggleAuthor" style="cursor: pointer;">Mostra Nome Autore</label>
-            </div>
+        <div style="margin-bottom: 1rem;">
+            <input type="checkbox" id="toggleAuthorProp" checked> <label for="toggleAuthorProp">Mostra Nome Autore</label>
         </div>
         <div id="cardPreviewContainer">
-            <div class="social-card" id="captureCard">
+            <div class="social-card" id="captureCardProp">
                 <div class="card-header">
-                    <svg class="card-icon" id="cardIcon" viewBox="0 0 24 24">
-                        <path d=""/>
-                    </svg>
-                    <span class="card-date" id="cardDate">DD/MM/YYYY HH:MM</span>
+                    <div style="display:flex; align-items:center;">
+                        <svg class="card-icon" id="cardIconProp" viewBox="0 0 24 24"><path d=""/></svg>
+                    </div>
+                    <span class="card-date" id="cardDateProp">DD/MM/YYYY</span>
                 </div>
-                <div class="card-body" id="cardText">Testo...</div>
-                <div class="card-footer" id="cardAuthor">Nome Autore</div>
+                <div class="card-body">
+                    <div id="cardTextProp">Testo...</div>
+                </div>
+                <div class="card-footer">
+                    <div id="cardAuthorProp">Nome Autore</div>
+                    <div>Canale Proprietario</div>
+                </div>
             </div>
         </div>
-        <div style="text-align: right;">
-            <button class="btn btn-copy" id="copyCardBtn">Copia Immagine</button>
-            <button class="btn btn-download" id="downloadCardBtn">Scarica Card</button>
+        <div style="text-align: right; margin-top: 15px;">
+            <button class="btn btn-download" id="dlBtnProp">Scarica Card</button>
         </div>
     </div>
 </div>
 
 <script>
-    // --- SETUP & VARS ---
-    let allComments = [];
-    let displayedComments = [];
-    let myChart = null;
+    // Register the plugin to ensure labels appear
+    Chart.register(ChartDataLabels);
 
-    // DOM Elements
-    const fileInput = document.getElementById('fileInput');
-    const uploadLabel = document.getElementById('uploadBtnLabel');
-    const fileCountDisplay = document.getElementById('fileCount');
-    const errorMsg = document.getElementById('errorMsg');
-    const appContent = document.getElementById('appContent');
-    const commentsList = document.getElementById('commentsList');
-    const totalCommentsSpan = document.getElementById('totalComments');
-    const customLegend = document.getElementById('customLegend');
-
-    // Filter DOM Elements
-    const filterText = document.getElementById('filterText');
-    const filterSentiment = document.getElementById('filterSentiment');
-    const filterPlatform = document.getElementById('filterPlatform');
-    const sortOrder = document.getElementById('sortOrder');
-    const dateStart = document.getElementById('dateStart');
-    const dateEnd = document.getElementById('dateEnd');
-    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
-    
-    // Modal & Editor
-    const modal = document.getElementById('editorModal');
-    const closeModal = document.getElementById('closeModal');
-    const toggleAuthor = document.getElementById('toggleAuthor');
-    const cardAuthor = document.getElementById('cardAuthor');
-    const cardText = document.getElementById('cardText');
-    const cardDate = document.getElementById('cardDate');
-    const cardIcon = document.getElementById('cardIcon');
-    const downloadBtn = document.getElementById('downloadCardBtn');
-    const copyBtn = document.getElementById('copyCardBtn'); // Nuovo
-    const captureArea = document.getElementById('captureCard');
-
-    // Icons Paths
+    // --- ICONS PATHS ---
     const icons = {
         facebook: "M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.15 5.96C15.21 5.96 16.12 6.04 16.12 6.04V8.51H15.01C13.77 8.51 13.38 9.28 13.38 10.07V12.06H16.15L15.71 14.96H13.38V21.96C18.16 21.21 21.82 17.06 21.82 12.06C21.82 6.53 17.32 2.04 12 2.04Z",
         instagram: "M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4C4,18.39 5.61,20 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6C20,5.61 18.39,4 16.4,4H7.6M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z",
-        twitter: "M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z",
+        twitter: "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z",
         default: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"
     };
 
-    // --- HELPER DATE ---
-    function parseDate(dateInput) {
-        let d;
-        if (typeof dateInput === 'number') {
-            const excelEpoch = new Date(1899, 11, 30);
-            d = new Date(excelEpoch.getTime() + dateInput * 86400000);
-        } else if (typeof dateInput === 'string') {
-            const parts = dateInput.split(/[\/\-\s:]/);
-            if (dateInput.includes('/')) {
-                const day = parseInt(parts[0], 10);
-                const month = parseInt(parts[1], 10) - 1;
-                const year = parseInt(parts[2], 10);
-                const hour = parseInt(parts[3], 10) || 0;
-                const min = parseInt(parts[4], 10) || 0;
-                d = new Date(year, month, day, hour, min);
-            } else {
-                d = new Date(dateInput);
-            }
-        } else {
-            d = new Date(dateInput);
-        }
-        return d;
+    // --- UTILS ---
+    function switchTab(name) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        document.querySelectorAll('.tab-button')[name === 'proprietary' ? 0 : 1].classList.add('active');
     }
 
-    function formatDate(dateObj) {
-        if (isNaN(dateObj.getTime())) return "N/A";
-        return dateObj.toLocaleString('it-IT', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' });
+    function formatCompactNumber(number) {
+        if (!number || isNaN(number)) return "0";
+        return Intl.NumberFormat('en-US', {
+            notation: "compact",
+            maximumFractionDigits: 1
+        }).format(number);
     }
 
-    function getPlatformFromLink(link) {
-        if (!link) return 'other';
-        link = String(link).toLowerCase();
-        if (link.includes('facebook')) return 'facebook';
-        if (link.includes('instagram')) return 'instagram';
-        if (link.includes('twitter') || link.includes('x.com')) return 'twitter';
-        return 'other';
+    function formatItalianDate(dateObj) {
+        if (!dateObj || isNaN(dateObj.getTime())) return "N/D";
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+        const hours = String(dateObj.getHours()).padStart(2, '0');
+        const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+        return `${day}/${month}/${year} ${hours}:${minutes}`;
     }
 
-    function getPlatformIconPath(platform) {
-        if (platform === 'facebook') return icons.facebook;
-        if (platform === 'instagram') return icons.instagram;
-        if (platform === 'twitter') return icons.twitter;
-        return icons.default;
-    }
-
-    // --- FILE HANDLING ---
-    fileInput.addEventListener('change', (e) => {
-        const files = e.target.files;
-        if (files.length === 0) return;
-
-        uploadLabel.innerText = "Analisi in corso...";
-        errorMsg.style.display = 'none';
+    function dlCanvas(elementId) {
+        const el = document.getElementById(elementId);
+        const editables = el.querySelectorAll('[contenteditable="true"]');
+        editables.forEach(e => e.setAttribute('contenteditable', 'false'));
         
-        allComments = [];
-        let filesProcessed = 0;
+        html2canvas(el, { scale: 2 }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `social-card-${Date.now()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+            editables.forEach(e => e.setAttribute('contenteditable', 'true'));
+        });
+    }
 
+    // ==========================================
+    // LOGICA TAB 1: PROPRIETARI
+    // ==========================================
+    let propComments = [];
+    let propChart = null;
+
+    document.getElementById('fileInputProp').addEventListener('change', function(e) {
+        const files = e.target.files;
+        if(files.length === 0) return;
+        propComments = [];
+        let loaded = 0;
+        document.getElementById('uploadLabelProp').innerText = "Caricamento...";
+        
         Array.from(files).forEach(file => {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const data = new Uint8Array(e.target.result);
+            reader.onload = (evt) => {
                 try {
-                    const workbook = XLSX.read(data, {type: 'array'});
+                    const workbook = XLSX.read(evt.target.result, {type: 'array'});
+                    let sheetName = workbook.SheetNames.find(n => n.toLowerCase().includes('comment')) || workbook.SheetNames[0];
+                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {defval:""});
                     
-                    let targetSheetName = workbook.SheetNames.find(name => 
-                        name.toLowerCase().includes('comment') || name.toLowerCase().includes('replies')
-                    );
-
-                    let jsonData = null;
-                    if (targetSheetName) {
-                        jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[targetSheetName], { defval: "" });
-                        if (!checkColumns(jsonData)) jsonData = null;
-                    }
-
-                    if (!jsonData) {
-                        for (const name of workbook.SheetNames) {
-                            const temp = XLSX.utils.sheet_to_json(workbook.Sheets[name], { defval: "" });
-                            if (checkColumns(temp)) {
-                                jsonData = temp;
-                                break;
+                    json.forEach(row => {
+                        if(row['Comment Message']) {
+                            let d = new Date();
+                            if(row['Created Time']) {
+                                 if (typeof row['Created Time'] === 'number') {
+                                    d = new Date((row['Created Time'] - (25567 + 2)) * 86400 * 1000);
+                                 } else {
+                                     d = new Date(row['Created Time']);
+                                 }
                             }
+                            let plat = 'other';
+                            if(row['Comment Link']) {
+                                if(row['Comment Link'].includes('facebook')) plat = 'facebook';
+                                if(row['Comment Link'].includes('instagram')) plat = 'instagram';
+                                if(row['Comment Link'].includes('twitter')) plat = 'twitter';
+                            }
+                            propComments.push({
+                                msg: row['Comment Message'],
+                                sent: row['Sentiment'] || 'Neutral',
+                                date: d,
+                                author: row['Comment User Name'] || 'Utente',
+                                platform: plat
+                            });
                         }
-                    }
-
-                    if (jsonData) processData(jsonData, file.name);
-
-                } catch (error) {
-                    console.error("Errore lettura file:", file.name, error);
+                    });
+                } catch (err) {
+                    console.error("Errore lettura file proprietario", err);
                 }
-                
-                filesProcessed++;
-                if (filesProcessed === files.length) {
-                    finalizeUpload();
-                }
+                loaded++;
+                if(loaded === files.length) initPropDashboard();
             };
             reader.readAsArrayBuffer(file);
         });
     });
 
-    function checkColumns(data) {
-        if (!data || data.length === 0) return false;
-        return data.some(row => row['Comment Message'] && row['Sentiment']);
+    function initPropDashboard() {
+        document.getElementById('uploadLabelProp').innerText = "Fatto!";
+        document.getElementById('fileCountProp').innerText = `${propComments.length} commenti caricati.`;
+        document.getElementById('appContentProp').classList.remove('hidden');
+        updatePropUI();
     }
 
-    function processData(data, filename) {
-        data.forEach(row => {
-            const msg = row['Comment Message'];
-            const sent = row['Sentiment'];
-
-            if (msg && sent) {
-                const d = parseDate(row['Created Time']);
-                const platform = getPlatformFromLink(row['Comment Link']);
-                
-                const comment = {
-                    message: String(msg),
-                    sentiment: String(sent),
-                    dateObj: d,
-                    author: row['Comment User Name'] || 'Utente',
-                    link: row['Comment Link'] || '',
-                    platform: platform,
-                    sourceFile: filename
-                };
-
-                allComments.push(comment);
-            }
-        });
-    }
-
-    function finalizeUpload() {
-        if (allComments.length > 0) {
-            updateUI();
-            uploadLabel.innerText = "Fatto!";
-            fileCountDisplay.innerText = `Analisi completata: ${allComments.length} commenti trovati.`;
-        } else {
-            errorMsg.innerText = "Errore: Nessun commento valido trovato.";
-            errorMsg.style.display = 'block';
-            uploadLabel.innerText = "Riprova";
-        }
-        setTimeout(() => { 
-            if(uploadLabel.innerText === "Fatto!") uploadLabel.innerText = "Seleziona File"; 
-        }, 2000);
-    }
-
-    // --- MAIN UI LOGIC ---
-    function updateUI() {
-        appContent.classList.remove('hidden');
-        applyFilters(); 
-    }
-
-    resetFiltersBtn.addEventListener('click', () => {
-        filterText.value = '';
-        filterSentiment.value = 'all';
-        filterPlatform.value = 'all';
-        sortOrder.value = 'dateDesc';
-        dateStart.value = '';
-        dateEnd.value = '';
-        applyFilters();
+    ['filterTextProp', 'filterSentimentProp', 'filterPlatformProp'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updatePropUI);
     });
 
-    [filterText, filterSentiment, filterPlatform, sortOrder, dateStart, dateEnd].forEach(el => {
-        el.addEventListener('input', applyFilters);
-        el.addEventListener('change', applyFilters);
-    });
+    function updatePropUI() {
+        const txt = document.getElementById('filterTextProp').value.toLowerCase();
+        const sent = document.getElementById('filterSentimentProp').value;
+        const plat = document.getElementById('filterPlatformProp').value;
 
-    function applyFilters() {
-        displayedComments = allComments.filter(c => {
-            const searchText = filterText.value.toLowerCase();
-            if (searchText && !c.message.toLowerCase().includes(searchText)) return false;
-
-            const s = c.sentiment.toLowerCase();
-            const fSent = filterSentiment.value;
-            if (fSent === 'positive' && !s.includes('positive')) return false;
-            if (fSent === 'negative' && !s.includes('negative')) return false;
-            if (fSent === 'neutral' && !s.includes('neutral')) return false;
-
-            if (filterPlatform.value !== 'all' && c.platform !== filterPlatform.value) return false;
-
-            if (dateStart.value) {
-                const start = new Date(dateStart.value);
-                if (c.dateObj < start) return false;
-            }
-            if (dateEnd.value) {
-                const end = new Date(dateEnd.value);
-                end.setHours(23,59,59);
-                if (c.dateObj > end) return false;
-            }
-
+        const filtered = propComments.filter(c => {
+            if(txt && !c.msg.toLowerCase().includes(txt)) return false;
+            if(sent !== 'all' && !c.sent.toLowerCase().includes(sent)) return false;
+            if(plat !== 'all' && c.platform !== plat) return false;
             return true;
         });
 
-        const order = sortOrder.value;
-        displayedComments.sort((a, b) => {
-            if (order === 'dateDesc') return b.dateObj - a.dateObj;
-            if (order === 'dateAsc') return a.dateObj - b.dateObj;
-            if (order === 'lenDesc') return b.message.length - a.message.length;
-            if (order === 'lenAsc') return a.message.length - b.message.length;
-            return 0;
-        });
-
-        totalCommentsSpan.innerText = displayedComments.length;
-        renderCommentsList();
-        renderChart(); 
+        document.getElementById('totalCommentsProp').innerText = filtered.length;
+        renderPropList(filtered);
+        renderPropChart(filtered);
     }
 
-    function renderCommentsList() {
-        commentsList.innerHTML = '';
-        displayedComments.forEach((comment, index) => {
+    function renderPropList(list) {
+        const container = document.getElementById('commentsListProp');
+        container.innerHTML = '';
+        list.slice(0, 100).forEach((c, idx) => {
+            let badge = 'sentiment-neutral';
+            if(c.sent.toLowerCase().includes('positive')) badge = 'sentiment-positive';
+            if(c.sent.toLowerCase().includes('negative')) badge = 'sentiment-negative';
+            
             const div = document.createElement('div');
             div.className = 'comment-item';
-            
-            let badgeClass = 'sentiment-neutral';
-            const s = comment.sentiment.toLowerCase();
-            if (s.includes('positive')) badgeClass = 'sentiment-positive';
-            if (s.includes('negative')) badgeClass = 'sentiment-negative';
-
-            const iconPath = getPlatformIconPath(comment.platform);
-            
             div.innerHTML = `
-                <div class="comment-content">
-                    <div class="comment-meta">
-                        <span class="sentiment-badge ${badgeClass}">${comment.sentiment}</span>
-                        <span>
-                            <svg class="platform-icon-small" viewBox="0 0 24 24"><path d="${iconPath}"/></svg>
-                            ${formatDate(comment.dateObj).split(',')[0]}
-                        </span>
+                <div>
+                    <div style="font-size:0.8rem; color:#666; margin-bottom:5px;">
+                        <span class="sentiment-badge ${badge}">${c.sent}</span>
+                        ${formatItalianDate(c.date)} - ${c.author}
                     </div>
-                    <p>${comment.message.substring(0, 150)}${comment.message.length > 150 ? '...' : ''}</p>
+                    <div>${c.msg.substring(0, 120)}...</div>
                 </div>
-                <button class="btn btn-editor" onclick="openEditor(${index})">Editor</button>
+                <button class="btn btn-editor" onclick="openPropModal(${propComments.indexOf(c)})">Editor</button>
             `;
-            commentsList.appendChild(div);
+            container.appendChild(div);
         });
     }
 
-    function renderChart() {
-        const ctx = document.getElementById('sentimentChart').getContext('2d');
-        if (myChart) myChart.destroy();
-
+    function renderPropChart(list) {
+        const ctx = document.getElementById('sentimentChartProp').getContext('2d');
+        if(propChart) propChart.destroy();
+        
         let counts = { Positive: 0, Neutral: 0, Negative: 0 };
-        displayedComments.forEach(c => {
-            const s = c.sentiment.toLowerCase();
-            if (s.includes('positive')) counts.Positive++;
-            else if (s.includes('negative')) counts.Negative++;
+        list.forEach(c => {
+            let s = c.sent.toLowerCase();
+            if(s.includes('positive')) counts.Positive++;
+            else if(s.includes('negative')) counts.Negative++;
             else counts.Neutral++;
         });
-
-        const total = counts.Positive + counts.Neutral + counts.Negative;
         
-        const pPos = total ? Math.round((counts.Positive / total) * 100) : 0;
-        const pNeu = total ? Math.round((counts.Neutral / total) * 100) : 0;
-        const pNeg = total ? Math.round((counts.Negative / total) * 100) : 0;
+        const total = list.length || 1;
+        const percs = [
+            Math.round(counts.Positive/total*100),
+            Math.round(counts.Neutral/total*100),
+            Math.round(counts.Negative/total*100)
+        ];
 
-        const cPos = '#28a745';
-        const cNeu = '#ffc107';
-        const cNeg = '#dc3545';
-
-        myChart = new Chart(ctx, {
+        propChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: ['Positivo', 'Neutro', 'Negativo'],
                 datasets: [{
                     data: [counts.Positive, counts.Neutral, counts.Negative],
-                    backgroundColor: [cPos, cNeu, cNeg],
-                    borderWidth: 0,
-                    hoverOffset: 4
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                    borderWidth: 0
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { enabled: true }
-                },
-                cutout: '50%'
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: {display: false}, datalabels: { display: false } }, 
+                cutout: '60%' 
             }
         });
 
-        customLegend.innerHTML = `
-            <div class="legend-item">
-                <span class="legend-label"><span class="legend-color" style="background:${cPos}"></span>Positivo</span>
-                <span class="legend-percent">${pPos}%</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-label"><span class="legend-color" style="background:${cNeu}"></span>Neutro</span>
-                <span class="legend-percent">${pNeu}%</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-label"><span class="legend-color" style="background:${cNeg}"></span>Negativo</span>
-                <span class="legend-percent">${pNeg}%</span>
+        document.getElementById('legendProp').innerHTML = `
+            <div class="legend-item"><span class="legend-color" style="background:#28a745"></span>Positivo ${percs[0]}%</div>
+            <div class="legend-item"><span class="legend-color" style="background:#ffc107"></span>Neutro ${percs[1]}%</div>
+            <div class="legend-item"><span class="legend-color" style="background:#dc3545"></span>Negativo ${percs[2]}%</div>
+        `;
+    }
+
+    const modalProp = document.getElementById('editorModalProp');
+    function openPropModal(idx) {
+        const c = propComments[idx];
+        document.getElementById('cardTextProp').innerText = c.msg;
+        document.getElementById('cardAuthorProp').innerText = c.author;
+        document.getElementById('cardDateProp').innerText = formatItalianDate(c.date);
+        
+        const path = icons[c.platform] || icons.default;
+        const svgPath = document.querySelector('#cardIconProp path');
+        svgPath.setAttribute('d', path);
+        
+        if(c.platform === 'facebook') svgPath.style.fill = '#1877F2';
+        else if(c.platform === 'instagram') svgPath.style.fill = '#E4405F';
+        else if(c.platform === 'twitter') svgPath.style.fill = '#000000';
+        else svgPath.style.fill = '#0146bc';
+
+        modalProp.style.display = 'flex';
+    }
+    document.getElementById('closeModalProp').onclick = () => modalProp.style.display = 'none';
+    document.getElementById('toggleAuthorProp').onchange = (e) => {
+        document.getElementById('cardAuthorProp').style.display = e.target.checked ? 'block' : 'none';
+    };
+    document.getElementById('dlBtnProp').onclick = () => dlCanvas('captureCardProp');
+
+
+    // ==========================================
+    // LOGICA TAB 2: ESTERNI
+    // ==========================================
+    let extData = [];
+    let extFiltered = [];
+    let extIdx = 0;
+    let extCharts = {};
+    let currentCardImage = null; // Per l'immagine manuale
+
+    document.getElementById('fileInputExt').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        
+        document.getElementById('uploadLabelExt').innerText = "Analisi in corso...";
+
+        reader.onload = (evt) => {
+            try {
+                const wb = XLSX.read(evt.target.result, {type:'array'});
+                const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+                processExtData(json);
+                document.getElementById('uploadLabelExt').innerText = "Carica Export Esterno";
+            } catch(err) {
+                alert("Errore nella lettura del file. Verifica il formato.");
+                console.error(err);
+                document.getElementById('uploadLabelExt').innerText = "Errore - Riprova";
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+    function processExtData(json) {
+        extData = json.map(row => {
+            // ROBUST DATE PARSING
+            let rawDate = new Date();
+            const pub = row['published'];
+            if(pub) {
+                if(typeof pub === 'number') {
+                    // Excel serial date
+                    rawDate = new Date((pub - (25567 + 2)) * 86400 * 1000);
+                } else if(typeof pub === 'string') {
+                    // Try parsing "YYYY-MM-DD HH:mm:ss" or similar
+                    let d = new Date(pub);
+                    // If invalid, try replacing common separators
+                    if(isNaN(d.getTime())) {
+                        d = new Date(pub.replace(/-/g, '/'));
+                    }
+                    if(!isNaN(d.getTime())) {
+                        rawDate = d;
+                    }
+                }
+            }
+            
+            let sourceRaw = row['source_type'] || 'WEB';
+            let channel = 'Web/News';
+            let iconClass = 'fas fa-globe';
+            let isSocial = false; 
+            
+            if(sourceRaw.includes('TWITTER')) { channel = 'X (Twitter)'; iconClass = 'fab fa-twitter'; isSocial = true; }
+            else if(sourceRaw.includes('FACEBOOK')) { channel = 'Facebook'; iconClass = 'fab fa-facebook'; isSocial = true; }
+            else if(sourceRaw.includes('INSTAGRAM')) { channel = 'Instagram'; iconClass = 'fab fa-instagram'; isSocial = true; }
+            else if(sourceRaw.includes('YOUTUBE')) { channel = 'YouTube'; iconClass = 'fab fa-youtube'; isSocial = true; }
+            else if(sourceRaw.includes('LINKEDIN')) { channel = 'LinkedIn'; iconClass = 'fab fa-linkedin'; isSocial = true; }
+            else if(sourceRaw.includes('BLUESKY')) { channel = 'BlueSky'; iconClass = 'fas fa-cloud'; isSocial = true; }
+
+            let rawAuthor = "Autore Sconosciuto";
+            const name = row['extra_author_attributes.name'];
+            const shortName = row['extra_author_attributes.short_name'];
+            const sourceName = row['extra_source_attributes.name'];
+
+            if (name && String(name).trim() !== "") rawAuthor = name;
+            else if (shortName) rawAuthor = shortName;
+            else if (sourceName) rawAuthor = sourceName;
+
+            let displayAuthor = rawAuthor;
+            let subAuthor = null; 
+
+            if (!isSocial && row['host_url']) {
+                let host = String(row['host_url']).trim();
+                host = host.replace(/^https?:\/\//, '');
+                host = host.replace(/^www\./, '');
+                let parts = host.split('.');
+                let mainPart = parts[0]; 
+                
+                if(mainPart.length > 0) {
+                    mainPart = mainPart.charAt(0).toUpperCase() + mainPart.slice(1);
+                    displayAuthor = mainPart;
+                    subAuthor = rawAuthor; 
+                }
+            }
+
+            let likes = parseInt(row['engagement'] || 0);
+            let followers = 0;
+            if (channel === 'Facebook') {
+                 followers = parseInt(row['source_extended_attributes.facebook_followers'] || row['reach'] || 0);
+            } else {
+                 followers = parseInt(row['reach'] || 0);
+            }
+            
+            let retweets = parseInt(row['article_extended_attributes.twitter_retweets'] || 0);
+            
+            let pvSem = parseInt(row['source_extended_attributes.semrush_pageviews'] || 0);
+            let pvAle = parseInt(row['source_extended_attributes.alexa_pageviews'] || 0);
+            let pageviews = Math.max(pvSem, pvAle);
+
+            let sentVal = parseInt(row['sentiment'] || 0);
+            let sentiment = 'Neutro';
+            if(sentVal > 0) sentiment = 'Positivo';
+            if(sentVal < 0) sentiment = 'Negativo';
+
+            return {
+                date: rawDate,
+                content: row['content'] || row['title'] || '',
+                author: displayAuthor,
+                subAuthor: subAuthor,
+                channel: channel,
+                isSocial: isSocial,
+                iconClass: iconClass,
+                likes: likes,
+                followers: followers,
+                retweets: retweets,
+                pageviews: pageviews,
+                sentimentVal: sentVal,
+                sentiment: sentiment,
+                mediaType: row['post_type'] || 'TEXT',
+                url: row['url'] || '#'
+            };
+        });
+
+        const channels = [...new Set(extData.map(d => d.channel))].sort();
+        const sel = document.getElementById('filterChanExt');
+        sel.innerHTML = '<option value="all">Tutti</option>';
+        channels.forEach(c => {
+            let opt = document.createElement('option');
+            opt.value = c; opt.innerText = c;
+            sel.appendChild(opt);
+        });
+
+        document.getElementById('dashboardExt').classList.remove('hidden');
+        updateExtUI();
+    }
+
+    // Event listeners
+    ['filterSentExt', 'filterChanExt', 'sortExt'].forEach(id => {
+        document.getElementById(id).addEventListener('change', updateExtUI);
+    });
+    
+    // Search input listener
+    document.getElementById('searchExt').addEventListener('input', updateExtUI);
+
+    ['showAuthorExt', 'showOrigAuthorExt', 'showLikesExt', 'showFollowersExt'].forEach(id => {
+        document.getElementById(id).addEventListener('change', updateExtCard);
+    });
+
+    document.getElementById('imgUploadExt').addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                currentCardImage = evt.target.result;
+                updateExtCard();
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    document.getElementById('prevExt').onclick = () => { extIdx--; currentCardImage = null; updateExtCard(); };
+    document.getElementById('nextExt').onclick = () => { extIdx++; currentCardImage = null; updateExtCard(); };
+    document.getElementById('dlBtnExt').onclick = () => dlCanvas('captureCardExt');
+
+    function updateExtUI() {
+        const sFilter = document.getElementById('filterSentExt').value;
+        const cFilter = document.getElementById('filterChanExt').value;
+        const sort = document.getElementById('sortExt').value;
+        const searchText = document.getElementById('searchExt').value.toLowerCase();
+
+        extFiltered = extData.filter(d => {
+            // Search Text Filter
+            if (searchText && !d.content.toLowerCase().includes(searchText) && !d.author.toLowerCase().includes(searchText)) {
+                return false;
+            }
+
+            let targetS = 'all';
+            if(sFilter === 'positive') targetS = 'Positivo';
+            if(sFilter === 'neutral') targetS = 'Neutro';
+            if(sFilter === 'negative') targetS = 'Negativo';
+
+            if(targetS !== 'all' && d.sentiment !== targetS) return false;
+            if(cFilter !== 'all' && d.channel !== cFilter) return false;
+            return true;
+        });
+
+        if(sort === 'dateDesc') extFiltered.sort((a,b) => b.date - a.date);
+        if(sort === 'likesDesc') extFiltered.sort((a,b) => b.likes - a.likes);
+        if(sort === 'followersDesc') extFiltered.sort((a,b) => b.followers - a.followers);
+        if(sort === 'viewsDesc') extFiltered.sort((a,b) => b.pageviews - a.pageviews);
+
+        extIdx = 0;
+        currentCardImage = null; // reset image on filter change
+        updateExtCharts();
+        updateExtCard();
+    }
+
+    function updateExtCharts() {
+        const ctxS = document.getElementById('sentimentChartExt').getContext('2d');
+        if(extCharts.sent) extCharts.sent.destroy();
+
+        let counts = { Positivo: 0, Neutro: 0, Negativo: 0 };
+        extFiltered.forEach(d => { counts[d.sentiment]++; });
+        
+        const total = extFiltered.length || 1;
+        const percs = [
+            Math.round(counts.Positivo/total*100),
+            Math.round(counts.Neutro/total*100),
+            Math.round(counts.Negativo/total*100)
+        ];
+
+        extCharts.sent = new Chart(ctxS, {
+            type: 'doughnut',
+            data: {
+                labels: ['Positivo', 'Neutro', 'Negativo'],
+                datasets: [{
+                    data: [counts.Positivo, counts.Neutro, counts.Negativo],
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                    borderWidth: 0
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: {display: false}, datalabels: { display: false } }, 
+                cutout: '60%' 
+            }
+        });
+
+        document.getElementById('legendExt').innerHTML = `
+            <div class="legend-item"><span class="legend-color" style="background:#28a745"></span>Positivo ${percs[0]}%</div>
+            <div class="legend-item"><span class="legend-color" style="background:#ffc107"></span>Neutro ${percs[1]}%</div>
+            <div class="legend-item"><span class="legend-color" style="background:#dc3545"></span>Negativo ${percs[2]}%</div>
+        `;
+
+        const ctxC = document.getElementById('channelChartExt').getContext('2d');
+        if(extCharts.chan) extCharts.chan.destroy();
+        
+        let chanCounts = {};
+        extFiltered.forEach(d => { chanCounts[d.channel] = (chanCounts[d.channel]||0)+1; });
+        
+        let sortedEntries = Object.entries(chanCounts).sort((a,b) => b[1] - a[1]);
+        let labels = sortedEntries.map(e => e[0]);
+        let dataVals = sortedEntries.map(e => e[1]);
+
+        const gradient = ctxC.createLinearGradient(0, 400, 0, 0); 
+        gradient.addColorStop(0, '#b0c8f8'); 
+        gradient.addColorStop(1, '#c5d5f8'); 
+
+        extCharts.chan = new Chart(ctxC, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Post',
+                    data: dataVals,
+                    backgroundColor: gradient, 
+                    borderRadius: 4,
+                    barPercentage: 0.9, 
+                    categoryPercentage: 0.9 
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    datalabels: {
+                        display: true, // Force display
+                        anchor: 'end',
+                        align: 'end',
+                        offset: 4,
+                        color: '#666',
+                        font: { family: 'Avenir', weight: 'bold', size: 14 },
+                        formatter: function(value) { return formatCompactNumber(value); } 
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } }, 
+                    y: { display: false, grid: { display: false } } 
+                },
+                layout: { padding: { top: 25 } } 
+            }
+        });
+    }
+
+    function updateExtCard() {
+        if(extIdx < 0) extIdx = 0;
+        if(extIdx >= extFiltered.length) extIdx = Math.max(0, extFiltered.length - 1);
+        
+        document.getElementById('counterExt').innerText = extFiltered.length ? `${extIdx+1} / ${extFiltered.length}` : "0 / 0";
+        const container = document.getElementById('previewAreaExt');
+        
+        if(!extFiltered.length) {
+            container.innerHTML = "Nessun dato.";
+            return;
+        }
+
+        const d = extFiltered[extIdx];
+        const showAuthor = document.getElementById('showAuthorExt').checked;
+        const showOrigAuthor = document.getElementById('showOrigAuthorExt').checked;
+        const showLikes = document.getElementById('showLikesExt').checked;
+        const showFollowers = document.getElementById('showFollowersExt').checked;
+
+        const actualShowLikes = showLikes && (d.likes >= 50);
+        const actualShowFollowers = showFollowers && (d.followers >= 50);
+
+        document.getElementById('linkExt').href = d.url;
+
+        let sentColor = '#ffc107';
+        if(d.sentimentVal > 0) sentColor = '#28a745';
+        if(d.sentimentVal < 0) sentColor = '#dc3545';
+
+        let followerLabel = d.isSocial ? 'Followers' : 'Audience';
+
+        let iconHtml = `<i class="${d.iconClass} card-icon-fa"></i>`;
+        if(d.channel.includes('X (Twitter)')) {
+            iconHtml = `<svg class="card-icon" viewBox="0 0 24 24"><path d="${icons.twitter}"/></svg>`;
+        }
+
+        const imageHtml = currentCardImage ? `<img src="${currentCardImage}" class="card-custom-image">` : '';
+
+        // Retweets display logic (hidden if < 50 for consistency, enabled if showLikes is true)
+        let retweetHtml = '';
+        if (d.channel.includes('X') && actualShowLikes && d.retweets >= 50) {
+             retweetHtml = `
+                <div style="font-weight:bold; color:#17bf63; display:flex; align-items:center; gap:5px;">
+                    <i class="fas fa-retweet"></i> ${formatCompactNumber(d.retweets)}
+                </div>
+             `;
+        }
+
+        container.innerHTML = `
+            <div class="social-card" id="captureCardExt">
+                <div class="card-header">
+                    <div style="display:flex; align-items:center;">
+                        ${iconHtml}
+                        <span style="font-weight:bold; color:var(--brand-blue);" contenteditable="true">${d.channel}</span>
+                    </div>
+                    <span class="card-date" contenteditable="true">${formatItalianDate(d.date)}</span>
+                </div>
+                
+                <div class="card-body">
+                    ${imageHtml}
+                    <div style="font-size:1.1rem; line-height:1.6;" contenteditable="true">${d.content.substring(0, 350)}${d.content.length>350?'...':''}</div>
+                </div>
+                
+                <div class="card-footer">
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                        ${showAuthor ? `<span style="font-weight:bold; font-size:1.3rem;" contenteditable="true">${d.author}</span>` : ''}
+                        ${(d.subAuthor && showOrigAuthor) ? `<span style="font-size:0.85rem; color:#999;" contenteditable="true">${d.subAuthor}</span>` : ''}
+                        ${actualShowFollowers ? `<span style="font-size:0.8rem; opacity:0.8; margin-top:3px;">${followerLabel}: ${formatCompactNumber(d.followers)}</span>` : ''}
+                    </div>
+                    
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        ${retweetHtml}
+                        ${actualShowLikes ? `
+                        <div style="font-weight:bold; color:#e0245e; display:flex; align-items:center; gap:5px;">
+                            <i class="fas fa-heart"></i> ${formatCompactNumber(d.likes)}
+                        </div>` : ''}
+                    </div>
+                </div>
             </div>
         `;
     }
 
-    // --- EDITOR MODAL ---
-    function openEditor(index) {
-        const comment = displayedComments[index];
-        
-        cardText.innerText = comment.message;
-        cardDate.innerText = formatDate(comment.dateObj);
-        cardAuthor.innerText = comment.author;
-        
-        const path = getPlatformIconPath(comment.platform);
-        const pathElem = cardIcon.querySelector('path');
-        pathElem.setAttribute('d', path);
-        
-        if (comment.platform === 'facebook') pathElem.style.fill = '#1877F2';
-        else if (comment.platform === 'instagram') pathElem.style.fill = '#E4405F';
-        else if (comment.platform === 'twitter') pathElem.style.fill = '#000000';
-        else pathElem.style.fill = '#0146bc';
-
-        toggleAuthor.checked = true;
-        cardAuthor.style.display = 'block';
-
-        modal.style.display = 'flex';
-    }
-
-    closeModal.onclick = () => { modal.style.display = 'none'; }
-    window.onclick = (event) => { if (event.target == modal) modal.style.display = 'none'; }
-
-    toggleAuthor.addEventListener('change', (e) => {
-        cardAuthor.style.display = e.target.checked ? 'block' : 'none';
-    });
-
-    downloadBtn.addEventListener('click', () => {
-        downloadBtn.innerText = "Generazione...";
-        html2canvas(captureArea, { scale: 2 }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `social-card-${Date.now()}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-            downloadBtn.innerText = "Fatto!";
-            setTimeout(() => downloadBtn.innerText = "Scarica Card", 1500);
-        });
-    });
-
-    // --- NUOVA FUNZIONE COPIA ---
-    copyBtn.addEventListener('click', () => {
-        const originalText = copyBtn.innerText;
-        copyBtn.innerText = "Copia in corso...";
-        
-        html2canvas(captureArea, { scale: 2 }).then(canvas => {
-            canvas.toBlob(blob => {
-                if (!blob) {
-                    alert("Errore nella generazione dell'immagine");
-                    return;
-                }
-                
-                try {
-                    // Clipboard API (Richiede HTTPS o Localhost)
-                    const item = new ClipboardItem({ 'image/png': blob });
-                    navigator.clipboard.write([item]).then(() => {
-                        copyBtn.innerText = "Copiato!";
-                        setTimeout(() => copyBtn.innerText = originalText, 2000);
-                    }).catch(err => {
-                        console.error("Errore copia clipboard: ", err);
-                        alert("Impossibile copiare negli appunti. Il browser potrebbe non supportarlo o il sito non è sicuro (HTTPS).");
-                        copyBtn.innerText = originalText;
-                    });
-                } catch (err) {
-                    console.error("Errore creazione ClipboardItem: ", err);
-                    alert("Funzione non supportata dal browser.");
-                    copyBtn.innerText = originalText;
-                }
-            });
-        });
-    });
-
 </script>
-
 </body>
 </html>
