@@ -357,7 +357,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v4.9 Validation Update</span>
+    <span class="app-version">v5.0 Live Check URL</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -448,7 +448,8 @@
         </div>
         <div class="form-group">
             <label>URL Originale *</label>
-            <input type="text" id="manUrl" placeholder="https://...">
+            <input type="text" id="manUrl" placeholder="https://..." oninput="checkUrlDuplicate()">
+            <small id="urlWarning" style="color: var(--danger); display: none; font-weight: bold; margin-top: 5px;"></small>
         </div>
         <div style="text-align: right; margin-top: 20px;">
             <button class="btn btn-download" id="saveManualBtn" onclick="saveManualPost()">Aggiungi al Dataset</button>
@@ -998,6 +999,10 @@
         document.getElementById('manFollowers').value = 0;
         document.getElementById('manUrl').value = '';
         
+        // Reset warnings
+        document.getElementById('urlWarning').style.display = 'none';
+        document.getElementById('manUrl').style.borderColor = 'var(--border-color)';
+        
         document.getElementById('saveManualBtn').innerText = "Aggiungi al Dataset";
         manualModal.style.display = 'flex';
     }
@@ -1022,11 +1027,45 @@
         document.getElementById('manFollowers').value = item.followers;
         document.getElementById('manUrl').value = item.url;
         
+        // Reset warnings
+        document.getElementById('urlWarning').style.display = 'none';
+        document.getElementById('manUrl').style.borderColor = 'var(--border-color)';
+        
         document.getElementById('saveManualBtn').innerText = "Salva Modifiche";
         manualModal.style.display = 'flex';
     };
 
     function closeManualModal() { manualModal.style.display = 'none'; }
+
+    // --- LIVE URL DUPLICATE CHECK ---
+    function checkUrlDuplicate() {
+        const urlInput = document.getElementById('manUrl');
+        const warningEl = document.getElementById('urlWarning');
+        const urlVal = urlInput.value.trim().toLowerCase();
+
+        if(urlVal.length < 5) {
+            warningEl.style.display = 'none';
+            urlInput.style.borderColor = 'var(--border-color)';
+            return;
+        }
+
+        // Need to exclude current item if editing
+        let searchPool = extData;
+        if(isEditing && editTargetItem) {
+            searchPool = extData.filter(i => i !== editTargetItem);
+        }
+
+        const found = searchPool.find(d => d.url.trim().toLowerCase() === urlVal);
+
+        if(found) {
+            warningEl.innerText = `⚠️ Attenzione: Questo Link esiste già nel database (Autore: ${found.author})`;
+            warningEl.style.display = 'block';
+            urlInput.style.borderColor = 'var(--danger)';
+        } else {
+            warningEl.style.display = 'none';
+            urlInput.style.borderColor = 'var(--border-color)';
+        }
+    }
 
     function saveManualPost() {
         let content = document.getElementById('manContent').value;
@@ -1061,7 +1100,7 @@
         else if(chLower.includes('youtube')) { iconClass = 'fab fa-youtube'; isSocial = true; }
         else if(chLower.includes('tiktok')) { iconClass = 'fab fa-tiktok'; isSocial = true; }
 
-        // --- ENHANCED DUPLICATE CHECK ---
+        // --- ENHANCED DUPLICATE CHECK (ON SAVE) ---
         const nContent = content.trim().toLowerCase();
         const nAuthor = author.trim().toLowerCase();
         const nUrl = urlStr.trim().toLowerCase();
