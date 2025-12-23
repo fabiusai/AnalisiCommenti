@@ -34,6 +34,10 @@
 
         header { background-color: var(--brand-blue); color: var(--text-light); padding: 1rem 2rem; border-bottom: 5px solid var(--brand-yellow); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         header h1 { font-size: 1.5rem; font-weight: 500; }
+        
+        .header-actions { display: flex; gap: 10px; }
+        .btn-header { background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; transition: background 0.2s; }
+        .btn-header:hover { background-color: rgba(255,255,255,0.4); }
 
         .tabs-nav { display: flex; background: white; padding: 0 2rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1rem; }
         .tab-button { padding: 1rem 2rem; border: none; background: none; font-size: 1rem; font-weight: 500; color: var(--text-dark); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s; }
@@ -46,11 +50,14 @@
         main { flex: 1; padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; }
         .section-title { font-size: 1.2rem; color: var(--brand-blue); margin-bottom: 1rem; border-left: 4px solid var(--brand-yellow); padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .upload-container { background: white; padding: 2rem; border-radius: 4px; border: 1px solid var(--border-color); text-align: center; margin-bottom: 2rem; transition: border-color 0.3s; }
+        .upload-container { background: white; padding: 2rem; border-radius: 4px; border: 1px solid var(--border-color); text-align: center; margin-bottom: 2rem; transition: border-color 0.3s; position: relative; }
         .upload-container:hover { border-color: var(--brand-blue); }
         input[type="file"] { display: none; }
-        .custom-file-upload { display: inline-block; padding: 12px 24px; cursor: pointer; background-color: var(--brand-blue); color: white; font-weight: 500; border-radius: 2px; transition: background 0.3s; }
+        .custom-file-upload { display: inline-block; padding: 12px 24px; cursor: pointer; background-color: var(--brand-blue); color: white; font-weight: 500; border-radius: 2px; transition: background 0.3s; margin: 5px; }
         .custom-file-upload:hover { opacity: 0.9; }
+        
+        .btn-secondary { background-color: white; color: var(--brand-blue); border: 1px solid var(--brand-blue); padding: 10px 20px; font-weight: 500; border-radius: 2px; cursor: pointer; margin: 5px; }
+        .btn-secondary:hover { background-color: #f0f8ff; }
 
         .dashboard-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; margin-bottom: 2rem; }
         @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
@@ -115,7 +122,6 @@
         }
         
         .social-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background-color: var(--brand-blue); }
-        .sentiment-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-left: 5px; }
 
         [contenteditable="true"] { cursor: text; border: 1px dashed transparent; transition: all 0.2s; min-width: 20px; display: inline-block; }
         [contenteditable="true"]:hover, [contenteditable="true"]:focus { background-color: rgba(237, 220, 1, 0.2); border-color: #999; border-radius: 3px; }
@@ -135,6 +141,12 @@
 
         .hidden { display: none !important; }
 
+        /* Form Styles for Manual Entry */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
         .icon-fb path { fill: #1877F2; }
         .icon-ig path { fill: #E4405F; }
         .icon-tw path { fill: #000000; }
@@ -145,8 +157,14 @@
 <body>
 
 <header>
-    <h1>Social Sentiment Dashboard</h1>
-    <div style="width: 40px; height: 40px; background-color: var(--brand-yellow);"></div>
+    <div>
+        <h1>Social Sentiment Dashboard</h1>
+    </div>
+    <div class="header-actions">
+        <button class="btn-header" onclick="exportFullState()"><i class="fas fa-save"></i> Salva Backup Completo</button>
+        <label for="importFullStateInput" class="btn-header"><i class="fas fa-upload"></i> Ripristina Backup</label>
+        <input type="file" id="importFullStateInput" accept=".json" style="display:none" onchange="importFullState(this)">
+    </div>
 </header>
 
 <div class="tabs-nav">
@@ -209,22 +227,39 @@
     <div id="tab-external" class="tab-content">
         <section class="upload-container">
             <h2 style="margin-bottom: 15px; color: var(--brand-blue);">Importazione Web & Social Esterni</h2>
-            <p style="margin-bottom: 20px; color: #666;">Carica Export Excel (es. formato standard)</p>
-            <label for="fileInputExt" class="custom-file-upload" id="uploadLabelExt">Carica Export Esterno</label>
-            <input type="file" id="fileInputExt" accept=".xlsx, .xls, .csv">
+            <p style="margin-bottom: 20px; color: #666;">Carica Export Excel, Importa JSON integrativo o aggiungi manualmente.</p>
+            
+            <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;">
+                <label for="fileInputExt" class="custom-file-upload" id="uploadLabelExt"><i class="fas fa-file-excel"></i> Carica Export Excel</label>
+                <input type="file" id="fileInputExt" accept=".xlsx, .xls, .csv">
+                
+                <label for="importJsonExt" class="btn-secondary" style="display:inline-flex; align-items:center; gap:5px; height: 42px; margin-top:5px;">
+                    <i class="fas fa-file-code"></i> Importa JSON
+                </label>
+                <input type="file" id="importJsonExt" accept=".json" style="display:none" onchange="importExtJSON(this)">
+                
+                <button class="btn-secondary" onclick="openManualModal()" style="height: 42px; margin-top:5px;">
+                    <i class="fas fa-plus-circle"></i> Aggiungi Manuale
+                </button>
+
+                <button class="btn-secondary" onclick="exportExtJSON()" style="height: 42px; margin-top:5px;">
+                    <i class="fas fa-download"></i> Esporta JSON (Integrazioni)
+                </button>
+            </div>
         </section>
 
         <div id="dashboardExt" class="dashboard-grid hidden">
             <div class="left-column">
                 <div class="card-box" style="margin-bottom: 2rem;">
                     <h3 class="section-title">Sentiment Analysis</h3>
+                    <div style="margin-bottom: 1rem;"><strong>Totale Contenuti:</strong> <span id="totalContentExt">0</span></div>
                     <div class="chart-wrapper">
                         <canvas id="sentimentChartExt"></canvas>
                     </div>
                     <div id="legendExt" class="custom-legend"></div>
                 </div>
                 <div class="card-box">
-                    <h3 class="section-title">Canali / Sorgenti</h3>
+                    <h3 class="section-title">Canali e siti</h3>
                     <div class="chart-wrapper">
                         <canvas id="channelChartExt"></canvas>
                     </div>
@@ -298,7 +333,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v3.5 Followers-Fixed</span>
+    <span class="app-version">v4.0 Enhanced Integration</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -329,6 +364,68 @@
         </div>
         <div style="text-align: right; margin-top: 15px;">
             <button class="btn btn-download" id="dlBtnProp">Scarica Card</button>
+        </div>
+    </div>
+</div>
+
+<div id="manualModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="color: var(--brand-blue);">Aggiungi Post Manualmente</h2>
+            <span class="close" onclick="closeManualModal()">&times;</span>
+        </div>
+        <div class="form-group">
+            <label>Testo del Post *</label>
+            <textarea id="manContent" rows="4"></textarea>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Data *</label>
+                <input type="datetime-local" id="manDate">
+            </div>
+            <div class="form-group">
+                <label>Canale / Sito *</label>
+                <input type="text" id="manChannel" list="channelListHint" placeholder="Es. Facebook, Repubblica.it">
+                <datalist id="channelListHint">
+                    <option value="Facebook">
+                    <option value="Instagram">
+                    <option value="X (Twitter)">
+                    <option value="LinkedIn">
+                    <option value="YouTube">
+                    <option value="Web/News">
+                </datalist>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Autore</label>
+                <input type="text" id="manAuthor" placeholder="Nome autore o pagina">
+            </div>
+            <div class="form-group">
+                <label>Sentiment</label>
+                <select id="manSentiment">
+                    <option value="0">Neutro</option>
+                    <option value="1">Positivo</option>
+                    <option value="-1">Negativo</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Likes / Engagement</label>
+                <input type="number" id="manLikes" value="0">
+            </div>
+            <div class="form-group">
+                <label>Followers / Reach</label>
+                <input type="number" id="manFollowers" value="0">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>URL Originale</label>
+            <input type="text" id="manUrl" placeholder="https://...">
+        </div>
+        <div style="text-align: right; margin-top: 20px;">
+            <button class="btn btn-download" onclick="saveManualPost()">Aggiungi al Dataset</button>
         </div>
     </div>
 </div>
@@ -383,6 +480,18 @@
             link.click();
             editables.forEach(e => e.setAttribute('contenteditable', 'true'));
         });
+    }
+
+    function generateHash(content, date, author) {
+        // Create a simple signature string
+        const str = (content + (date ? date.toISOString() : '') + author).toLowerCase().replace(/\s/g, '');
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return hash;
     }
 
     // ==========================================
@@ -576,25 +685,26 @@
         if(!file) return;
         const reader = new FileReader();
         
-        document.getElementById('uploadLabelExt').innerText = "Analisi in corso...";
+        document.getElementById('uploadLabelExt').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analisi in corso...';
 
         reader.onload = (evt) => {
             try {
                 const wb = XLSX.read(evt.target.result, {type:'array'});
                 const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-                processExtData(json);
-                document.getElementById('uploadLabelExt').innerText = "Carica Export Esterno";
+                const processed = processRawExtData(json);
+                handleDuplicateImport(processed);
+                document.getElementById('uploadLabelExt').innerHTML = '<i class="fas fa-check"></i> Fatto';
             } catch(err) {
                 alert("Errore nella lettura del file. Verifica il formato.");
                 console.error(err);
-                document.getElementById('uploadLabelExt').innerText = "Errore - Riprova";
+                document.getElementById('uploadLabelExt').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Errore';
             }
         };
         reader.readAsArrayBuffer(file);
     });
 
-    function processExtData(json) {
-        extData = json.map(row => {
+    function processRawExtData(json) {
+        return json.map(row => {
             // ROBUST DATE PARSING
             let rawDate = new Date();
             const pub = row['published'];
@@ -676,10 +786,12 @@
             let sentiment = 'Neutro';
             if(sentVal > 0) sentiment = 'Positivo';
             if(sentVal < 0) sentiment = 'Negativo';
+            
+            const content = row['content'] || row['title'] || '';
 
             return {
                 date: rawDate,
-                content: row['content'] || row['title'] || '',
+                content: content,
                 author: displayAuthor,
                 subAuthor: subAuthor,
                 channel: channel,
@@ -692,22 +804,205 @@
                 sentimentVal: sentVal,
                 sentiment: sentiment,
                 mediaType: row['post_type'] || 'TEXT',
-                url: row['url'] || '#'
+                url: row['url'] || '#',
+                hash: generateHash(content, rawDate, displayAuthor)
             };
         });
+    }
 
+    function handleDuplicateImport(newItems) {
+        if(extData.length === 0) {
+            extData = newItems;
+        } else {
+            // Check for duplicates based on hash
+            const existingHashes = new Set(extData.map(d => d.hash));
+            const uniqueNew = [];
+            let duplicateCount = 0;
+            
+            newItems.forEach(item => {
+                if(existingHashes.has(item.hash)) {
+                    duplicateCount++;
+                } else {
+                    uniqueNew.push(item);
+                }
+            });
+
+            if(duplicateCount > 0) {
+                if(confirm(`Trovati ${duplicateCount} duplicati nel file importato. Vuoi eliminare i doppioni (mantenendo i record esistenti) e importare solo i nuovi?`)) {
+                    extData = [...extData, ...uniqueNew];
+                } else {
+                    // Import all anyway
+                    extData = [...extData, ...newItems];
+                }
+            } else {
+                extData = [...extData, ...newItems];
+            }
+        }
+        
+        refreshExtDashboard();
+    }
+
+    function refreshExtDashboard() {
         const channels = [...new Set(extData.map(d => d.channel))].sort();
         const sel = document.getElementById('filterChanExt');
+        const currentVal = sel.value;
         sel.innerHTML = '<option value="all">Tutti</option>';
         channels.forEach(c => {
             let opt = document.createElement('option');
             opt.value = c; opt.innerText = c;
+            if(c === currentVal) opt.selected = true;
             sel.appendChild(opt);
         });
 
         document.getElementById('dashboardExt').classList.remove('hidden');
         updateExtUI();
     }
+
+    // --- MANUAL ENTRY FUNCTIONS ---
+    const manualModal = document.getElementById('manualModal');
+    function openManualModal() {
+        // Reset form
+        document.getElementById('manContent').value = '';
+        document.getElementById('manDate').value = new Date().toISOString().slice(0,16);
+        document.getElementById('manChannel').value = '';
+        document.getElementById('manAuthor').value = '';
+        document.getElementById('manSentiment').value = "0";
+        document.getElementById('manLikes').value = 0;
+        document.getElementById('manFollowers').value = 0;
+        document.getElementById('manUrl').value = '';
+        manualModal.style.display = 'flex';
+    }
+
+    function closeManualModal() { manualModal.style.display = 'none'; }
+
+    function saveManualPost() {
+        const content = document.getElementById('manContent').value;
+        const dateStr = document.getElementById('manDate').value;
+        const channel = document.getElementById('manChannel').value;
+        if(!content || !dateStr || !channel) {
+            alert("Compila i campi obbligatori (Testo, Data, Canale)");
+            return;
+        }
+
+        const date = new Date(dateStr);
+        const author = document.getElementById('manAuthor').value || "Manuale";
+        const sentVal = parseInt(document.getElementById('manSentiment').value);
+        let sentiment = 'Neutro';
+        if(sentVal > 0) sentiment = 'Positivo';
+        if(sentVal < 0) sentiment = 'Negativo';
+
+        let iconClass = 'fas fa-globe';
+        let isSocial = false;
+        const chLower = channel.toLowerCase();
+        if(chLower.includes('facebook')) { iconClass = 'fab fa-facebook'; isSocial = true; }
+        else if(chLower.includes('twitter') || chLower.includes(' x')) { iconClass = 'fab fa-twitter'; isSocial = true; }
+        else if(chLower.includes('instagram')) { iconClass = 'fab fa-instagram'; isSocial = true; }
+        else if(chLower.includes('linkedin')) { iconClass = 'fab fa-linkedin'; isSocial = true; }
+        else if(chLower.includes('youtube')) { iconClass = 'fab fa-youtube'; isSocial = true; }
+
+        const newItem = {
+            date: date,
+            content: content,
+            author: author,
+            subAuthor: null,
+            channel: channel,
+            isSocial: isSocial,
+            iconClass: iconClass,
+            likes: parseInt(document.getElementById('manLikes').value) || 0,
+            followers: parseInt(document.getElementById('manFollowers').value) || 0,
+            retweets: 0,
+            pageviews: 0,
+            sentimentVal: sentVal,
+            sentiment: sentiment,
+            mediaType: 'TEXT',
+            url: document.getElementById('manUrl').value || '#',
+            hash: generateHash(content, date, author)
+        };
+
+        handleDuplicateImport([newItem]);
+        closeManualModal();
+    }
+
+    // --- JSON EXPORT / IMPORT (INTEGRATION) ---
+    function exportExtJSON() {
+        if(extData.length === 0) { alert("Nessun dato da esportare"); return; }
+        // Simple export of current external data
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(extData));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href",     dataStr);
+        downloadAnchorNode.setAttribute("download", "integration_export.json");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+    function importExtJSON(input) {
+        const file = input.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const json = JSON.parse(e.target.result);
+                // Restore Date objects
+                const processed = json.map(item => {
+                    item.date = new Date(item.date);
+                    return item;
+                });
+                handleDuplicateImport(processed);
+                alert("Importazione JSON completata!");
+            } catch(err) {
+                console.error(err);
+                alert("Errore file JSON");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // --- FULL STATE BACKUP ---
+    function exportFullState() {
+        const state = {
+            proprietary: propComments,
+            external: extData,
+            timestamp: new Date()
+        };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+        const link = document.createElement('a');
+        link.href = dataStr;
+        link.download = `full_backup_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
+
+    function importFullState(input) {
+        const file = input.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const state = JSON.parse(e.target.result);
+                
+                // Restore Prop
+                if(state.proprietary) {
+                    propComments = state.proprietary.map(c => ({...c, date: new Date(c.date)}));
+                    initPropDashboard();
+                }
+
+                // Restore Ext
+                if(state.external) {
+                    extData = state.external.map(d => ({...d, date: new Date(d.date)}));
+                    refreshExtDashboard();
+                }
+                
+                alert("Backup ripristinato con successo!");
+            } catch(err) {
+                console.error(err);
+                alert("Errore nel file di backup.");
+            }
+        };
+        reader.readAsText(file);
+    }
+
 
     // Event listeners
     ['filterSentExt', 'filterChanExt', 'sortExt'].forEach(id => {
@@ -763,6 +1058,9 @@
         if(sort === 'followersDesc') extFiltered.sort((a,b) => b.followers - a.followers);
         if(sort === 'viewsDesc') extFiltered.sort((a,b) => b.pageviews - a.pageviews);
 
+        // Update Total Count Label
+        document.getElementById('totalContentExt').innerText = extFiltered.length;
+
         extIdx = 0;
         currentCardImage = null; // reset image on filter change
         updateExtCharts();
@@ -807,13 +1105,29 @@
             <div class="legend-item"><span class="legend-color" style="background:#dc3545"></span>Negativo ${percs[2]}%</div>
         `;
 
+        // --- CHANNEL CHART ---
         const ctxC = document.getElementById('channelChartExt').getContext('2d');
         if(extCharts.chan) extCharts.chan.destroy();
         
         let chanCounts = {};
         extFiltered.forEach(d => { chanCounts[d.channel] = (chanCounts[d.channel]||0)+1; });
         
-        let sortedEntries = Object.entries(chanCounts).sort((a,b) => b[1] - a[1]);
+        // AGGREGATION LOGIC: Items < 10 go to "Altro"
+        let aggregatedCounts = {};
+        let otherCount = 0;
+        
+        for (let [channel, count] of Object.entries(chanCounts)) {
+            if (count < 10) {
+                otherCount += count;
+            } else {
+                aggregatedCounts[channel] = count;
+            }
+        }
+        if (otherCount > 0) {
+            aggregatedCounts['Altro'] = otherCount;
+        }
+
+        let sortedEntries = Object.entries(aggregatedCounts).sort((a,b) => b[1] - a[1]);
         let labels = sortedEntries.map(e => e[0]);
         let dataVals = sortedEntries.map(e => e[1]);
 
@@ -840,12 +1154,13 @@
                 plugins: {
                     legend: { display: false },
                     datalabels: {
-                        display: true, // Force display
+                        display: true, 
                         anchor: 'end',
                         align: 'end',
                         offset: 4,
                         color: '#666',
-                        font: { family: 'Avenir', weight: 'bold', size: 14 },
+                        // Font Size Increase
+                        font: { family: 'Avenir', weight: 'bold', size: 16 },
                         formatter: function(value) { return formatCompactNumber(value); } 
                     }
                 },
@@ -882,10 +1197,6 @@
 
         document.getElementById('linkExt').href = d.url;
 
-        let sentColor = '#ffc107';
-        if(d.sentimentVal > 0) sentColor = '#28a745';
-        if(d.sentimentVal < 0) sentColor = '#dc3545';
-
         let followerLabel = d.isSocial ? 'Followers' : 'Audience';
 
         let iconHtml = `<i class="${d.iconClass} card-icon-fa"></i>`;
@@ -895,7 +1206,7 @@
 
         const imageHtml = currentCardImage ? `<img src="${currentCardImage}" class="card-custom-image">` : '';
 
-        // Retweets display logic (hidden if < 50 for consistency, enabled if showLikes is true)
+        // Retweets display logic
         let retweetHtml = '';
         if (d.channel.includes('X') && actualShowLikes && d.retweets >= 50) {
              retweetHtml = `
