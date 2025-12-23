@@ -323,6 +323,7 @@
                     <button id="prevExt" class="btn btn-editor"><i class="fas fa-chevron-left"></i></button>
                     <span id="counterExt">0 / 0</span>
                     <div style="display: flex; gap: 10px;">
+                        <button id="editExt" class="btn btn-secondary" title="Modifica Record"><i class="fas fa-edit"></i></button>
                         <button id="delExt" class="btn btn-danger" title="Elimina Record Corrente"><i class="fas fa-trash-alt"></i></button>
                         <button id="nextExt" class="btn btn-editor"><i class="fas fa-chevron-right"></i></button>
                     </div>
@@ -356,7 +357,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v4.5 Reset Buttons Added</span>
+    <span class="app-version">v4.6 Edit Record Added</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -395,7 +396,7 @@
 <div id="manualModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2 style="color: var(--brand-blue);">Aggiungi Post Manualmente</h2>
+            <h2 style="color: var(--brand-blue);">Dati Post</h2>
             <span class="close" onclick="closeManualModal()">&times;</span>
         </div>
         <div class="form-group">
@@ -450,7 +451,7 @@
             <input type="text" id="manUrl" placeholder="https://...">
         </div>
         <div style="text-align: right; margin-top: 20px;">
-            <button class="btn btn-download" onclick="saveManualPost()">Aggiungi al Dataset</button>
+            <button class="btn btn-download" id="saveManualBtn" onclick="saveManualPost()">Aggiungi al Dataset</button>
         </div>
     </div>
 </div>
@@ -533,20 +534,18 @@
     }
 
     function generateHash(content, date, author) {
-        // Create a simple signature string
         const str = (content + (date ? date.toISOString() : '') + author).toLowerCase().replace(/\s/g, '');
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
             const char = str.charCodeAt(i);
             hash = (hash << 5) - hash + char;
-            hash = hash & hash; // Convert to 32bit integer
+            hash = hash & hash;
         }
         return hash;
     }
 
     // --- PASTE LISTENER FOR IMAGES ---
     document.addEventListener('paste', function(e) {
-        // Only active if we are in External tab (visible dashboard)
         if(document.getElementById('dashboardExt').classList.contains('hidden')) return;
 
         const items = e.clipboardData.items;
@@ -563,7 +562,7 @@
                     setTimeout(() => btn.innerHTML = orig, 1500);
                 };
                 reader.readAsDataURL(blob);
-                e.preventDefault(); // Prevent default paste behavior
+                e.preventDefault(); 
                 break;
             }
         }
@@ -580,7 +579,7 @@
         if(files.length === 0) return;
         
         let loaded = 0;
-        let newBatchItems = []; // Accumulate items from this batch of files
+        let newBatchItems = [];
         document.getElementById('uploadLabelProp').innerText = "Caricamento...";
         
         Array.from(files).forEach(file => {
@@ -678,12 +677,11 @@
             propChart = null;
         }
         
-        document.getElementById('fileInputProp').value = ''; // Reset file input
+        document.getElementById('fileInputProp').value = '';
         document.getElementById('appContentProp').classList.add('hidden');
         document.getElementById('uploadLabelProp').innerText = 'Seleziona File';
         document.getElementById('fileCountProp').innerText = '';
         
-        // Reset modal if open
         document.getElementById('commentsListProp').innerHTML = '';
         document.getElementById('totalCommentsProp').innerText = '0';
     }
@@ -810,7 +808,9 @@
     let extFiltered = [];
     let extIdx = 0;
     let extCharts = {};
-    let currentCardImage = null; // Per l'immagine manuale
+    let currentCardImage = null; 
+    let isEditing = false;
+    let editTargetItem = null;
 
     document.getElementById('fileInputExt').addEventListener('change', function(e) {
         const file = e.target.files[0];
@@ -837,17 +837,13 @@
 
     function processRawExtData(json) {
         return json.map(row => {
-            // ROBUST DATE PARSING
             let rawDate = new Date();
             const pub = row['published'];
             if(pub) {
                 if(typeof pub === 'number') {
-                    // Excel serial date
                     rawDate = new Date((pub - (25567 + 2)) * 86400 * 1000);
                 } else if(typeof pub === 'string') {
-                    // Try parsing "YYYY-MM-DD HH:mm:ss" or similar
                     let d = new Date(pub);
-                    // If invalid, try replacing common separators
                     if(isNaN(d.getTime())) {
                         d = new Date(pub.replace(/-/g, '/'));
                     }
@@ -898,19 +894,16 @@
 
             let likes = parseInt(row['engagement'] || 0);
             
-            // Logic for specific social followers
             let followers = 0;
             if (channel === 'Facebook') followers = row['source_extended_attributes.facebook_followers'];
             else if (channel.includes('X (Twitter)')) followers = row['source_extended_attributes.twitter_followers'];
             else if (channel === 'Instagram') followers = row['source_extended_attributes.instagram_followers'];
             else if (channel === 'YouTube') followers = row['source_extended_attributes.youtube_subscribers'] || row['source_extended_attributes.subscribers'];
             
-            // Fallback
             if (!followers) followers = row['source_extended_attributes.followers'] || row['reach'] || 0;
             followers = parseInt(followers);
             
             let retweets = parseInt(row['article_extended_attributes.twitter_retweets'] || 0);
-            
             let pvSem = parseInt(row['source_extended_attributes.semrush_pageviews'] || 0);
             let pvAle = parseInt(row['source_extended_attributes.alexa_pageviews'] || 0);
             let pageviews = Math.max(pvSem, pvAle);
@@ -947,7 +940,6 @@
         if(extData.length === 0) {
             extData = newItems;
         } else {
-            // Check for duplicates based on hash
             const existingHashes = new Set(extData.map(d => d.hash));
             const uniqueNew = [];
             let duplicateCount = 0;
@@ -964,7 +956,6 @@
                 if(confirm(`Trovati ${duplicateCount} duplicati nel file importato. Vuoi eliminare i doppioni (mantenendo i record esistenti) e importare solo i nuovi?`)) {
                     extData = [...extData, ...uniqueNew];
                 } else {
-                    // Import all anyway
                     extData = [...extData, ...newItems];
                 }
             } else {
@@ -991,10 +982,13 @@
         updateExtUI();
     }
 
-    // --- MANUAL ENTRY FUNCTIONS ---
+    // --- MANUAL ENTRY & EDIT FUNCTIONS ---
     const manualModal = document.getElementById('manualModal');
+    
     function openManualModal() {
-        // Reset form
+        isEditing = false;
+        editTargetItem = null;
+        
         document.getElementById('manContent').value = '';
         document.getElementById('manDate').value = new Date().toISOString().slice(0,16);
         document.getElementById('manChannel').value = '';
@@ -1003,8 +997,34 @@
         document.getElementById('manLikes').value = 0;
         document.getElementById('manFollowers').value = 0;
         document.getElementById('manUrl').value = '';
+        
+        document.getElementById('saveManualBtn').innerText = "Aggiungi al Dataset";
         manualModal.style.display = 'flex';
     }
+
+    document.getElementById('editExt').onclick = function() {
+        if(!extFiltered.length) return;
+        const item = extFiltered[extIdx];
+        editTargetItem = item;
+        isEditing = true;
+
+        document.getElementById('manContent').value = item.content;
+        
+        // Correct date offset for input
+        const d = item.date;
+        const dateString = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0,16);
+        document.getElementById('manDate').value = dateString;
+        
+        document.getElementById('manChannel').value = item.channel;
+        document.getElementById('manAuthor').value = item.author;
+        document.getElementById('manSentiment').value = item.sentimentVal;
+        document.getElementById('manLikes').value = item.likes;
+        document.getElementById('manFollowers').value = item.followers;
+        document.getElementById('manUrl').value = item.url;
+        
+        document.getElementById('saveManualBtn').innerText = "Salva Modifiche";
+        manualModal.style.display = 'flex';
+    };
 
     function closeManualModal() { manualModal.style.display = 'none'; }
 
@@ -1034,26 +1054,46 @@
         else if(chLower.includes('youtube')) { iconClass = 'fab fa-youtube'; isSocial = true; }
         else if(chLower.includes('tiktok')) { iconClass = 'fab fa-tiktok'; isSocial = true; }
 
-        const newItem = {
-            date: date,
-            content: content,
-            author: author,
-            subAuthor: null,
-            channel: channel,
-            isSocial: isSocial,
-            iconClass: iconClass,
-            likes: parseInt(document.getElementById('manLikes').value) || 0,
-            followers: parseInt(document.getElementById('manFollowers').value) || 0,
-            retweets: 0,
-            pageviews: 0,
-            sentimentVal: sentVal,
-            sentiment: sentiment,
-            mediaType: 'TEXT',
-            url: document.getElementById('manUrl').value || '#',
-            hash: generateHash(content, date, author)
-        };
-
-        handleDuplicateImport([newItem]);
+        if(isEditing && editTargetItem) {
+            // Update Existing Record
+            editTargetItem.content = content;
+            editTargetItem.date = date;
+            editTargetItem.channel = channel;
+            editTargetItem.author = author;
+            editTargetItem.sentimentVal = sentVal;
+            editTargetItem.sentiment = sentiment;
+            editTargetItem.likes = parseInt(document.getElementById('manLikes').value) || 0;
+            editTargetItem.followers = parseInt(document.getElementById('manFollowers').value) || 0;
+            editTargetItem.url = document.getElementById('manUrl').value || '#';
+            editTargetItem.iconClass = iconClass;
+            editTargetItem.isSocial = isSocial;
+            editTargetItem.hash = generateHash(content, date, author);
+            
+            // Refresh Dashboard logic (keep same filtered view)
+            refreshExtDashboard();
+        } else {
+            // Create New Record
+            const newItem = {
+                date: date,
+                content: content,
+                author: author,
+                subAuthor: null,
+                channel: channel,
+                isSocial: isSocial,
+                iconClass: iconClass,
+                likes: parseInt(document.getElementById('manLikes').value) || 0,
+                followers: parseInt(document.getElementById('manFollowers').value) || 0,
+                retweets: 0,
+                pageviews: 0,
+                sentimentVal: sentVal,
+                sentiment: sentiment,
+                mediaType: 'TEXT',
+                url: document.getElementById('manUrl').value || '#',
+                hash: generateHash(content, date, author)
+            };
+            handleDuplicateImport([newItem]);
+        }
+        
         closeManualModal();
     }
 
@@ -1064,19 +1104,14 @@
 
         const currentItem = extFiltered[extIdx];
         
-        // Remove from main dataset
         extData = extData.filter(d => d !== currentItem);
-        
-        // Reset image if manually added
         currentCardImage = null;
 
-        // If data is empty, hide dashboard or reset
         if(extData.length === 0) {
             document.getElementById('dashboardExt').classList.add('hidden');
             return;
         }
 
-        // Refresh UI
         refreshExtDashboard();
     };
 
@@ -1106,12 +1141,11 @@
     // --- JSON EXPORT / IMPORT (INTEGRATION) ---
     function exportExtJSON() {
         if(extData.length === 0) { alert("Nessun dato da esportare"); return; }
-        // Simple export of current external data
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(extData));
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href",     dataStr);
         downloadAnchorNode.setAttribute("download", "integration_export.json");
-        document.body.appendChild(downloadAnchorNode); // required for firefox
+        document.body.appendChild(downloadAnchorNode); 
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
     }
@@ -1123,7 +1157,6 @@
         reader.onload = function(e) {
             try {
                 const json = JSON.parse(e.target.result);
-                // Restore Date objects
                 const processed = json.map(item => {
                     item.date = new Date(item.date);
                     return item;
@@ -1161,19 +1194,14 @@
         reader.onload = function(e) {
             try {
                 const state = JSON.parse(e.target.result);
-                
-                // Restore Prop
                 if(state.proprietary) {
                     propComments = state.proprietary.map(c => ({...c, date: new Date(c.date)}));
                     initPropDashboard();
                 }
-
-                // Restore Ext
                 if(state.external) {
                     extData = state.external.map(d => ({...d, date: new Date(d.date)}));
                     refreshExtDashboard();
                 }
-                
                 alert("Backup ripristinato con successo!");
             } catch(err) {
                 console.error(err);
@@ -1183,13 +1211,11 @@
         reader.readAsText(file);
     }
 
-
     // Event listeners
     ['filterSentExt', 'filterChanExt', 'sortExt'].forEach(id => {
         document.getElementById(id).addEventListener('change', updateExtUI);
     });
     
-    // Search input listener
     document.getElementById('searchExt').addEventListener('input', updateExtUI);
 
     ['showAuthorExt', 'showOrigAuthorExt', 'showLikesExt', 'showFollowersExt'].forEach(id => {
@@ -1219,16 +1245,13 @@
         const searchText = document.getElementById('searchExt').value.toLowerCase();
 
         extFiltered = extData.filter(d => {
-            // Search Text Filter
             if (searchText && !d.content.toLowerCase().includes(searchText) && !d.author.toLowerCase().includes(searchText)) {
                 return false;
             }
-
             let targetS = 'all';
             if(sFilter === 'positive') targetS = 'Positivo';
             if(sFilter === 'neutral') targetS = 'Neutro';
             if(sFilter === 'negative') targetS = 'Negativo';
-
             if(targetS !== 'all' && d.sentiment !== targetS) return false;
             if(cFilter !== 'all' && d.channel !== cFilter) return false;
             return true;
@@ -1239,11 +1262,10 @@
         if(sort === 'followersDesc') extFiltered.sort((a,b) => b.followers - a.followers);
         if(sort === 'viewsDesc') extFiltered.sort((a,b) => b.pageviews - a.pageviews);
 
-        // Update Total Count Label
         document.getElementById('totalContentExt').innerText = extFiltered.length;
 
         extIdx = 0;
-        currentCardImage = null; // reset image on filter change
+        currentCardImage = null;
         updateExtCharts();
         updateExtCard();
     }
@@ -1255,13 +1277,6 @@
         let counts = { Positivo: 0, Neutro: 0, Negativo: 0 };
         extFiltered.forEach(d => { counts[d.sentiment]++; });
         
-        const total = extFiltered.length || 1;
-        const percs = [
-            Math.round(counts.Positivo/total*100),
-            Math.round(counts.Neutro/total*100),
-            Math.round(counts.Negativo/total*100)
-        ];
-
         extCharts.sent = new Chart(ctxS, {
             type: 'doughnut',
             data: {
@@ -1281,19 +1296,17 @@
         });
 
         document.getElementById('legendExt').innerHTML = `
-            <div class="legend-item"><span class="legend-color" style="background:#28a745"></span>Positivo ${percs[0]}%</div>
-            <div class="legend-item"><span class="legend-color" style="background:#ffc107"></span>Neutro ${percs[1]}%</div>
-            <div class="legend-item"><span class="legend-color" style="background:#dc3545"></span>Negativo ${percs[2]}%</div>
+            <div class="legend-item"><span class="legend-color" style="background:#28a745"></span>Positivo ${Math.round(counts.Positivo/extFiltered.length*100)||0}%</div>
+            <div class="legend-item"><span class="legend-color" style="background:#ffc107"></span>Neutro ${Math.round(counts.Neutro/extFiltered.length*100)||0}%</div>
+            <div class="legend-item"><span class="legend-color" style="background:#dc3545"></span>Negativo ${Math.round(counts.Negativo/extFiltered.length*100)||0}%</div>
         `;
 
-        // --- CHANNEL CHART ---
         const ctxC = document.getElementById('channelChartExt').getContext('2d');
         if(extCharts.chan) extCharts.chan.destroy();
         
         let chanCounts = {};
         extFiltered.forEach(d => { chanCounts[d.channel] = (chanCounts[d.channel]||0)+1; });
         
-        // AGGREGATION LOGIC: Items < 10 go to "Altro"
         let aggregatedCounts = {};
         let otherCount = 0;
         
@@ -1340,7 +1353,6 @@
                         align: 'end',
                         offset: 4,
                         color: '#666',
-                        // Font Size Increase
                         font: { family: 'Avenir', weight: 'bold', size: 16 },
                         formatter: function(value) { return formatCompactNumber(value); } 
                     }
@@ -1372,7 +1384,6 @@
         const showLikes = document.getElementById('showLikesExt').checked;
         const showFollowers = document.getElementById('showFollowersExt').checked;
 
-        // KPI Logic: Hide if < 50
         const actualShowLikes = showLikes && (d.likes >= 50);
         const actualShowFollowers = showFollowers && (d.followers >= 50);
 
@@ -1387,7 +1398,6 @@
 
         const imageHtml = currentCardImage ? `<img src="${currentCardImage}" class="card-custom-image">` : '';
 
-        // Retweets display logic
         let retweetHtml = '';
         if (d.channel.includes('X') && actualShowLikes && d.retweets >= 50) {
              retweetHtml = `
