@@ -344,7 +344,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v4.3 Copy & Paste Added</span>
+    <span class="app-version">v4.4 Prop. Duplicates Control</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -566,8 +566,9 @@
     document.getElementById('fileInputProp').addEventListener('change', function(e) {
         const files = e.target.files;
         if(files.length === 0) return;
-        propComments = [];
+        
         let loaded = 0;
+        let newBatchItems = []; // Accumulate items from this batch of files
         document.getElementById('uploadLabelProp').innerText = "Caricamento...";
         
         Array.from(files).forEach(file => {
@@ -594,12 +595,17 @@
                                 if(row['Comment Link'].includes('instagram')) plat = 'instagram';
                                 if(row['Comment Link'].includes('twitter')) plat = 'twitter';
                             }
-                            propComments.push({
-                                msg: row['Comment Message'],
+                            
+                            const msg = row['Comment Message'];
+                            const author = row['Comment User Name'] || 'Utente';
+                            
+                            newBatchItems.push({
+                                msg: msg,
                                 sent: row['Sentiment'] || 'Neutral',
                                 date: d,
-                                author: row['Comment User Name'] || 'Utente',
-                                platform: plat
+                                author: author,
+                                platform: plat,
+                                hash: generateHash(msg, d, author)
                             });
                         }
                     });
@@ -607,11 +613,42 @@
                     console.error("Errore lettura file proprietario", err);
                 }
                 loaded++;
-                if(loaded === files.length) initPropDashboard();
+                if(loaded === files.length) {
+                    handlePropDuplicateImport(newBatchItems);
+                }
             };
             reader.readAsArrayBuffer(file);
         });
     });
+
+    function handlePropDuplicateImport(newItems) {
+        if(propComments.length === 0) {
+            propComments = newItems;
+        } else {
+            const existingHashes = new Set(propComments.map(c => c.hash));
+            let duplicateCount = 0;
+            const uniqueNew = [];
+
+            newItems.forEach(item => {
+                if(existingHashes.has(item.hash)) {
+                    duplicateCount++;
+                } else {
+                    uniqueNew.push(item);
+                }
+            });
+
+            if(duplicateCount > 0) {
+                if(confirm(`Trovati ${duplicateCount} duplicati nel file proprietario. Vuoi eliminare i doppioni (mantenendo i record esistenti) e importare solo i nuovi?`)) {
+                    propComments = [...propComments, ...uniqueNew];
+                } else {
+                    propComments = [...propComments, ...newItems];
+                }
+            } else {
+                propComments = [...propComments, ...newItems];
+            }
+        }
+        initPropDashboard();
+    }
 
     function initPropDashboard() {
         document.getElementById('uploadLabelProp').innerText = "Fatto!";
