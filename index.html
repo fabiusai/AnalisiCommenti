@@ -357,7 +357,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v4.8 Enhanced Duplicate Check</span>
+    <span class="app-version">v4.9 Validation Update</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -400,12 +400,12 @@
             <span class="close" onclick="closeManualModal()">&times;</span>
         </div>
         <div class="form-group">
-            <label>Testo del Post *</label>
+            <label>Testo del Post</label>
             <textarea id="manContent" rows="4"></textarea>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>Data *</label>
+                <label>Data</label>
                 <input type="datetime-local" id="manDate">
             </div>
             <div class="form-group">
@@ -428,7 +428,7 @@
                 <input type="text" id="manAuthor" placeholder="Nome autore o pagina">
             </div>
             <div class="form-group">
-                <label>Sentiment</label>
+                <label>Sentiment *</label>
                 <select id="manSentiment">
                     <option value="0">Neutro</option>
                     <option value="1">Positivo</option>
@@ -447,7 +447,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label>URL Originale</label>
+            <label>URL Originale *</label>
             <input type="text" id="manUrl" placeholder="https://...">
         </div>
         <div style="text-align: right; margin-top: 20px;">
@@ -1029,16 +1029,23 @@
     function closeManualModal() { manualModal.style.display = 'none'; }
 
     function saveManualPost() {
-        const content = document.getElementById('manContent').value;
-        const dateStr = document.getElementById('manDate').value;
+        let content = document.getElementById('manContent').value;
+        let dateStr = document.getElementById('manDate').value;
         const channel = document.getElementById('manChannel').value;
-        if(!content || !dateStr || !channel) {
-            alert("Compila i campi obbligatori (Testo, Data, Canale)");
+        const urlStr = document.getElementById('manUrl').value;
+
+        // Validation - Mandatory fields: URL, Channel, Sentiment (default selected)
+        if(!urlStr || !channel) {
+            alert("Compila i campi obbligatori (URL Originale, Canale, Sentiment)");
             return;
         }
 
+        // Default values for optional fields
+        if (!dateStr) dateStr = new Date().toISOString();
         const date = new Date(dateStr);
-        const author = document.getElementById('manAuthor').value || "Manuale";
+        let author = document.getElementById('manAuthor').value || "Autore Sconosciuto";
+        if (!content) content = ""; // Empty content allowed
+
         const sentVal = parseInt(document.getElementById('manSentiment').value);
         let sentiment = 'Neutro';
         if(sentVal > 0) sentiment = 'Positivo';
@@ -1057,7 +1064,7 @@
         // --- ENHANCED DUPLICATE CHECK ---
         const nContent = content.trim().toLowerCase();
         const nAuthor = author.trim().toLowerCase();
-        const nUrl = document.getElementById('manUrl').value.trim().toLowerCase();
+        const nUrl = urlStr.trim().toLowerCase();
 
         let searchPool = extData;
         if(isEditing && editTargetItem) {
@@ -1066,11 +1073,11 @@
         }
 
         const duplicateFound = searchPool.some(d => {
-            // Check Content
-            if(d.content.trim().toLowerCase() === nContent) return true;
-            // Check Author
-            if(d.author.trim().toLowerCase() === nAuthor) return true;
-            // Check Link (if valid)
+            // Check Content (only if not empty)
+            if(nContent && d.content.trim().toLowerCase() === nContent) return true;
+            // Check Author (only if not unknown/default)
+            if(nAuthor !== "autore sconosciuto" && d.author.trim().toLowerCase() === nAuthor) return true;
+            // Check Link
             if(nUrl && nUrl.length > 5 && nUrl !== '#' && d.url.trim().toLowerCase() === nUrl) return true;
             return false;
         });
@@ -1092,7 +1099,7 @@
             editTargetItem.sentiment = sentiment;
             editTargetItem.likes = parseInt(document.getElementById('manLikes').value) || 0;
             editTargetItem.followers = parseInt(document.getElementById('manFollowers').value) || 0;
-            editTargetItem.url = document.getElementById('manUrl').value || '#';
+            editTargetItem.url = urlStr;
             editTargetItem.iconClass = iconClass;
             editTargetItem.isSocial = isSocial;
             editTargetItem.hash = generateHash(content, date, author);
@@ -1116,7 +1123,7 @@
                 sentimentVal: sentVal,
                 sentiment: sentiment,
                 mediaType: 'TEXT',
-                url: document.getElementById('manUrl').value || '#',
+                url: urlStr,
                 hash: generateHash(content, date, author)
             };
             handleDuplicateImport([newItem]);
@@ -1376,7 +1383,7 @@
             },
             options: { 
                 responsive: true, 
-                maintainAspectRatio: false,
+                maintainAspectRatio: false, 
                 plugins: {
                     legend: { display: false },
                     datalabels: {
