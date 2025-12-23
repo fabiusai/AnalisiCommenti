@@ -59,6 +59,21 @@
         .btn-secondary { background-color: white; color: var(--brand-blue); border: 1px solid var(--brand-blue); padding: 10px 20px; font-weight: 500; border-radius: 2px; cursor: pointer; margin: 5px; }
         .btn-secondary:hover { background-color: #f0f8ff; }
 
+        .btn { border: none; padding: 8px 16px; font-size: 0.8rem; cursor: pointer; border-radius: 2px; font-weight: 500; text-transform: uppercase; transition: all 0.2s; }
+        .btn-editor { background-color: var(--bg-light); color: var(--brand-blue); border: 1px solid var(--brand-blue); }
+        .btn-editor:hover { background-color: var(--brand-blue); color: white; }
+        .btn-download { background-color: var(--brand-yellow); color: var(--brand-blue); }
+        .btn-copy { background-color: var(--brand-lightblue); color: white; }
+        .btn-copy:hover { opacity: 0.9; }
+        
+        /* Danger / Reset Button Style */
+        .btn-danger { background-color: white; color: var(--danger); border: 1px solid var(--danger); padding: 10px 20px; }
+        .btn-danger:hover { background-color: var(--danger); color: white; }
+
+        .btn-link { background: none; color: var(--brand-blue); text-decoration: underline; border: none; padding: 0; font-size: 0.9rem; cursor: pointer; }
+        .btn-upload-img { background-color: #e2e6ea; color: #333; margin-right: 10px; }
+        .btn-upload-img:hover { background-color: #dbe0e5; }
+        
         .dashboard-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; margin-bottom: 2rem; }
         @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
         
@@ -127,21 +142,6 @@
         [contenteditable="true"]:hover, [contenteditable="true"]:focus { background-color: rgba(237, 220, 1, 0.2); border-color: #999; border-radius: 3px; }
         .edit-hint { text-align: center; font-size: 0.85rem; color: #666; margin-bottom: 10px; font-style: italic; }
 
-        .btn { border: none; padding: 8px 16px; font-size: 0.8rem; cursor: pointer; border-radius: 2px; font-weight: 500; text-transform: uppercase; transition: all 0.2s; }
-        .btn-editor { background-color: var(--bg-light); color: var(--brand-blue); border: 1px solid var(--brand-blue); }
-        .btn-editor:hover { background-color: var(--brand-blue); color: white; }
-        .btn-download { background-color: var(--brand-yellow); color: var(--brand-blue); }
-        .btn-copy { background-color: var(--brand-lightblue); color: white; }
-        .btn-copy:hover { opacity: 0.9; }
-        
-        /* New Delete Button Style */
-        .btn-danger { background-color: var(--bg-light); color: var(--danger); border: 1px solid var(--danger); }
-        .btn-danger:hover { background-color: var(--danger); color: white; }
-
-        .btn-link { background: none; color: var(--brand-blue); text-decoration: underline; border: none; padding: 0; font-size: 0.9rem; cursor: pointer; }
-        .btn-upload-img { background-color: #e2e6ea; color: #333; margin-right: 10px; }
-        .btn-upload-img:hover { background-color: #dbe0e5; }
-        
         .nav-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
         .toggle-group { display: flex; gap: 15px; margin-bottom: 10px; font-size: 0.9rem; flex-wrap: wrap; }
         .toggle-item { display: flex; align-items: center; gap: 5px; cursor: pointer; }
@@ -184,8 +184,16 @@
         <section class="upload-container">
             <h2 style="margin-bottom: 15px; color: var(--brand-blue);">Importazione Dati Proprietari</h2>
             <p style="margin-bottom: 20px; color: #666;">Carica file Excel (.xlsx) o CSV. Supporto multi-file.</p>
-            <label for="fileInputProp" class="custom-file-upload" id="uploadLabelProp">Seleziona File</label>
-            <input type="file" id="fileInputProp" accept=".xlsx, .xls, .csv" multiple>
+            
+            <div style="display:flex; justify-content:center; gap:10px; align-items:center; flex-wrap:wrap;">
+                <label for="fileInputProp" class="custom-file-upload" id="uploadLabelProp">Seleziona File</label>
+                <input type="file" id="fileInputProp" accept=".xlsx, .xls, .csv" multiple>
+                
+                <button onclick="resetPropData()" class="btn btn-danger" style="margin-top: 5px;">
+                    <i class="fas fa-trash-alt"></i> Reset / Svuota
+                </button>
+            </div>
+            
             <p id="fileCountProp" style="margin-top: 10px; font-size: 0.9rem; color: var(--brand-blue);"></p>
         </section>
 
@@ -236,7 +244,7 @@
             <h2 style="margin-bottom: 15px; color: var(--brand-blue);">Importazione Web & Social Esterni</h2>
             <p style="margin-bottom: 20px; color: #666;">Carica Export Excel, Importa JSON integrativo o aggiungi manualmente.</p>
             
-            <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; align-items:center;">
                 <label for="fileInputExt" class="custom-file-upload" id="uploadLabelExt"><i class="fas fa-file-excel"></i> Carica Export Excel</label>
                 <input type="file" id="fileInputExt" accept=".xlsx, .xls, .csv">
                 
@@ -251,6 +259,10 @@
 
                 <button class="btn-secondary" onclick="exportExtJSON()" style="height: 42px; margin-top:5px;">
                     <i class="fas fa-download"></i> Esporta JSON (Integrazioni)
+                </button>
+                
+                <button onclick="resetExtData()" class="btn btn-danger" style="height: 42px; margin-top:5px;">
+                    <i class="fas fa-trash-alt"></i> Reset / Svuota
                 </button>
             </div>
         </section>
@@ -344,7 +356,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v4.4 Prop. Duplicates Control</span>
+    <span class="app-version">v4.5 Reset Buttons Added</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -655,6 +667,25 @@
         document.getElementById('fileCountProp').innerText = `${propComments.length} commenti caricati.`;
         document.getElementById('appContentProp').classList.remove('hidden');
         updatePropUI();
+    }
+
+    function resetPropData() {
+        if(!confirm("Sicuro di voler azzerare tutti i dati Proprietari? L'azione è irreversibile.")) return;
+        
+        propComments = [];
+        if(propChart) {
+            propChart.destroy();
+            propChart = null;
+        }
+        
+        document.getElementById('fileInputProp').value = ''; // Reset file input
+        document.getElementById('appContentProp').classList.add('hidden');
+        document.getElementById('uploadLabelProp').innerText = 'Seleziona File';
+        document.getElementById('fileCountProp').innerText = '';
+        
+        // Reset modal if open
+        document.getElementById('commentsListProp').innerHTML = '';
+        document.getElementById('totalCommentsProp').innerText = '0';
     }
 
     ['filterTextProp', 'filterSentimentProp', 'filterPlatformProp'].forEach(id => {
@@ -1048,6 +1079,29 @@
         // Refresh UI
         refreshExtDashboard();
     };
+
+    function resetExtData() {
+        if(!confirm("Sicuro di voler azzerare tutti i dati Esterni (Excel + JSON + Manuali)? L'azione è irreversibile.")) return;
+
+        extData = [];
+        extFiltered = [];
+        extIdx = 0;
+        currentCardImage = null;
+
+        if(extCharts.sent) {
+            extCharts.sent.destroy();
+            extCharts.sent = null;
+        }
+        if(extCharts.chan) {
+            extCharts.chan.destroy();
+            extCharts.chan = null;
+        }
+
+        document.getElementById('fileInputExt').value = '';
+        document.getElementById('importJsonExt').value = '';
+        document.getElementById('dashboardExt').classList.add('hidden');
+        document.getElementById('uploadLabelExt').innerHTML = '<i class="fas fa-file-excel"></i> Carica Export Excel';
+    }
 
     // --- JSON EXPORT / IMPORT (INTEGRATION) ---
     function exportExtJSON() {
