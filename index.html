@@ -357,7 +357,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v4.6 Edit Record Added</span>
+    <span class="app-version">v4.8 Enhanced Duplicate Check</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -1054,6 +1054,34 @@
         else if(chLower.includes('youtube')) { iconClass = 'fab fa-youtube'; isSocial = true; }
         else if(chLower.includes('tiktok')) { iconClass = 'fab fa-tiktok'; isSocial = true; }
 
+        // --- ENHANCED DUPLICATE CHECK ---
+        const nContent = content.trim().toLowerCase();
+        const nAuthor = author.trim().toLowerCase();
+        const nUrl = document.getElementById('manUrl').value.trim().toLowerCase();
+
+        let searchPool = extData;
+        if(isEditing && editTargetItem) {
+            // Exclude current item from search if editing
+            searchPool = extData.filter(i => i !== editTargetItem);
+        }
+
+        const duplicateFound = searchPool.some(d => {
+            // Check Content
+            if(d.content.trim().toLowerCase() === nContent) return true;
+            // Check Author
+            if(d.author.trim().toLowerCase() === nAuthor) return true;
+            // Check Link (if valid)
+            if(nUrl && nUrl.length > 5 && nUrl !== '#' && d.url.trim().toLowerCase() === nUrl) return true;
+            return false;
+        });
+
+        if(duplicateFound) {
+            if(!confirm("ATTENZIONE: Trovato un possibile duplicato!\n\nEsiste già un record con lo stesso Autore, Link o Contenuto nel database.\n\nVuoi procedere comunque col salvataggio?")) {
+                return; // User cancelled
+            }
+        }
+        // -------------------------------
+
         if(isEditing && editTargetItem) {
             // Update Existing Record
             editTargetItem.content = content;
@@ -1317,11 +1345,15 @@
                 aggregatedCounts[channel] = count;
             }
         }
+        
+        // Ordina le categorie principali
+        let sortedEntries = Object.entries(aggregatedCounts).sort((a,b) => b[1] - a[1]);
+        
+        // Aggiungi "Altro" alla fine se presente
         if (otherCount > 0) {
-            aggregatedCounts['Altro'] = otherCount;
+            sortedEntries.push(['Altro', otherCount]);
         }
 
-        let sortedEntries = Object.entries(aggregatedCounts).sort((a,b) => b[1] - a[1]);
         let labels = sortedEntries.map(e => e[0]);
         let dataVals = sortedEntries.map(e => e[1]);
 
