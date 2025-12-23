@@ -131,6 +131,13 @@
         .btn-editor { background-color: var(--bg-light); color: var(--brand-blue); border: 1px solid var(--brand-blue); }
         .btn-editor:hover { background-color: var(--brand-blue); color: white; }
         .btn-download { background-color: var(--brand-yellow); color: var(--brand-blue); }
+        .btn-copy { background-color: var(--brand-lightblue); color: white; }
+        .btn-copy:hover { opacity: 0.9; }
+        
+        /* New Delete Button Style */
+        .btn-danger { background-color: var(--bg-light); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger:hover { background-color: var(--danger); color: white; }
+
         .btn-link { background: none; color: var(--brand-blue); text-decoration: underline; border: none; padding: 0; font-size: 0.9rem; cursor: pointer; }
         .btn-upload-img { background-color: #e2e6ea; color: #333; margin-right: 10px; }
         .btn-upload-img:hover { background-color: #dbe0e5; }
@@ -303,7 +310,10 @@
                 <div class="nav-controls">
                     <button id="prevExt" class="btn btn-editor"><i class="fas fa-chevron-left"></i></button>
                     <span id="counterExt">0 / 0</span>
-                    <button id="nextExt" class="btn btn-editor"><i class="fas fa-chevron-right"></i></button>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="delExt" class="btn btn-danger" title="Elimina Record Corrente"><i class="fas fa-trash-alt"></i></button>
+                        <button id="nextExt" class="btn btn-editor"><i class="fas fa-chevron-right"></i></button>
+                    </div>
                 </div>
 
                 <div class="toggle-group">
@@ -314,7 +324,7 @@
                 </div>
 
                 <div style="margin-bottom: 10px; display:flex; justify-content: flex-end; align-items:center;">
-                    <label for="imgUploadExt" class="btn btn-upload-img" style="cursor:pointer;"><i class="fas fa-image"></i> Carica Immagine</label>
+                    <label for="imgUploadExt" class="btn btn-upload-img" style="cursor:pointer;"><i class="fas fa-image"></i> Carica Immagine (o Incolla CTRL+V)</label>
                     <input type="file" id="imgUploadExt" accept="image/*" style="display:none;">
                     <a href="#" id="linkExt" target="_blank" class="btn-link">Apri Post Originale <i class="fas fa-external-link-alt"></i></a>
                 </div>
@@ -323,8 +333,9 @@
                 <div id="previewAreaExt">
                     </div>
 
-                <div style="text-align: center; margin-top: 15px;">
-                    <button id="dlBtnExt" class="btn btn-download">Scarica Card</button>
+                <div style="text-align: center; margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
+                    <button id="copyBtnExt" class="btn btn-copy"><i class="fas fa-copy"></i> Copia Card</button>
+                    <button id="dlBtnExt" class="btn btn-download"><i class="fas fa-download"></i> Scarica Card</button>
                 </div>
             </div>
         </div>
@@ -333,7 +344,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v4.0 Enhanced Integration</span>
+    <span class="app-version">v4.3 Copy & Paste Added</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -362,8 +373,9 @@
                 </div>
             </div>
         </div>
-        <div style="text-align: right; margin-top: 15px;">
-            <button class="btn btn-download" id="dlBtnProp">Scarica Card</button>
+        <div style="text-align: right; margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn btn-copy" id="copyBtnProp"><i class="fas fa-copy"></i> Copia Card</button>
+            <button class="btn btn-download" id="dlBtnProp"><i class="fas fa-download"></i> Scarica Card</button>
         </div>
     </div>
 </div>
@@ -389,6 +401,7 @@
                 <datalist id="channelListHint">
                     <option value="Facebook">
                     <option value="Instagram">
+                    <option value="TikTok">
                     <option value="X (Twitter)">
                     <option value="LinkedIn">
                     <option value="YouTube">
@@ -482,6 +495,31 @@
         });
     }
 
+    function copyCanvas(elementId, btnId) {
+        const el = document.getElementById(elementId);
+        const btn = document.getElementById(btnId);
+        const originalText = btn.innerHTML;
+        
+        const editables = el.querySelectorAll('[contenteditable="true"]');
+        editables.forEach(e => e.setAttribute('contenteditable', 'false'));
+
+        html2canvas(el, { scale: 2 }).then(canvas => {
+            canvas.toBlob(blob => {
+                try {
+                    const item = new ClipboardItem({ 'image/png': blob });
+                    navigator.clipboard.write([item]).then(() => {
+                        btn.innerHTML = '<i class="fas fa-check"></i> Copiato!';
+                        setTimeout(() => btn.innerHTML = originalText, 2000);
+                    });
+                } catch (err) {
+                    alert("Errore: Impossibile copiare negli appunti (usa HTTPS o Localhost)");
+                    console.error(err);
+                }
+                editables.forEach(e => e.setAttribute('contenteditable', 'true'));
+            });
+        });
+    }
+
     function generateHash(content, date, author) {
         // Create a simple signature string
         const str = (content + (date ? date.toISOString() : '') + author).toLowerCase().replace(/\s/g, '');
@@ -493,6 +531,31 @@
         }
         return hash;
     }
+
+    // --- PASTE LISTENER FOR IMAGES ---
+    document.addEventListener('paste', function(e) {
+        // Only active if we are in External tab (visible dashboard)
+        if(document.getElementById('dashboardExt').classList.contains('hidden')) return;
+
+        const items = e.clipboardData.items;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                const blob = items[i].getAsFile();
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    currentCardImage = event.target.result;
+                    updateExtCard();
+                    const btn = document.querySelector('label[for="imgUploadExt"]');
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Incollato!';
+                    setTimeout(() => btn.innerHTML = orig, 1500);
+                };
+                reader.readAsDataURL(blob);
+                e.preventDefault(); // Prevent default paste behavior
+                break;
+            }
+        }
+    });
 
     // ==========================================
     // LOGICA TAB 1: PROPRIETARI
@@ -669,6 +732,7 @@
         document.getElementById('cardAuthorProp').style.display = e.target.checked ? 'block' : 'none';
     };
     document.getElementById('dlBtnProp').onclick = () => dlCanvas('captureCardProp');
+    document.getElementById('copyBtnProp').onclick = () => copyCanvas('captureCardProp', 'copyBtnProp');
 
 
     // ==========================================
@@ -736,6 +800,7 @@
             else if(sourceRaw.includes('YOUTUBE')) { channel = 'YouTube'; iconClass = 'fab fa-youtube'; isSocial = true; }
             else if(sourceRaw.includes('LINKEDIN')) { channel = 'LinkedIn'; iconClass = 'fab fa-linkedin'; isSocial = true; }
             else if(sourceRaw.includes('BLUESKY')) { channel = 'BlueSky'; iconClass = 'fas fa-cloud'; isSocial = true; }
+            else if(sourceRaw.includes('TIKTOK')) { channel = 'TikTok'; iconClass = 'fab fa-tiktok'; isSocial = true; }
 
             let rawAuthor = "Autore Sconosciuto";
             const name = row['extra_author_attributes.name'];
@@ -899,6 +964,7 @@
         else if(chLower.includes('instagram')) { iconClass = 'fab fa-instagram'; isSocial = true; }
         else if(chLower.includes('linkedin')) { iconClass = 'fab fa-linkedin'; isSocial = true; }
         else if(chLower.includes('youtube')) { iconClass = 'fab fa-youtube'; isSocial = true; }
+        else if(chLower.includes('tiktok')) { iconClass = 'fab fa-tiktok'; isSocial = true; }
 
         const newItem = {
             date: date,
@@ -922,6 +988,29 @@
         handleDuplicateImport([newItem]);
         closeManualModal();
     }
+
+    // --- DELETE RECORD FUNCTION ---
+    document.getElementById('delExt').onclick = function() {
+        if(!extFiltered.length) return;
+        if(!confirm("Sei sicuro di voler eliminare questo record dal database? L'operazione non è reversibile.")) return;
+
+        const currentItem = extFiltered[extIdx];
+        
+        // Remove from main dataset
+        extData = extData.filter(d => d !== currentItem);
+        
+        // Reset image if manually added
+        currentCardImage = null;
+
+        // If data is empty, hide dashboard or reset
+        if(extData.length === 0) {
+            document.getElementById('dashboardExt').classList.add('hidden');
+            return;
+        }
+
+        // Refresh UI
+        refreshExtDashboard();
+    };
 
     // --- JSON EXPORT / IMPORT (INTEGRATION) ---
     function exportExtJSON() {
@@ -1030,6 +1119,7 @@
     document.getElementById('prevExt').onclick = () => { extIdx--; currentCardImage = null; updateExtCard(); };
     document.getElementById('nextExt').onclick = () => { extIdx++; currentCardImage = null; updateExtCard(); };
     document.getElementById('dlBtnExt').onclick = () => dlCanvas('captureCardExt');
+    document.getElementById('copyBtnExt').onclick = () => copyCanvas('captureCardExt', 'copyBtnExt');
 
     function updateExtUI() {
         const sFilter = document.getElementById('filterSentExt').value;
