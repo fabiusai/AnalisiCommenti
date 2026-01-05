@@ -90,18 +90,19 @@
         .filter-select, .filter-input { padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; width: 100%; font-family: inherit; }
         
         .comments-list { background: white; border: 1px solid var(--border-color); border-radius: 4px; max-height: 500px; overflow-y: auto; }
-        .comment-item { padding: 1rem; border-bottom: 1px solid var(--bg-light); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
-        .sentiment-badge { padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; color: white; }
+        .comment-item { padding: 1rem; border-bottom: 1px solid var(--bg-light); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; transition: background 0.2s; cursor: pointer;}
+        .comment-item:hover { background-color: #f9f9f9; }
+        .sentiment-badge { padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; color: white; display: inline-block; min-width: 60px; text-align: center;}
         .sentiment-positive { background-color: var(--success); }
         .sentiment-neutral { background-color: var(--warning); color: #333; }
         .sentiment-negative { background-color: var(--danger); }
 
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal-content { background-color: white; padding: 2rem; border-radius: 4px; width: 90%; max-width: 600px; border-top: 5px solid var(--brand-blue); max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-content { background-color: white; padding: 2rem; border-radius: 4px; width: 90%; max-width: 650px; border-top: 5px solid var(--brand-blue); max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
         .close { font-size: 1.5rem; font-weight: bold; cursor: pointer; color: #aaa; }
         
-        #cardPreviewContainer, #previewAreaExt { display: flex; justify-content: center; margin-bottom: 1.5rem; padding: 20px; background-color: #e0e0e0; border-radius: 4px; min-height: 300px; align-items: center; }
+        #cardPreviewContainer, #cardPreviewContainerExt { display: flex; justify-content: center; margin-bottom: 1rem; padding: 20px; background-color: #e0e0e0; border-radius: 4px; min-height: 300px; align-items: center; }
         
         .social-card { 
             background: white; 
@@ -144,9 +145,9 @@
         [contenteditable="true"]:hover, [contenteditable="true"]:focus { background-color: rgba(237, 220, 1, 0.2); border-color: #999; border-radius: 3px; }
         .edit-hint { text-align: center; font-size: 0.85rem; color: #666; margin-bottom: 10px; font-style: italic; }
 
-        .nav-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .toggle-group { display: flex; gap: 15px; margin-bottom: 10px; font-size: 0.9rem; flex-wrap: wrap; }
-        .toggle-item { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .modal-nav-bar { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 15px; border: 1px solid #eee; }
+        .modal-nav-btn { background: none; border: 1px solid #ccc; border-radius: 4px; padding: 5px 12px; cursor: pointer; }
+        .modal-nav-btn:hover { background: #eee; }
 
         .hidden { display: none !important; }
 
@@ -162,15 +163,14 @@
         
         footer { margin-top: auto; background-color: white; border-top: 1px solid var(--border-color); padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #888; display: flex; justify-content: space-between; }
 
-        /* NUOVO STILE: Select per modifica rapida Sentiment */
         .sentiment-select-wrapper { display: inline-block; position: relative; }
         .sentiment-select { 
             appearance: none; 
             -webkit-appearance: none; 
-            border: 2px solid transparent; /* Per evidenziare focus */
+            border: 2px solid transparent; 
             border-radius: 12px; 
-            padding: 4px 24px 4px 10px; /* Più spazio a destra per la freccia */
-            font-size: 0.75rem; 
+            padding: 4px 24px 4px 10px; 
+            font-size: 0.85rem; 
             font-weight: bold; 
             color: white; 
             cursor: pointer; 
@@ -179,11 +179,12 @@
         }
         .sentiment-select:focus { outline: none; box-shadow: 0 0 0 2px rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.5); }
         .sentiment-select option { color: #333; background: white; padding: 5px; }
-        /* Icona freccina custom per la select */
         .sentiment-arrow {
             position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
             pointer-events: none; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid white;
         }
+        
+        .modal-settings-bar { display: flex; gap: 15px; font-size: 0.9rem; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
 
     </style>
 </head>
@@ -251,12 +252,11 @@
                                 </select>
                             </div>
                             <div>
-                                <label>Canale</label>
-                                <select id="filterPlatformProp" class="filter-select">
-                                    <option value="all">Tutti</option>
-                                    <option value="facebook">Facebook</option>
-                                    <option value="instagram">Instagram</option>
-                                    <option value="twitter">X (Twitter)</option>
+                                <label>Ordina per</label>
+                                <select id="sortProp" class="filter-select">
+                                    <option value="dateDesc">Più Recenti</option>
+                                    <option value="lengthDesc">Lunghezza (Max)</option>
+                                    <option value="lengthAsc">Lunghezza (Min)</option>
                                 </select>
                             </div>
                         </div>
@@ -314,7 +314,7 @@
             </div>
 
             <div class="card-box">
-                <h3 class="section-title">Editor Card Evoluto</h3>
+                <h3 class="section-title">Feed Post & Commenti</h3>
                 
                 <div class="filters-container">
                     <div class="filter-row" style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
@@ -339,6 +339,8 @@
                         <div><label>Ordina per</label>
                             <select id="sortExt" class="filter-select">
                                 <option value="dateDesc">Data (Recenti)</option>
+                                <option value="lengthDesc">Lunghezza (Max)</option>
+                                <option value="lengthAsc">Lunghezza (Min)</option>
                                 <option value="likesDesc">Engagement (Like/Reaz.)</option>
                                 <option value="followersDesc">Followers (Alti)</option>
                                 <option value="viewsDesc">Page Views</option>
@@ -347,45 +349,10 @@
                     </div>
                 </div>
 
-                <div class="nav-controls">
-                    <button id="prevExt" class="btn btn-editor"><i class="fas fa-chevron-left"></i></button>
-                    
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span id="counterExt">0 / 0</span>
-                        <select id="quickSentExt" class="filter-select" style="padding: 4px; font-size: 0.85rem; width: auto;" onchange="updateCurrentExtSentiment(this.value)">
-                            <option value="Positivo">😊 Positivo</option>
-                            <option value="Neutro">😐 Neutro</option>
-                            <option value="Negativo">😡 Negativo</option>
-                        </select>
-                    </div>
+                <div class="comments-list" id="commentsListExt"></div>
 
-                    <div style="display: flex; gap: 10px;">
-                        <button id="editExt" class="btn btn-secondary" title="Modifica Record"><i class="fas fa-edit"></i></button>
-                        <button id="delExt" class="btn btn-danger" title="Elimina Record Corrente"><i class="fas fa-trash-alt"></i></button>
-                        <button id="nextExt" class="btn btn-editor"><i class="fas fa-chevron-right"></i></button>
-                    </div>
-                </div>
-
-                <div class="toggle-group">
-                    <label class="toggle-item"><input type="checkbox" id="showAuthorExt" checked> Mostra Autore</label>
-                    <label class="toggle-item"><input type="checkbox" id="showOrigAuthorExt" checked> Mostra Fonte Orig.</label>
-                    <label class="toggle-item"><input type="checkbox" id="showLikesExt" checked> Mostra Like</label>
-                    <label class="toggle-item"><input type="checkbox" id="showFollowersExt" checked> Mostra Follower</label>
-                </div>
-
-                <div style="margin-bottom: 10px; display:flex; justify-content: flex-end; align-items:center;">
-                    <label for="imgUploadExt" class="btn btn-upload-img" style="cursor:pointer;"><i class="fas fa-image"></i> Carica Immagine (o Incolla CTRL+V)</label>
-                    <input type="file" id="imgUploadExt" accept="image/*" style="display:none;">
-                    <a href="#" id="linkExt" target="_blank" class="btn-link">Apri Post Originale <i class="fas fa-external-link-alt"></i></a>
-                </div>
-
-                <p class="edit-hint"><i class="fas fa-pen"></i> Clicca sui testi dell'anteprima per modificarli</p>
-                <div id="previewAreaExt">
-                    </div>
-
-                <div style="text-align: center; margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
-                    <button id="copyBtnExt" class="btn btn-copy"><i class="fas fa-copy"></i> Copia Card</button>
-                    <button id="dlBtnExt" class="btn btn-download"><i class="fas fa-download"></i> Scarica Card</button>
+                <div style="display:none;">
+                    <button id="prevExt"></button><button id="nextExt"></button><span id="counterExt"></span><select id="quickSentExt"></select>
                 </div>
             </div>
         </div>
@@ -394,7 +361,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v5.1 Local Storage Enabled</span>
+    <span class="app-version">v5.2 Uniform Interaction</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -403,9 +370,26 @@
             <h2 style="color: var(--brand-blue);">Editor Card Social</h2>
             <span class="close" id="closeModalProp">&times;</span>
         </div>
-        <div style="margin-bottom: 1rem;">
+
+        <div class="modal-nav-bar">
+            <button class="modal-nav-btn" id="modalPrevProp"><i class="fas fa-chevron-left"></i> Prec</button>
+            
+            <div class="sentiment-select-wrapper">
+                <select id="modalSentSelectProp" class="sentiment-select">
+                    <option value="Positive">😊 Positivo</option>
+                    <option value="Neutral">😐 Neutro</option>
+                    <option value="Negative">😡 Negativo</option>
+                </select>
+                <div class="sentiment-arrow"></div>
+            </div>
+
+            <button class="modal-nav-btn" id="modalNextProp">Succ <i class="fas fa-chevron-right"></i></button>
+        </div>
+
+        <div style="margin-bottom: 1rem; text-align:center;">
             <input type="checkbox" id="toggleAuthorProp" checked> <label for="toggleAuthorProp">Mostra Nome Autore</label>
         </div>
+
         <div id="cardPreviewContainer">
             <div class="social-card" id="captureCardProp">
                 <div class="card-header">
@@ -415,17 +399,67 @@
                     <span class="card-date" id="cardDateProp">DD/MM/YYYY</span>
                 </div>
                 <div class="card-body">
-                    <div id="cardTextProp">Testo...</div>
+                    <div id="cardTextProp" contenteditable="true">Testo...</div>
                 </div>
                 <div class="card-footer">
                     <div id="cardAuthorProp">Nome Autore</div>
-                    <div>Canale Proprietario</div>
-                </div>
+                    </div>
             </div>
         </div>
         <div style="text-align: right; margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
             <button class="btn btn-copy" id="copyBtnProp"><i class="fas fa-copy"></i> Copia Card</button>
             <button class="btn btn-download" id="dlBtnProp"><i class="fas fa-download"></i> Scarica Card</button>
+        </div>
+    </div>
+</div>
+
+<div id="editorModalExt" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="color: var(--brand-blue);">Editor Card Esterni</h2>
+            <span class="close" id="closeModalExt">&times;</span>
+        </div>
+
+        <div class="modal-nav-bar">
+            <button class="modal-nav-btn" id="modalPrevExt"><i class="fas fa-chevron-left"></i> Prec</button>
+            
+            <div class="sentiment-select-wrapper">
+                <select id="modalSentSelectExt" class="sentiment-select">
+                    <option value="Positivo">😊 Positivo</option>
+                    <option value="Neutro">😐 Neutro</option>
+                    <option value="Negativo">😡 Negativo</option>
+                </select>
+                <div class="sentiment-arrow"></div>
+            </div>
+
+            <button class="modal-nav-btn" id="modalNextExt">Succ <i class="fas fa-chevron-right"></i></button>
+        </div>
+        
+        <div class="modal-settings-bar">
+            <label><input type="checkbox" id="showAuthorExt" checked> Autore</label>
+            <label><input type="checkbox" id="showOrigAuthorExt" checked> Fonte</label>
+            <label><input type="checkbox" id="showLikesExt" checked> Like</label>
+            <label><input type="checkbox" id="showFollowersExt" checked> Follower</label>
+        </div>
+        
+        <div style="text-align:center; margin-bottom:15px;">
+            <label for="imgUploadExt" class="btn btn-upload-img" style="cursor:pointer; font-size:0.8rem;"><i class="fas fa-image"></i> Carica Immagine (o Incolla CTRL+V)</label>
+            <input type="file" id="imgUploadExt" accept="image/*" style="display:none;">
+            <a href="#" id="linkExt" target="_blank" class="btn-link" style="margin-left:10px;">Apri Originale <i class="fas fa-external-link-alt"></i></a>
+            
+             <div style="margin-top:5px;">
+                <button id="editExt" class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" title="Modifica Dati Record"><i class="fas fa-edit"></i> Edit Dati</button>
+                <button id="delExt" class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem;" title="Elimina Record"><i class="fas fa-trash-alt"></i> Elimina</button>
+             </div>
+        </div>
+
+        <div id="cardPreviewContainerExt">
+            <div id="previewAreaExt"></div>
+        </div>
+
+        <div style="text-align: right; margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+            <button id="copyBtnExt" class="btn btn-copy"><i class="fas fa-copy"></i> Copia Card</button>
+            <button id="dlBtnExt" class="btn btn-download"><i class="fas fa-download"></i> Scarica Card</button>
         </div>
     </div>
 </div>
@@ -628,7 +662,9 @@
 
     // --- PASTE LISTENER FOR IMAGES ---
     document.addEventListener('paste', function(e) {
-        if(document.getElementById('dashboardExt').classList.contains('hidden')) return;
+        // Verifica che il modale esterno sia visibile
+        const extModal = document.getElementById('editorModalExt');
+        if(extModal.style.display !== 'block' && extModal.style.display !== 'flex') return;
 
         const items = e.clipboardData.items;
         for (let i = 0; i < items.length; i++) {
@@ -637,7 +673,7 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     currentCardImage = event.target.result;
-                    updateExtCard();
+                    updateExtCard(); // Aggiorna la card dentro il modale
                     const btn = document.querySelector('label[for="imgUploadExt"]');
                     const orig = btn.innerHTML;
                     btn.innerHTML = '<i class="fas fa-check"></i> Incollato!';
@@ -654,7 +690,9 @@
     // LOGICA TAB 1: PROPRIETARI
     // ==========================================
     let propComments = [];
+    let propFiltered = []; // Per navigazione modale
     let propChart = null;
+    let currentPropIdx = 0;
 
     document.getElementById('fileInputProp').addEventListener('change', function(e) {
         const files = e.target.files;
@@ -754,6 +792,7 @@
         if(!confirm("Sicuro di voler azzerare tutti i dati Proprietari? L'azione è irreversibile.")) return;
         
         propComments = [];
+        propFiltered = [];
         if(propChart) {
             propChart.destroy();
             propChart = null;
@@ -766,19 +805,19 @@
         
         document.getElementById('commentsListProp').innerHTML = '';
         document.getElementById('totalCommentsProp').innerText = '0';
-        localStorage.removeItem(STORAGE_KEY); // Clear browser storage on reset
+        localStorage.removeItem(STORAGE_KEY);
     }
 
-    ['filterTextProp', 'filterSentimentProp', 'filterPlatformProp'].forEach(id => {
+    ['filterTextProp', 'filterSentimentProp', 'filterPlatformProp', 'sortProp'].forEach(id => {
         document.getElementById(id).addEventListener('input', updatePropUI);
     });
 
     // Funzione principale che aggiorna tutto (lista + grafici)
     function updatePropUI() {
-        const filtered = getPropFilteredData();
-        document.getElementById('totalCommentsProp').innerText = filtered.length;
-        renderPropList(filtered);
-        renderPropChart(filtered);
+        propFiltered = getPropFilteredData(); // Aggiorna la variabile globale filtrata
+        document.getElementById('totalCommentsProp').innerText = propFiltered.length;
+        renderPropList(propFiltered);
+        renderPropChart(propFiltered);
     }
 
     // Funzione helper per ottenere i dati filtrati
@@ -786,50 +825,54 @@
         const txt = document.getElementById('filterTextProp').value.toLowerCase();
         const sent = document.getElementById('filterSentimentProp').value;
         const plat = document.getElementById('filterPlatformProp').value;
+        const sort = document.getElementById('sortProp').value;
 
-        return propComments.filter(c => {
+        let res = propComments.filter(c => {
             if(txt && !c.msg.toLowerCase().includes(txt)) return false;
             if(sent !== 'all' && !c.sent.toLowerCase().includes(sent)) return false;
             if(plat !== 'all' && c.platform !== plat) return false;
             return true;
         });
+
+        // Ordinamento Proprietari
+        if(sort === 'dateDesc') res.sort((a,b) => b.date - a.date);
+        else if(sort === 'lengthDesc') res.sort((a,b) => b.msg.length - a.msg.length);
+        else if(sort === 'lengthAsc') res.sort((a,b) => a.msg.length - b.msg.length);
+
+        return res;
     }
 
     // Funzione leggera: aggiorna solo grafici e totali (usata quando si cambia sentiment)
     function refreshPropStats() {
-        const filtered = getPropFilteredData();
-        document.getElementById('totalCommentsProp').innerText = filtered.length;
-        renderPropChart(filtered);
+        // Non ricalcoliamo tutto l'ordinamento, solo stats
+        document.getElementById('totalCommentsProp').innerText = propFiltered.length;
+        renderPropChart(propFiltered);
     }
 
     function renderPropList(list) {
         const container = document.getElementById('commentsListProp');
         container.innerHTML = '';
-        list.slice(0, 100).forEach((c) => { 
+        
+        // Limitiamo render per performance, ma manteniamo indice corretto
+        list.slice(0, 100).forEach((c, index) => { 
             
-            // Determina colore select
+            // Determina colore badge
             let badgeClass = 'sentiment-neutral';
-            let selVal = 'Neutral';
-            if(c.sent.toLowerCase().includes('positive')) { badgeClass = 'sentiment-positive'; selVal = 'Positive'; }
-            else if(c.sent.toLowerCase().includes('negative')) { badgeClass = 'sentiment-negative'; selVal = 'Negative'; }
+            let sentLabel = 'Neutro';
+            if(c.sent.toLowerCase().includes('positive')) { badgeClass = 'sentiment-positive'; sentLabel = 'Positivo'; }
+            else if(c.sent.toLowerCase().includes('negative')) { badgeClass = 'sentiment-negative'; sentLabel = 'Negativo'; }
 
             const div = document.createElement('div');
             div.className = 'comment-item';
+            div.onclick = () => openPropModal(index); // Apre il modale all'indice corrispondente nella lista filtrata
+            
             div.innerHTML = `
                 <div style="width: 100%;">
                     <div style="font-size:0.8rem; color:#666; margin-bottom:5px; display:flex; align-items:center; justify-content:space-between;">
                         <div>
-                            <div class="sentiment-select-wrapper">
-                                <select onchange="changePropSentiment(this, '${c.hash}')" class="sentiment-select ${badgeClass}">
-                                    <option value="Positive" ${selVal==='Positive'?'selected':''}>Positivo</option>
-                                    <option value="Neutral" ${selVal==='Neutral'?'selected':''}>Neutro</option>
-                                    <option value="Negative" ${selVal==='Negative'?'selected':''}>Negativo</option>
-                                </select>
-                                <div class="sentiment-arrow"></div>
-                            </div>
+                            <span class="sentiment-badge ${badgeClass}">${sentLabel}</span>
                             <span style="margin-left: 8px;">${formatItalianDate(c.date)} - <strong>${c.author}</strong></span>
                         </div>
-                        <button class="btn btn-editor" onclick="openPropModal(${propComments.indexOf(c)})" style="padding: 2px 8px; font-size: 0.7rem;">Card</button>
                     </div>
                     <div style="margin-top:5px;">${c.msg.substring(0, 120)}...</div>
                 </div>
@@ -838,22 +881,29 @@
         });
     }
 
-    // --- AGGIORNATA: Cambia colore IMMEDIATAMENTE + Aggiorna Stats ---
-    function changePropSentiment(selectEl, hash) {
-        // 1. Aggiorna il Data Model
-        const target = propComments.find(c => c.hash == hash);
-        if(target) {
-            target.sent = selectEl.value;
-        }
+    // Aggiornamento Sentiment da dentro il modale o lista
+    function changePropSentiment(newVal) {
+        if(!propFiltered.length) return;
+        const c = propFiltered[currentPropIdx];
+        
+        // Aggiorna dato originale (reference)
+        c.sent = newVal;
+        
+        // Aggiorna UI Modale (Select colore)
+        updatePropModalUIColor(newVal);
+        
+        // Aggiorna Lista e Grafici sotto (senza chiudere modale)
+        renderPropList(propFiltered);
+        renderPropChart(propFiltered);
+    }
 
-        // 2. Aggiorna UI del singolo elemento immediatamente (Colore sfondo)
-        selectEl.classList.remove('sentiment-positive', 'sentiment-neutral', 'sentiment-negative');
-        if (selectEl.value === 'Positive') selectEl.classList.add('sentiment-positive');
-        else if (selectEl.value === 'Negative') selectEl.classList.add('sentiment-negative');
-        else selectEl.classList.add('sentiment-neutral');
-
-        // 3. Aggiorna solo grafici e totali (evita sfarfallio della lista)
-        refreshPropStats();
+    function updatePropModalUIColor(val) {
+        const sel = document.getElementById('modalSentSelectProp');
+        sel.value = val;
+        sel.classList.remove('sentiment-positive', 'sentiment-neutral', 'sentiment-negative');
+        if (val === 'Positive') sel.classList.add('sentiment-positive');
+        else if (val === 'Negative') sel.classList.add('sentiment-negative');
+        else sel.classList.add('sentiment-neutral');
     }
 
     function renderPropChart(list) {
@@ -901,16 +951,26 @@
     }
 
     const modalProp = document.getElementById('editorModalProp');
+    
     function openPropModal(idx) {
-        const c = propComments[idx];
+        currentPropIdx = idx;
+        const c = propFiltered[idx];
+        
+        // Update Content
         document.getElementById('cardTextProp').innerText = c.msg;
         document.getElementById('cardAuthorProp').innerText = c.author;
         document.getElementById('cardDateProp').innerText = formatItalianDate(c.date);
         
+        // Update Sentiment Select in Modal
+        let currentSent = 'Neutral';
+        if(c.sent.toLowerCase().includes('positive')) currentSent = 'Positive';
+        if(c.sent.toLowerCase().includes('negative')) currentSent = 'Negative';
+        updatePropModalUIColor(currentSent);
+
+        // Update Icon
         const path = icons[c.platform] || icons.default;
         const svgPath = document.querySelector('#cardIconProp path');
         svgPath.setAttribute('d', path);
-        
         if(c.platform === 'facebook') svgPath.style.fill = '#1877F2';
         else if(c.platform === 'instagram') svgPath.style.fill = '#E4405F';
         else if(c.platform === 'twitter') svgPath.style.fill = '#000000';
@@ -918,7 +978,20 @@
 
         modalProp.style.display = 'flex';
     }
+
+    // Modal Events Prop
     document.getElementById('closeModalProp').onclick = () => modalProp.style.display = 'none';
+    
+    document.getElementById('modalPrevProp').onclick = () => {
+        if(currentPropIdx > 0) openPropModal(currentPropIdx - 1);
+    };
+    document.getElementById('modalNextProp').onclick = () => {
+        if(currentPropIdx < propFiltered.length - 1) openPropModal(currentPropIdx + 1);
+    };
+    document.getElementById('modalSentSelectProp').onchange = (e) => {
+        changePropSentiment(e.target.value);
+    };
+
     document.getElementById('toggleAuthorProp').onchange = (e) => {
         document.getElementById('cardAuthorProp').style.display = e.target.checked ? 'block' : 'none';
     };
@@ -931,7 +1004,7 @@
     // ==========================================
     let extData = [];
     let extFiltered = [];
-    let extIdx = 0;
+    let extIdx = 0; // Index globale rispetto a extFiltered
     let extCharts = {};
     let currentCardImage = null; 
     let isEditing = false;
@@ -1025,25 +1098,22 @@
             let pvAle = parseInt(row['source_extended_attributes.alexa_pageviews'] || 0);
             let maxPageviews = Math.max(pvSem, pvAle);
 
-            // Logica specifica per Social
             if (channel === 'Facebook') followers = row['source_extended_attributes.facebook_followers'];
             else if (channel.includes('X (Twitter)')) followers = row['source_extended_attributes.twitter_followers'];
             else if (channel === 'Instagram') followers = row['source_extended_attributes.instagram_followers'];
             else if (channel === 'YouTube') followers = row['source_extended_attributes.youtube_subscribers'] || row['source_extended_attributes.subscribers'];
             
-            // Logica specifica per Web/News: Priorità a Pageviews (Semrush/Alexa)
             if (!followers && !isSocial) {
                 if (maxPageviews > 0) {
                     followers = maxPageviews;
                 }
             }
 
-            // Fallback finale se ancora 0
             if (!followers) followers = row['source_extended_attributes.followers'] || row['reach'] || 0;
             followers = parseInt(followers);
             
             let retweets = parseInt(row['article_extended_attributes.twitter_retweets'] || 0);
-            let pageviews = maxPageviews; // Mantieni per ordinamento views
+            let pageviews = maxPageviews;
 
             let sentVal = parseInt(row['sentiment'] || 0);
             let sentiment = 'Neutro';
@@ -1135,7 +1205,6 @@
         document.getElementById('manFollowers').value = 0;
         document.getElementById('manUrl').value = '';
         
-        // Reset warnings
         document.getElementById('urlWarning').style.display = 'none';
         document.getElementById('manUrl').style.borderColor = 'var(--border-color)';
         
@@ -1143,6 +1212,7 @@
         manualModal.style.display = 'flex';
     }
 
+    // Edit aperto dal modale Ext
     document.getElementById('editExt').onclick = function() {
         if(!extFiltered.length) return;
         const item = extFiltered[extIdx];
@@ -1151,7 +1221,6 @@
 
         document.getElementById('manContent').value = item.content;
         
-        // Correct date offset for input
         const d = item.date;
         const dateString = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0,16);
         document.getElementById('manDate').value = dateString;
@@ -1163,17 +1232,21 @@
         document.getElementById('manFollowers').value = item.followers;
         document.getElementById('manUrl').value = item.url;
         
-        // Reset warnings
         document.getElementById('urlWarning').style.display = 'none';
         document.getElementById('manUrl').style.borderColor = 'var(--border-color)';
         
         document.getElementById('saveManualBtn').innerText = "Salva Modifiche";
         manualModal.style.display = 'flex';
+        // Chiudi temporaneamente modal viewer per edit
+        document.getElementById('editorModalExt').style.display = 'none';
     };
 
-    function closeManualModal() { manualModal.style.display = 'none'; }
+    function closeManualModal() { 
+        manualModal.style.display = 'none'; 
+        // Se stavo editando, riapro il viewer
+        if(isEditing) document.getElementById('editorModalExt').style.display = 'flex';
+    }
 
-    // --- LIVE URL DUPLICATE CHECK ---
     function checkUrlDuplicate() {
         const urlInput = document.getElementById('manUrl');
         const warningEl = document.getElementById('urlWarning');
@@ -1185,7 +1258,6 @@
             return;
         }
 
-        // Need to exclude current item if editing
         let searchPool = extData;
         if(isEditing && editTargetItem) {
             searchPool = extData.filter(i => i !== editTargetItem);
@@ -1209,17 +1281,15 @@
         const channel = document.getElementById('manChannel').value;
         const urlStr = document.getElementById('manUrl').value;
 
-        // Validation - Mandatory fields: URL, Channel, Sentiment (default selected)
         if(!urlStr || !channel) {
             alert("Compila i campi obbligatori (URL Originale, Canale, Sentiment)");
             return;
         }
 
-        // Default values for optional fields
         if (!dateStr) dateStr = new Date().toISOString();
         const date = new Date(dateStr);
         let author = document.getElementById('manAuthor').value || "Autore Sconosciuto";
-        if (!content) content = ""; // Empty content allowed
+        if (!content) content = ""; 
 
         const sentVal = parseInt(document.getElementById('manSentiment').value);
         let sentiment = 'Neutro';
@@ -1236,36 +1306,29 @@
         else if(chLower.includes('youtube')) { iconClass = 'fab fa-youtube'; isSocial = true; }
         else if(chLower.includes('tiktok')) { iconClass = 'fab fa-tiktok'; isSocial = true; }
 
-        // --- ENHANCED DUPLICATE CHECK (ON SAVE) ---
         const nContent = content.trim().toLowerCase();
         const nAuthor = author.trim().toLowerCase();
         const nUrl = urlStr.trim().toLowerCase();
 
         let searchPool = extData;
         if(isEditing && editTargetItem) {
-            // Exclude current item from search if editing
             searchPool = extData.filter(i => i !== editTargetItem);
         }
 
         const duplicateFound = searchPool.some(d => {
-            // Check Content (only if not empty)
             if(nContent && d.content.trim().toLowerCase() === nContent) return true;
-            // Check Author (only if not unknown/default)
             if(nAuthor !== "autore sconosciuto" && d.author.trim().toLowerCase() === nAuthor) return true;
-            // Check Link
             if(nUrl && nUrl.length > 5 && nUrl !== '#' && d.url.trim().toLowerCase() === nUrl) return true;
             return false;
         });
 
         if(duplicateFound) {
             if(!confirm("ATTENZIONE: Trovato un possibile duplicato!\n\nEsiste già un record con lo stesso Autore, Link o Contenuto nel database.\n\nVuoi procedere comunque col salvataggio?")) {
-                return; // User cancelled
+                return; 
             }
         }
-        // -------------------------------
 
         if(isEditing && editTargetItem) {
-            // Update Existing Record
             editTargetItem.content = content;
             editTargetItem.date = date;
             editTargetItem.channel = channel;
@@ -1279,10 +1342,9 @@
             editTargetItem.isSocial = isSocial;
             editTargetItem.hash = generateHash(content, date, author);
             
-            // Refresh Dashboard logic (keep same filtered view)
             refreshExtDashboard();
+            updateExtCard(); // Update modal
         } else {
-            // Create New Record
             const newItem = {
                 date: date,
                 content: content,
@@ -1307,21 +1369,22 @@
         closeManualModal();
     }
 
-    // --- DELETE RECORD FUNCTION ---
     document.getElementById('delExt').onclick = function() {
         if(!extFiltered.length) return;
         if(!confirm("Sei sicuro di voler eliminare questo record dal database? L'operazione non è reversibile.")) return;
 
         const currentItem = extFiltered[extIdx];
-        
         extData = extData.filter(d => d !== currentItem);
         currentCardImage = null;
 
         if(extData.length === 0) {
             document.getElementById('dashboardExt').classList.add('hidden');
+            document.getElementById('editorModalExt').style.display = 'none';
             return;
         }
-
+        
+        // Chiudi modale e ricarica
+        document.getElementById('editorModalExt').style.display = 'none';
         refreshExtDashboard();
     };
 
@@ -1333,23 +1396,17 @@
         extIdx = 0;
         currentCardImage = null;
 
-        if(extCharts.sent) {
-            extCharts.sent.destroy();
-            extCharts.sent = null;
-        }
-        if(extCharts.chan) {
-            extCharts.chan.destroy();
-            extCharts.chan = null;
-        }
+        if(extCharts.sent) { extCharts.sent.destroy(); extCharts.sent = null; }
+        if(extCharts.chan) { extCharts.chan.destroy(); extCharts.chan = null; }
 
         document.getElementById('fileInputExt').value = '';
         document.getElementById('importJsonExt').value = '';
         document.getElementById('dashboardExt').classList.add('hidden');
+        document.getElementById('commentsListExt').innerHTML = '';
         document.getElementById('uploadLabelExt').innerHTML = '<i class="fas fa-file-excel"></i> Carica Export Excel';
         localStorage.removeItem(STORAGE_KEY);
     }
 
-    // --- JSON EXPORT / IMPORT (INTEGRATION) ---
     function exportExtJSON() {
         if(extData.length === 0) { alert("Nessun dato da esportare"); return; }
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(extData));
@@ -1422,13 +1479,14 @@
         reader.readAsText(file);
     }
 
-    // Event listeners
+    // Event listeners Esterni
     ['filterSentExt', 'filterChanExt', 'sortExt'].forEach(id => {
         document.getElementById(id).addEventListener('change', updateExtUI);
     });
     
     document.getElementById('searchExt').addEventListener('input', updateExtUI);
 
+    // Toggles del modale esterno
     ['showAuthorExt', 'showOrigAuthorExt', 'showLikesExt', 'showFollowersExt'].forEach(id => {
         document.getElementById(id).addEventListener('change', updateExtCard);
     });
@@ -1444,11 +1502,23 @@
         }
     });
 
-    document.getElementById('prevExt').onclick = () => { extIdx--; currentCardImage = null; updateExtCard(); };
-    document.getElementById('nextExt').onclick = () => { extIdx++; currentCardImage = null; updateExtCard(); };
+    // Navigazione Modale Esterno
+    const modalExt = document.getElementById('editorModalExt');
+    document.getElementById('closeModalExt').onclick = () => modalExt.style.display = 'none';
+    
+    document.getElementById('modalPrevExt').onclick = () => { if(extIdx > 0) openExtModal(extIdx - 1); };
+    document.getElementById('modalNextExt').onclick = () => { if(extIdx < extFiltered.length - 1) openExtModal(extIdx + 1); };
+    
+    // Select Sentiment in Modale Ext
+    document.getElementById('modalSentSelectExt').onchange = (e) => {
+        updateCurrentExtSentiment(e.target.value);
+    };
+
     document.getElementById('dlBtnExt').onclick = () => dlCanvas('captureCardExt');
     document.getElementById('copyBtnExt').onclick = () => copyCanvas('captureCardExt', 'copyBtnExt');
 
+
+    // UPDATE UI ESTERNI
     function updateExtUI() {
         const sFilter = document.getElementById('filterSentExt').value;
         const cFilter = document.getElementById('filterChanExt').value;
@@ -1468,17 +1538,49 @@
             return true;
         });
 
+        // Sorting Logic
         if(sort === 'dateDesc') extFiltered.sort((a,b) => b.date - a.date);
-        if(sort === 'likesDesc') extFiltered.sort((a,b) => b.likes - a.likes);
-        if(sort === 'followersDesc') extFiltered.sort((a,b) => b.followers - a.followers);
-        if(sort === 'viewsDesc') extFiltered.sort((a,b) => b.pageviews - a.pageviews);
+        else if(sort === 'likesDesc') extFiltered.sort((a,b) => b.likes - a.likes);
+        else if(sort === 'followersDesc') extFiltered.sort((a,b) => b.followers - a.followers);
+        else if(sort === 'viewsDesc') extFiltered.sort((a,b) => b.pageviews - a.pageviews);
+        // NUOVO SORTING PER LUNGHEZZA
+        else if(sort === 'lengthDesc') extFiltered.sort((a,b) => b.content.length - a.content.length);
+        else if(sort === 'lengthAsc') extFiltered.sort((a,b) => a.content.length - b.content.length);
 
         document.getElementById('totalContentExt').innerText = extFiltered.length;
 
-        extIdx = 0;
-        currentCardImage = null;
         updateExtCharts();
-        updateExtCard();
+        renderExtList(extFiltered); // Ora renderizziamo la lista, non solo la card
+    }
+
+    function renderExtList(list) {
+        const container = document.getElementById('commentsListExt');
+        container.innerHTML = '';
+
+        list.slice(0, 100).forEach((item, index) => {
+            let badgeClass = 'sentiment-neutral';
+            if(item.sentiment === 'Positivo') badgeClass = 'sentiment-positive';
+            if(item.sentiment === 'Negativo') badgeClass = 'sentiment-negative';
+
+            const div = document.createElement('div');
+            div.className = 'comment-item';
+            div.onclick = () => openExtModal(index);
+            
+            div.innerHTML = `
+                <div style="width: 100%;">
+                    <div style="font-size:0.8rem; color:#666; margin-bottom:5px; display:flex; align-items:center; justify-content:space-between;">
+                        <div>
+                            <span class="sentiment-badge ${badgeClass}">${item.sentiment}</span>
+                            <span style="margin-left: 8px;">
+                                <i class="${item.iconClass}"></i> ${formatItalianDate(item.date)} - <strong>${item.author}</strong>
+                            </span>
+                        </div>
+                    </div>
+                    <div style="margin-top:5px;">${item.content.substring(0, 120)}${item.content.length>120?'...':''}</div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
     }
 
     function updateExtCharts() {
@@ -1529,10 +1631,7 @@
             }
         }
         
-        // Ordina le categorie principali
         let sortedEntries = Object.entries(aggregatedCounts).sort((a,b) => b[1] - a[1]);
-        
-        // Aggiungi "Altro" alla fine se presente
         if (otherCount > 0) {
             sortedEntries.push(['Altro', otherCount]);
         }
@@ -1581,7 +1680,15 @@
         });
     }
 
-    // Aggiorna sentiment esterno dalla select rapida
+    // Apre il modale Esterno con i dati
+    function openExtModal(idx) {
+        extIdx = idx;
+        currentCardImage = null; // Reset image on new open usually, or keep logic if preferred
+        updateExtCard();
+        modalExt.style.display = 'flex';
+    }
+
+    // Aggiorna sentiment esterno
     function updateCurrentExtSentiment(newVal) {
         if(!extFiltered.length) return;
         const item = extFiltered[extIdx];
@@ -1591,26 +1698,39 @@
         else if(newVal === 'Negativo') item.sentimentVal = -1;
         else item.sentimentVal = 0;
 
+        // Update Modal UI
+        const sel = document.getElementById('modalSentSelectExt');
+        sel.value = newVal;
+        sel.classList.remove('sentiment-positive', 'sentiment-neutral', 'sentiment-negative');
+        if (newVal === 'Positivo') sel.classList.add('sentiment-positive');
+        else if (newVal === 'Negativo') sel.classList.add('sentiment-negative');
+        else sel.classList.add('sentiment-neutral');
+
         updateExtCharts(); 
+        renderExtList(extFiltered); // Update list colors
     }
 
+    // Genera HTML card Esterna (ora dentro il modale)
     function updateExtCard() {
         if(extIdx < 0) extIdx = 0;
-        if(extIdx >= extFiltered.length) extIdx = Math.max(0, extFiltered.length - 1);
-        
-        if(extFiltered.length > 0) {
-            document.getElementById('quickSentExt').value = extFiltered[extIdx].sentiment;
-        }
-
-        document.getElementById('counterExt').innerText = extFiltered.length ? `${extIdx+1} / ${extFiltered.length}` : "0 / 0";
-        const container = document.getElementById('previewAreaExt');
-        
-        if(!extFiltered.length) {
-            container.innerHTML = "Nessun dato.";
-            return;
+        if(extIdx >= extFiltered.length) {
+             // Handle case where list empty or idx out of bounds
+             document.getElementById('previewAreaExt').innerHTML = 'Nessun dato';
+             return;
         }
 
         const d = extFiltered[extIdx];
+        
+        // Update sentiment select color in modal without triggering change event
+        const sel = document.getElementById('modalSentSelectExt');
+        sel.value = d.sentiment;
+        sel.classList.remove('sentiment-positive', 'sentiment-neutral', 'sentiment-negative');
+        if (d.sentiment === 'Positivo') sel.classList.add('sentiment-positive');
+        else if (d.sentiment === 'Negativo') sel.classList.add('sentiment-negative');
+        else sel.classList.add('sentiment-neutral');
+
+        const container = document.getElementById('previewAreaExt');
+        
         const showAuthor = document.getElementById('showAuthorExt').checked;
         const showOrigAuthor = document.getElementById('showOrigAuthorExt').checked;
         const showLikes = document.getElementById('showLikesExt').checked;
