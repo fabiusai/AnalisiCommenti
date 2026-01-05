@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Social Sentiment Dashboard</title>
-    <link rel="icon" href="favicon.ico">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script> 
@@ -39,7 +38,6 @@
         .btn-header { background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; transition: background 0.2s; }
         .btn-header:hover { background-color: rgba(255,255,255,0.4); }
         .btn-header-primary { background-color: var(--brand-yellow); color: var(--brand-blue); border: 1px solid var(--brand-yellow); font-weight: bold; }
-        .btn-header-primary:hover { background-color: #ffe600; }
 
         .tabs-nav { display: flex; background: white; padding: 0 2rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1rem; }
         .tab-button { padding: 1rem 2rem; border: none; background: none; font-size: 1rem; font-weight: 500; color: var(--text-dark); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s; }
@@ -56,27 +54,22 @@
         .upload-container:hover { border-color: var(--brand-blue); }
         input[type="file"] { display: none; }
         .custom-file-upload { display: inline-block; padding: 12px 24px; cursor: pointer; background-color: var(--brand-blue); color: white; font-weight: 500; border-radius: 2px; transition: background 0.3s; margin: 5px; }
-        .custom-file-upload:hover { opacity: 0.9; }
         
         .btn-secondary { background-color: white; color: var(--brand-blue); border: 1px solid var(--brand-blue); padding: 10px 20px; font-weight: 500; border-radius: 2px; cursor: pointer; margin: 5px; }
         .btn-secondary:hover { background-color: #f0f8ff; }
 
         .btn { border: none; padding: 8px 16px; font-size: 0.8rem; cursor: pointer; border-radius: 2px; font-weight: 500; text-transform: uppercase; transition: all 0.2s; }
-        .btn-editor { background-color: var(--bg-light); color: var(--brand-blue); border: 1px solid var(--brand-blue); }
-        .btn-editor:hover { background-color: var(--brand-blue); color: white; }
         .btn-download { background-color: var(--brand-yellow); color: var(--brand-blue); }
         .btn-copy { background-color: var(--brand-lightblue); color: white; }
-        .btn-copy:hover { opacity: 0.9; }
-        
-        /* Danger / Reset Button Style */
         .btn-danger { background-color: white; color: var(--danger); border: 1px solid var(--danger); padding: 10px 20px; }
         .btn-danger:hover { background-color: var(--danger); color: white; }
+        .btn-sm { padding: 4px 8px; font-size: 0.7rem; margin-left: auto; }
 
         .btn-link { background: none; color: var(--brand-blue); text-decoration: underline; border: none; padding: 0; font-size: 0.9rem; cursor: pointer; }
-        .btn-upload-img { background-color: #e2e6ea; color: #333; margin-right: 10px; }
-        .btn-upload-img:hover { background-color: #dbe0e5; }
+        .btn-upload-img { background-color: #e2e6ea; color: #333; margin-right: 10px; padding: 5px 10px; border-radius: 4px; }
         
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; margin-bottom: 2rem; }
+        /* LAYOUT 50% - 50% */
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
         @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
         
         .card-box { background: white; padding: 1.5rem; border-radius: 4px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
@@ -89,61 +82,72 @@
         .filter-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 10px; align-items: end; }
         .filter-select, .filter-input { padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; width: 100%; font-family: inherit; }
         
+        /* Lista Commenti */
         .comments-list { background: white; border: 1px solid var(--border-color); border-radius: 4px; max-height: 500px; overflow-y: auto; }
-        .comment-item { padding: 1rem; border-bottom: 1px solid var(--bg-light); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; transition: background 0.2s; cursor: pointer;}
+        .comment-item { padding: 1rem; border-bottom: 1px solid var(--bg-light); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; transition: background 0.2s; cursor: pointer; }
         .comment-item:hover { background-color: #f9f9f9; }
+        
         .sentiment-badge { padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; color: white; display: inline-block; min-width: 60px; text-align: center;}
         .sentiment-positive { background-color: var(--success); }
         .sentiment-neutral { background-color: var(--warning); color: #333; }
         .sentiment-negative { background-color: var(--danger); }
 
+        /* --- MODAL STYLE --- */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal-content { background-color: white; padding: 2rem; border-radius: 4px; width: 90%; max-width: 650px; border-top: 5px solid var(--brand-blue); max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .close { font-size: 1.5rem; font-weight: bold; cursor: pointer; color: #aaa; }
         
-        #cardPreviewContainer, #cardPreviewContainerExt { display: flex; justify-content: center; margin-bottom: 1rem; padding: 20px; background-color: #e0e0e0; border-radius: 4px; min-height: 300px; align-items: center; }
-        
-        .social-card { 
-            background: white; 
-            width: 100%; 
-            max-width: 450px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-            font-family: 'Roboto', sans-serif; 
-            position: relative; 
-            overflow: hidden; 
+        .modal-content { 
+            background-color: white; 
+            border-radius: 4px; 
+            width: 90%; 
+            max-width: 650px; 
+            border-top: 5px solid var(--brand-blue); 
+            max-height: 95vh; 
             display: flex; 
-            flex-direction: column;
-            text-align: left;
+            flex-direction: column; 
+            overflow: hidden; 
         }
         
+        .modal-header { padding: 1.5rem 2rem 1rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .modal-tools-top { padding: 0 2rem 1rem 2rem; flex-shrink: 0; }
+        .modal-footer-custom { padding: 1rem 2rem 1.5rem 2rem; flex-shrink: 0; text-align: right; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #eee; margin-top: auto; }
+        .close { font-size: 1.5rem; font-weight: bold; cursor: pointer; color: #aaa; }
+        
+        /* Scrollable Card Container - FIXED VISUALIZATION */
+        #cardPreviewContainer, #cardPreviewContainerExt { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            background-color: #e0e0e0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; /* Impostato a colonna */
+            justify-content: flex-start; /* Parte dall'alto, non dal centro verticale */
+            align-items: center; /* Centrato orizzontalmente */
+            min-height: 200px;
+        }
+        
+        /* Social Card Styles */
+        .social-card { 
+            background: white; width: 100%; max-width: 450px; border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-family: 'Roboto', sans-serif; 
+            position: relative; overflow: hidden; display: flex; flex-direction: column; text-align: left;
+            flex-shrink: 0; 
+            margin: auto; /* Margine automatico per centrare se piccolo, scrollare se grande */
+        }
         .social-card .card-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 25px 25px 10px 25px; }
         .social-card .card-icon { width: 24px; height: 24px; fill: var(--brand-blue); flex-shrink: 0; margin-right: 10px; }
         .social-card .card-icon-fa { font-size: 24px; color: var(--brand-blue); margin-right: 10px; }
         .social-card .card-date { font-size: 0.8rem; color: #999; margin-left: auto; white-space: nowrap; }
-
         .social-card .card-body { padding: 10px 25px 20px 25px; font-size: 1.1rem; line-height: 1.5; color: #222; flex-grow: 1; }
-        
         .card-custom-image { width: 100%; height: auto; border-radius: 4px; margin-bottom: 15px; display: block; object-fit: cover; max-height: 250px; }
-
         .social-card .card-footer { 
-            margin-top: auto; 
-            border-top: 1px solid #eee; 
-            padding: 15px 25px; 
-            font-size: 0.9rem; 
-            font-weight: 500; 
-            color: var(--brand-blue); 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            margin-top: auto; border-top: 1px solid #eee; padding: 15px 25px; 
+            font-size: 0.9rem; font-weight: 500; color: var(--brand-blue); 
+            display: flex; justify-content: space-between; align-items: center;
         }
-        
         .social-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background-color: var(--brand-blue); }
 
         [contenteditable="true"] { cursor: text; border: 1px dashed transparent; transition: all 0.2s; min-width: 20px; display: inline-block; }
         [contenteditable="true"]:hover, [contenteditable="true"]:focus { background-color: rgba(237, 220, 1, 0.2); border-color: #999; border-radius: 3px; }
-        .edit-hint { text-align: center; font-size: 0.85rem; color: #666; margin-bottom: 10px; font-style: italic; }
 
         .modal-nav-bar { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 15px; border: 1px solid #eee; }
         .modal-nav-btn { background: none; border: 1px solid #ccc; border-radius: 4px; padding: 5px 12px; cursor: pointer; }
@@ -151,52 +155,35 @@
 
         .hidden { display: none !important; }
 
-        /* Form Styles for Manual Entry */
+        .sentiment-select-wrapper { display: inline-block; position: relative; }
+        .sentiment-select { 
+            appearance: none; -webkit-appearance: none; border: 2px solid transparent; 
+            border-radius: 12px; padding: 4px 24px 4px 10px; font-size: 0.85rem; 
+            font-weight: bold; color: white; cursor: pointer; text-align: center;
+        }
+        .sentiment-select:focus { outline: none; box-shadow: 0 0 0 2px rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.5); }
+        .sentiment-select option { color: #333; background: white; padding: 5px; }
+        .sentiment-arrow { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid white; }
+        
+        .modal-settings-bar { display: flex; gap: 15px; font-size: 0.9rem; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
+
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
-        .icon-fb path { fill: #1877F2; }
-        .icon-ig path { fill: #E4405F; }
-        .icon-tw path { fill: #000000; }
         
         footer { margin-top: auto; background-color: white; border-top: 1px solid var(--border-color); padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #888; display: flex; justify-content: space-between; }
-
-        .sentiment-select-wrapper { display: inline-block; position: relative; }
-        .sentiment-select { 
-            appearance: none; 
-            -webkit-appearance: none; 
-            border: 2px solid transparent; 
-            border-radius: 12px; 
-            padding: 4px 24px 4px 10px; 
-            font-size: 0.85rem; 
-            font-weight: bold; 
-            color: white; 
-            cursor: pointer; 
-            text-align: center;
-            transition: background-color 0.2s, box-shadow 0.2s;
-        }
-        .sentiment-select:focus { outline: none; box-shadow: 0 0 0 2px rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.5); }
-        .sentiment-select option { color: #333; background: white; padding: 5px; }
-        .sentiment-arrow {
-            position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-            pointer-events: none; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid white;
-        }
         
-        .modal-settings-bar { display: flex; gap: 15px; font-size: 0.9rem; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
-
+        /* Flex header title for button */
+        .box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
     </style>
 </head>
 <body>
 
 <header>
-    <div>
-        <h1>Social Sentiment Dashboard</h1>
-    </div>
+    <h1>Social Sentiment Dashboard</h1>
     <div class="header-actions">
         <button class="btn-header btn-header-primary" onclick="saveToBrowser()"><i class="fas fa-cloud-upload-alt"></i> Salva nel Browser</button>
-        
         <button class="btn-header" onclick="exportFullState()"><i class="fas fa-save"></i> Salva Backup File</button>
         <label for="importFullStateInput" class="btn-header"><i class="fas fa-upload"></i> Ripristina Backup</label>
         <input type="file" id="importFullStateInput" accept=".json" style="display:none" onchange="importFullState(this)">
@@ -212,33 +199,28 @@
     <div id="tab-proprietary" class="tab-content active">
         <section class="upload-container">
             <h2 style="margin-bottom: 15px; color: var(--brand-blue);">Importazione Dati Proprietari</h2>
-            <p style="margin-bottom: 20px; color: #666;">Carica file Excel (.xlsx) o CSV. Supporto multi-file.</p>
-            
             <div style="display:flex; justify-content:center; gap:10px; align-items:center; flex-wrap:wrap;">
                 <label for="fileInputProp" class="custom-file-upload" id="uploadLabelProp">Seleziona File</label>
                 <input type="file" id="fileInputProp" accept=".xlsx, .xls, .csv" multiple>
-                
-                <button onclick="resetPropData()" class="btn btn-danger" style="margin-top: 5px;">
-                    <i class="fas fa-trash-alt"></i> Reset / Svuota
-                </button>
+                <button onclick="resetPropData()" class="btn btn-danger" style="margin-top: 5px;"><i class="fas fa-trash-alt"></i> Reset</button>
             </div>
-            
             <p id="fileCountProp" style="margin-top: 10px; font-size: 0.9rem; color: var(--brand-blue);"></p>
         </section>
 
         <div id="appContentProp" class="hidden">
             <div class="dashboard-grid">
                 <div class="card-box">
-                    <h3 class="section-title">Sentiment Overview</h3>
-                    <div style="margin-bottom: 1rem;"><strong>Totale Commenti:</strong> <span id="totalCommentsProp">0</span></div>
-                    <div class="chart-wrapper">
-                        <canvas id="sentimentChartProp"></canvas>
+                    <div class="box-header">
+                        <h3 class="section-title" style="margin:0;">Sentiment Overview</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="downloadChart('sentimentChartProp')"><i class="fas fa-camera"></i> Scarica PNG</button>
                     </div>
+                    <div style="margin-bottom: 1rem;"><strong>Totale Commenti:</strong> <span id="totalCommentsProp">0</span></div>
+                    <div class="chart-wrapper"><canvas id="sentimentChartProp"></canvas></div>
                     <div id="legendProp" class="custom-legend"></div>
                 </div>
                 
                 <div class="card-box">
-                    <h3 class="section-title" style="margin-bottom: 10px;">Feed Commenti</h3>
+                    <h3 class="section-title">Feed Commenti</h3>
                     <div class="filters-container">
                         <div class="filter-row">
                             <div><label>Cerca</label><input type="text" id="filterTextProp" class="filter-input"></div>
@@ -249,6 +231,15 @@
                                     <option value="positive">Positivi</option>
                                     <option value="neutral">Neutri</option>
                                     <option value="negative">Negativi</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Canale</label>
+                                <select id="filterPlatformProp" class="filter-select">
+                                    <option value="all">Tutti</option>
+                                    <option value="facebook">Facebook</option>
+                                    <option value="instagram">Instagram</option>
+                                    <option value="twitter">X (Twitter)</option>
                                 </select>
                             </div>
                             <div>
@@ -270,8 +261,6 @@
     <div id="tab-external" class="tab-content">
         <section class="upload-container">
             <h2 style="margin-bottom: 15px; color: var(--brand-blue);">Importazione Web & Social Esterni</h2>
-            <p style="margin-bottom: 20px; color: #666;">Carica Export Excel, Importa JSON integrativo o aggiungi manualmente.</p>
-            
             <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; align-items:center;">
                 <label for="fileInputExt" class="custom-file-upload" id="uploadLabelExt"><i class="fas fa-file-excel"></i> Carica Export Excel</label>
                 <input type="file" id="fileInputExt" accept=".xlsx, .xls, .csv">
@@ -281,41 +270,34 @@
                 </label>
                 <input type="file" id="importJsonExt" accept=".json" style="display:none" onchange="importExtJSON(this)">
                 
-                <button class="btn-secondary" onclick="openManualModal()" style="height: 42px; margin-top:5px;">
-                    <i class="fas fa-plus-circle"></i> Aggiungi Manuale
-                </button>
-
-                <button class="btn-secondary" onclick="exportExtJSON()" style="height: 42px; margin-top:5px;">
-                    <i class="fas fa-download"></i> Esporta JSON (Integrazioni)
-                </button>
-                
-                <button onclick="resetExtData()" class="btn btn-danger" style="height: 42px; margin-top:5px;">
-                    <i class="fas fa-trash-alt"></i> Reset / Svuota
-                </button>
+                <button class="btn-secondary" onclick="openManualModal()" style="height: 42px; margin-top:5px;"><i class="fas fa-plus-circle"></i> Aggiungi Manuale</button>
+                <button class="btn-secondary" onclick="exportExtJSON()" style="height: 42px; margin-top:5px;"><i class="fas fa-download"></i> Esporta JSON</button>
+                <button onclick="resetExtData()" class="btn btn-danger" style="height: 42px; margin-top:5px;"><i class="fas fa-trash-alt"></i> Reset</button>
             </div>
         </section>
 
         <div id="dashboardExt" class="dashboard-grid hidden">
             <div class="left-column">
                 <div class="card-box" style="margin-bottom: 2rem;">
-                    <h3 class="section-title">Sentiment Analysis</h3>
-                    <div style="margin-bottom: 1rem;"><strong>Totale Contenuti:</strong> <span id="totalContentExt">0</span></div>
-                    <div class="chart-wrapper">
-                        <canvas id="sentimentChartExt"></canvas>
+                    <div class="box-header">
+                        <h3 class="section-title" style="margin:0;">Sentiment Analysis</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="downloadChart('sentimentChartExt')"><i class="fas fa-camera"></i> Scarica PNG</button>
                     </div>
+                    <div style="margin-bottom: 1rem;"><strong>Totale Contenuti:</strong> <span id="totalContentExt">0</span></div>
+                    <div class="chart-wrapper"><canvas id="sentimentChartExt"></canvas></div>
                     <div id="legendExt" class="custom-legend"></div>
                 </div>
                 <div class="card-box">
-                    <h3 class="section-title">Canali e siti</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="channelChartExt"></canvas>
+                    <div class="box-header">
+                        <h3 class="section-title" style="margin:0;">Canali e siti</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="downloadChart('channelChartExt')"><i class="fas fa-camera"></i> Scarica PNG</button>
                     </div>
+                    <div class="chart-wrapper"><canvas id="channelChartExt"></canvas></div>
                 </div>
             </div>
 
             <div class="card-box">
                 <h3 class="section-title">Feed Post & Commenti</h3>
-                
                 <div class="filters-container">
                     <div class="filter-row" style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
                         <div style="flex: 1;">
@@ -323,7 +305,6 @@
                             <input type="text" id="searchExt" class="filter-input" placeholder="Cerca parole chiave o autori...">
                         </div>
                     </div>
-                    
                     <div class="filter-row">
                         <div><label>Sentiment</label>
                             <select id="filterSentExt" class="filter-select">
@@ -341,8 +322,8 @@
                                 <option value="dateDesc">Data (Recenti)</option>
                                 <option value="lengthDesc">Lunghezza (Max)</option>
                                 <option value="lengthAsc">Lunghezza (Min)</option>
-                                <option value="likesDesc">Engagement (Like/Reaz.)</option>
-                                <option value="followersDesc">Followers (Alti)</option>
+                                <option value="likesDesc">Engagement</option>
+                                <option value="followersDesc">Followers</option>
                                 <option value="viewsDesc">Page Views</option>
                             </select>
                         </div>
@@ -350,10 +331,6 @@
                 </div>
 
                 <div class="comments-list" id="commentsListExt"></div>
-
-                <div style="display:none;">
-                    <button id="prevExt"></button><button id="nextExt"></button><span id="counterExt"></span><select id="quickSentExt"></select>
-                </div>
             </div>
         </div>
     </div>
@@ -361,7 +338,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v5.2 Uniform Interaction</span>
+    <span class="app-version">v5.8 Layout & Sort Fixed</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -370,24 +347,25 @@
             <h2 style="color: var(--brand-blue);">Editor Card Social</h2>
             <span class="close" id="closeModalProp">&times;</span>
         </div>
-
-        <div class="modal-nav-bar">
-            <button class="modal-nav-btn" id="modalPrevProp"><i class="fas fa-chevron-left"></i> Prec</button>
-            
-            <div class="sentiment-select-wrapper">
-                <select id="modalSentSelectProp" class="sentiment-select">
-                    <option value="Positive">😊 Positivo</option>
-                    <option value="Neutral">😐 Neutro</option>
-                    <option value="Negative">😡 Negativo</option>
-                </select>
-                <div class="sentiment-arrow"></div>
+        <div class="modal-tools-top">
+            <div class="modal-nav-bar">
+                <button class="modal-nav-btn" id="modalPrevProp"><i class="fas fa-chevron-left"></i> Prec</button>
+                <div class="sentiment-select-wrapper">
+                    <select id="modalSentSelectProp" class="sentiment-select">
+                        <option value="Positive">😊 Positivo</option>
+                        <option value="Neutral">😐 Neutro</option>
+                        <option value="Negative">😡 Negativo</option>
+                    </select>
+                    <div class="sentiment-arrow"></div>
+                </div>
+                <button class="modal-nav-btn" id="modalNextProp">Succ <i class="fas fa-chevron-right"></i></button>
             </div>
-
-            <button class="modal-nav-btn" id="modalNextProp">Succ <i class="fas fa-chevron-right"></i></button>
-        </div>
-
-        <div style="margin-bottom: 1rem; text-align:center;">
-            <input type="checkbox" id="toggleAuthorProp" checked> <label for="toggleAuthorProp">Mostra Nome Autore</label>
+            <div style="text-align:center;">
+                <input type="checkbox" id="toggleAuthorProp" checked> <label for="toggleAuthorProp">Mostra Nome Autore</label>
+                <button id="delProp" class="btn btn-danger" style="margin-left: 10px; padding: 4px 10px; font-size: 0.8rem;">
+                    <i class="fas fa-trash-alt"></i> Elimina
+                </button>
+            </div>
         </div>
 
         <div id="cardPreviewContainer">
@@ -403,10 +381,11 @@
                 </div>
                 <div class="card-footer">
                     <div id="cardAuthorProp">Nome Autore</div>
-                    </div>
+                </div>
             </div>
         </div>
-        <div style="text-align: right; margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+
+        <div class="modal-footer-custom">
             <button class="btn btn-copy" id="copyBtnProp"><i class="fas fa-copy"></i> Copia Card</button>
             <button class="btn btn-download" id="dlBtnProp"><i class="fas fa-download"></i> Scarica Card</button>
         </div>
@@ -420,44 +399,43 @@
             <span class="close" id="closeModalExt">&times;</span>
         </div>
 
-        <div class="modal-nav-bar">
-            <button class="modal-nav-btn" id="modalPrevExt"><i class="fas fa-chevron-left"></i> Prec</button>
-            
-            <div class="sentiment-select-wrapper">
-                <select id="modalSentSelectExt" class="sentiment-select">
-                    <option value="Positivo">😊 Positivo</option>
-                    <option value="Neutro">😐 Neutro</option>
-                    <option value="Negativo">😡 Negativo</option>
-                </select>
-                <div class="sentiment-arrow"></div>
+        <div class="modal-tools-top">
+            <div class="modal-nav-bar">
+                <button class="modal-nav-btn" id="modalPrevExt"><i class="fas fa-chevron-left"></i> Prec</button>
+                <div class="sentiment-select-wrapper">
+                    <select id="modalSentSelectExt" class="sentiment-select">
+                        <option value="Positivo">😊 Positivo</option>
+                        <option value="Neutro">😐 Neutro</option>
+                        <option value="Negativo">😡 Negativo</option>
+                    </select>
+                    <div class="sentiment-arrow"></div>
+                </div>
+                <button class="modal-nav-btn" id="modalNextExt">Succ <i class="fas fa-chevron-right"></i></button>
             </div>
-
-            <button class="modal-nav-btn" id="modalNextExt">Succ <i class="fas fa-chevron-right"></i></button>
-        </div>
-        
-        <div class="modal-settings-bar">
-            <label><input type="checkbox" id="showAuthorExt" checked> Autore</label>
-            <label><input type="checkbox" id="showOrigAuthorExt" checked> Fonte</label>
-            <label><input type="checkbox" id="showLikesExt" checked> Like</label>
-            <label><input type="checkbox" id="showFollowersExt" checked> Follower</label>
-        </div>
-        
-        <div style="text-align:center; margin-bottom:15px;">
-            <label for="imgUploadExt" class="btn btn-upload-img" style="cursor:pointer; font-size:0.8rem;"><i class="fas fa-image"></i> Carica Immagine (o Incolla CTRL+V)</label>
-            <input type="file" id="imgUploadExt" accept="image/*" style="display:none;">
-            <a href="#" id="linkExt" target="_blank" class="btn-link" style="margin-left:10px;">Apri Originale <i class="fas fa-external-link-alt"></i></a>
             
-             <div style="margin-top:5px;">
-                <button id="editExt" class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" title="Modifica Dati Record"><i class="fas fa-edit"></i> Edit Dati</button>
-                <button id="delExt" class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem;" title="Elimina Record"><i class="fas fa-trash-alt"></i> Elimina</button>
-             </div>
+            <div class="modal-settings-bar">
+                <label><input type="checkbox" id="showAuthorExt" checked> Autore</label>
+                <label><input type="checkbox" id="showOrigAuthorExt" checked> Fonte</label>
+                <label><input type="checkbox" id="showLikesExt" checked> Like</label>
+                <label><input type="checkbox" id="showFollowersExt" checked> Follower</label>
+            </div>
+            
+            <div style="text-align:center; margin-top:10px;">
+                <label for="imgUploadExt" class="btn btn-upload-img" style="cursor:pointer; font-size:0.8rem;"><i class="fas fa-image"></i> Carica Immagine (o Incolla CTRL+V)</label>
+                <input type="file" id="imgUploadExt" accept="image/*" style="display:none;">
+                <a href="#" id="linkExt" target="_blank" class="btn-link" style="margin-left:10px;">Apri Originale <i class="fas fa-external-link-alt"></i></a>
+                <div style="margin-top:5px;">
+                    <button id="editExt" class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" title="Modifica Dati Record"><i class="fas fa-edit"></i> Edit Dati</button>
+                    <button id="delExt" class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem;" title="Elimina Record"><i class="fas fa-trash-alt"></i> Elimina</button>
+                </div>
+            </div>
         </div>
 
         <div id="cardPreviewContainerExt">
             <div id="previewAreaExt"></div>
         </div>
 
-        <div style="text-align: right; margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+        <div class="modal-footer-custom">
             <button id="copyBtnExt" class="btn btn-copy"><i class="fas fa-copy"></i> Copia Card</button>
             <button id="dlBtnExt" class="btn btn-download"><i class="fas fa-download"></i> Scarica Card</button>
         </div>
@@ -465,74 +443,64 @@
 </div>
 
 <div id="manualModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="overflow-y:auto; display:block;"> 
         <div class="modal-header">
             <h2 style="color: var(--brand-blue);">Dati Post</h2>
             <span class="close" onclick="closeManualModal()">&times;</span>
         </div>
-        <div class="form-group">
-            <label>Testo del Post</label>
-            <textarea id="manContent" rows="4"></textarea>
-        </div>
-        <div class="form-row">
+        <div style="padding: 0 2rem 2rem 2rem;">
             <div class="form-group">
-                <label>Data</label>
-                <input type="datetime-local" id="manDate">
+                <label>Testo del Post</label>
+                <textarea id="manContent" rows="4"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="datetime-local" id="manDate">
+                </div>
+                <div class="form-group">
+                    <label>Canale / Sito *</label>
+                    <input type="text" id="manChannel" list="channelListHint" placeholder="Es. Facebook">
+                    <datalist id="channelListHint">
+                        <option value="Facebook"><option value="Instagram"><option value="TikTok"><option value="X (Twitter)"><option value="LinkedIn"><option value="YouTube"><option value="Web/News">
+                    </datalist>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Autore</label>
+                    <input type="text" id="manAuthor" placeholder="Nome autore o pagina">
+                </div>
+                <div class="form-group">
+                    <label>Sentiment *</label>
+                    <select id="manSentiment"><option value="0">Neutro</option><option value="1">Positivo</option><option value="-1">Negativo</option></select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Likes / Engagement</label>
+                    <input type="number" id="manLikes" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Followers / Reach</label>
+                    <input type="number" id="manFollowers" value="0">
+                </div>
             </div>
             <div class="form-group">
-                <label>Canale / Sito *</label>
-                <input type="text" id="manChannel" list="channelListHint" placeholder="Es. Facebook, Repubblica.it">
-                <datalist id="channelListHint">
-                    <option value="Facebook">
-                    <option value="Instagram">
-                    <option value="TikTok">
-                    <option value="X (Twitter)">
-                    <option value="LinkedIn">
-                    <option value="YouTube">
-                    <option value="Web/News">
-                </datalist>
+                <label>URL Originale *</label>
+                <input type="text" id="manUrl" placeholder="https://..." oninput="checkUrlDuplicate()">
+                <small id="urlWarning" style="color: var(--danger); display: none; font-weight: bold; margin-top: 5px;"></small>
             </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label>Autore</label>
-                <input type="text" id="manAuthor" placeholder="Nome autore o pagina">
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-download" id="saveManualBtn" onclick="saveManualPost()">Aggiungi al Dataset</button>
             </div>
-            <div class="form-group">
-                <label>Sentiment *</label>
-                <select id="manSentiment">
-                    <option value="0">Neutro</option>
-                    <option value="1">Positivo</option>
-                    <option value="-1">Negativo</option>
-                </select>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label>Likes / Engagement</label>
-                <input type="number" id="manLikes" value="0">
-            </div>
-            <div class="form-group">
-                <label>Followers / Reach</label>
-                <input type="number" id="manFollowers" value="0">
-            </div>
-        </div>
-        <div class="form-group">
-            <label>URL Originale *</label>
-            <input type="text" id="manUrl" placeholder="https://..." oninput="checkUrlDuplicate()">
-            <small id="urlWarning" style="color: var(--danger); display: none; font-weight: bold; margin-top: 5px;"></small>
-        </div>
-        <div style="text-align: right; margin-top: 20px;">
-            <button class="btn btn-download" id="saveManualBtn" onclick="saveManualPost()">Aggiungi al Dataset</button>
         </div>
     </div>
 </div>
 
 <script>
-    // Register the plugin to ensure labels appear
     Chart.register(ChartDataLabels);
-
-    // --- ICONS PATHS ---
+    
     const icons = {
         facebook: "M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.15 5.96C15.21 5.96 16.12 6.04 16.12 6.04V8.51H15.01C13.77 8.51 13.38 9.28 13.38 10.07V12.06H16.15L15.71 14.96H13.38V21.96C18.16 21.21 21.82 17.06 21.82 12.06C21.82 6.53 17.32 2.04 12 2.04Z",
         instagram: "M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4C4,18.39 5.61,20 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6C20,5.61 18.39,4 16.4,4H7.6M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z",
@@ -540,7 +508,6 @@
         default: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"
     };
 
-    // --- UTILS ---
     function switchTab(name) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
@@ -548,1251 +515,668 @@
         document.querySelectorAll('.tab-button')[name === 'proprietary' ? 0 : 1].classList.add('active');
     }
 
-    function formatCompactNumber(number) {
-        if (!number || isNaN(number)) return "0";
-        return Intl.NumberFormat('en-US', {
-            notation: "compact",
-            maximumFractionDigits: 1
-        }).format(number);
+    function formatCompactNumber(n) {
+        if (!n || isNaN(n)) return "0";
+        return Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(n);
     }
 
-    function formatItalianDate(dateObj) {
-        if (!dateObj || isNaN(dateObj.getTime())) return "N/D";
-        const day = String(dateObj.getDate()).padStart(2, '0');
-        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-        const year = dateObj.getFullYear();
-        const hours = String(dateObj.getHours()).padStart(2, '0');
-        const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-        return `${day}/${month}/${year} ${hours}:${minutes}`;
+    function formatItalianDate(d) {
+        if (!d || isNaN(d.getTime())) return "N/D";
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        return `${day}/${month}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
     }
 
-    function dlCanvas(elementId) {
-        const el = document.getElementById(elementId);
+    function smartTruncate(text, maxLen) {
+        if (!text) return "";
+        if (text.length <= maxLen) return text;
+        const sub = text.substring(0, maxLen);
+        const lastDot = sub.lastIndexOf('.');
+        if (lastDot !== -1) return sub.substring(0, lastDot + 1); 
+        const lastSpace = sub.lastIndexOf(' ');
+        if (lastSpace !== -1) return sub.substring(0, lastSpace) + '...';
+        return sub + '...';
+    }
+
+    function dlCanvas(id) {
+        const el = document.getElementById(id);
         const editables = el.querySelectorAll('[contenteditable="true"]');
         editables.forEach(e => e.setAttribute('contenteditable', 'false'));
-        
         html2canvas(el, { scale: 2 }).then(canvas => {
             const link = document.createElement('a');
-            link.download = `social-card-${Date.now()}.png`;
+            link.download = `card-${Date.now()}.png`;
             link.href = canvas.toDataURL();
             link.click();
             editables.forEach(e => e.setAttribute('contenteditable', 'true'));
         });
     }
+    
+    // Funzione download grafico PNG
+    function downloadChart(chartId) {
+        const c = document.getElementById(chartId);
+        const link = document.createElement('a');
+        link.download = `grafico-${Date.now()}.png`;
+        link.href = c.toDataURL('image/png', 1.0);
+        link.click();
+    }
 
-    function copyCanvas(elementId, btnId) {
-        const el = document.getElementById(elementId);
+    function copyCanvas(id, btnId) {
+        const el = document.getElementById(id);
         const btn = document.getElementById(btnId);
-        const originalText = btn.innerHTML;
-        
+        const origText = btn.innerHTML;
         const editables = el.querySelectorAll('[contenteditable="true"]');
         editables.forEach(e => e.setAttribute('contenteditable', 'false'));
-
         html2canvas(el, { scale: 2 }).then(canvas => {
             canvas.toBlob(blob => {
                 try {
-                    const item = new ClipboardItem({ 'image/png': blob });
-                    navigator.clipboard.write([item]).then(() => {
-                        btn.innerHTML = '<i class="fas fa-check"></i> Copiato!';
-                        setTimeout(() => btn.innerHTML = originalText, 2000);
+                    navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(() => {
+                        btn.innerHTML = '<i class="fas fa-check"></i>';
+                        setTimeout(() => btn.innerHTML = origText, 2000);
                     });
-                } catch (err) {
-                    alert("Errore: Impossibile copiare negli appunti (usa HTTPS o Localhost)");
-                    console.error(err);
-                }
+                } catch (e) { alert("Errore copia (usa HTTPS/Localhost)"); }
                 editables.forEach(e => e.setAttribute('contenteditable', 'true'));
             });
         });
     }
 
-    function generateHash(content, date, author) {
-        const str = (content + (date ? date.toISOString() : '') + author).toLowerCase().replace(/\s/g, '');
+    function generateHash(c, d, a) {
+        const str = (c + (d ? d.toISOString() : '') + a).toLowerCase().replace(/\s/g, '');
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = (hash << 5) - hash + char;
-            hash = hash & hash;
+            hash = ((hash << 5) - hash) + str.charCodeAt(i);
+            hash |= 0;
         }
         return hash;
     }
 
-    // --- BROWSER LOCAL STORAGE SAVE/LOAD ---
-    const STORAGE_KEY = 'socialDashboardState';
-
+    const STORAGE_KEY = 'socialDashState';
     function saveToBrowser() {
         try {
-            const state = {
-                proprietary: propComments,
-                external: extData,
-                timestamp: new Date()
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-            alert(`Salvataggio completato nel browser!\nDati salvati: ${propComments.length} proprietari, ${extData.length} esterni.`);
-        } catch (e) {
-            console.error(e);
-            alert("Errore durante il salvataggio. La memoria del browser potrebbe essere piena.");
-        }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ prop: propComments, ext: extData, ts: new Date() }));
+            alert("Salvato!");
+        } catch (e) { alert("Errore salvataggio (Memoria Piena?)"); }
     }
-
-    function checkAndLoadFromBrowser() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if(saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                const dateSaved = new Date(parsed.timestamp).toLocaleString();
-                if(confirm(`Trovato un salvataggio automatico del ${dateSaved}.\nVuoi ripristinare i dati e continuare il lavoro?`)) {
-                    if(parsed.proprietary) {
-                        propComments = parsed.proprietary.map(c => ({...c, date: new Date(c.date)}));
-                        initPropDashboard();
-                    }
-                    if(parsed.external) {
-                        extData = parsed.external.map(d => ({...d, date: new Date(d.date)}));
-                        refreshExtDashboard();
-                    }
-                }
-            } catch(e) {
-                console.error("Errore lettura LocalStorage", e);
-            }
+    
+    window.addEventListener('load', () => {
+        const s = localStorage.getItem(STORAGE_KEY);
+        if(s && confirm("Trovati dati salvati. Ripristinare?")) {
+            const p = JSON.parse(s);
+            if(p.prop) { propComments = p.prop.map(x=>({...x, date: new Date(x.date)})); initPropDashboard(); }
+            if(p.ext) { extData = p.ext.map(x=>({...x, date: new Date(x.date)})); refreshExtDashboard(); }
         }
-    }
+    });
 
-    // Check on Load
-    window.addEventListener('load', checkAndLoadFromBrowser);
-
-
-    // --- PASTE LISTENER FOR IMAGES ---
     document.addEventListener('paste', function(e) {
-        // Verifica che il modale esterno sia visibile
         const extModal = document.getElementById('editorModalExt');
         if(extModal.style.display !== 'block' && extModal.style.display !== 'flex') return;
-
         const items = e.clipboardData.items;
         for (let i = 0; i < items.length; i++) {
             if (items[i].type.indexOf('image') !== -1) {
-                const blob = items[i].getAsFile();
                 const reader = new FileReader();
-                reader.onload = (event) => {
-                    currentCardImage = event.target.result;
-                    updateExtCard(); // Aggiorna la card dentro il modale
+                reader.onload = (ev) => {
+                    currentCardImage = ev.target.result;
+                    updateExtCard();
                     const btn = document.querySelector('label[for="imgUploadExt"]');
-                    const orig = btn.innerHTML;
                     btn.innerHTML = '<i class="fas fa-check"></i> Incollato!';
-                    setTimeout(() => btn.innerHTML = orig, 1500);
+                    setTimeout(() => btn.innerHTML = '<i class="fas fa-image"></i> Carica Immagine (o Incolla CTRL+V)', 1500);
                 };
-                reader.readAsDataURL(blob);
-                e.preventDefault(); 
-                break;
+                reader.readAsDataURL(items[i].getAsFile());
+                e.preventDefault(); break;
             }
         }
     });
 
-    // ==========================================
-    // LOGICA TAB 1: PROPRIETARI
-    // ==========================================
-    let propComments = [];
-    let propFiltered = []; // Per navigazione modale
-    let propChart = null;
-    let currentPropIdx = 0;
+    // ================== PROPRIETARI ==================
+    let propComments = [], propFiltered = [], propChart = null, currentPropIdx = 0;
 
     document.getElementById('fileInputProp').addEventListener('change', function(e) {
-        const files = e.target.files;
-        if(files.length === 0) return;
-        
-        let loaded = 0;
-        let newBatchItems = [];
-        document.getElementById('uploadLabelProp').innerText = "Caricamento...";
-        
-        Array.from(files).forEach(file => {
+        const f = e.target.files;
+        if(!f.length) return;
+        let loaded = 0, batch = [];
+        Array.from(f).forEach(file => {
             const reader = new FileReader();
             reader.onload = (evt) => {
                 try {
-                    const workbook = XLSX.read(evt.target.result, {type: 'array'});
-                    let sheetName = workbook.SheetNames.find(n => n.toLowerCase().includes('comment')) || workbook.SheetNames[0];
-                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {defval:""});
-                    
+                    const wb = XLSX.read(evt.target.result, {type: 'array'});
+                    const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval:""});
                     json.forEach(row => {
                         if(row['Comment Message']) {
                             let d = new Date();
-                            if(row['Created Time']) {
-                                 if (typeof row['Created Time'] === 'number') {
-                                    d = new Date((row['Created Time'] - (25567 + 2)) * 86400 * 1000);
-                                 } else {
-                                     d = new Date(row['Created Time']);
-                                 }
-                            }
+                            if(row['Created Time']) d = typeof row['Created Time'] === 'number' ? new Date((row['Created Time'] - 25569) * 86400 * 1000) : new Date(row['Created Time']);
                             let plat = 'other';
                             if(row['Comment Link']) {
                                 if(row['Comment Link'].includes('facebook')) plat = 'facebook';
-                                if(row['Comment Link'].includes('instagram')) plat = 'instagram';
-                                if(row['Comment Link'].includes('twitter')) plat = 'twitter';
+                                else if(row['Comment Link'].includes('instagram')) plat = 'instagram';
+                                else if(row['Comment Link'].includes('twitter')) plat = 'twitter';
                             }
-                            
-                            const msg = row['Comment Message'];
-                            const author = row['Comment User Name'] || 'Utente';
-                            
-                            newBatchItems.push({
-                                msg: msg,
-                                sent: row['Sentiment'] || 'Neutral',
-                                date: d,
-                                author: author,
-                                platform: plat,
-                                hash: generateHash(msg, d, author)
+                            batch.push({
+                                msg: row['Comment Message'], sent: row['Sentiment'] || 'Neutral',
+                                date: d, author: row['Comment User Name'] || 'Utente', platform: plat,
+                                hash: generateHash(row['Comment Message'], d, row['Comment User Name'])
                             });
                         }
                     });
-                } catch (err) {
-                    console.error("Errore lettura file proprietario", err);
-                }
+                } catch (e) { console.error(e); }
                 loaded++;
-                if(loaded === files.length) {
-                    handlePropDuplicateImport(newBatchItems);
-                }
+                if(loaded === f.length) handlePropImport(batch);
             };
             reader.readAsArrayBuffer(file);
         });
     });
 
-    function handlePropDuplicateImport(newItems) {
-        if(propComments.length === 0) {
-            propComments = newItems;
-        } else {
-            const existingHashes = new Set(propComments.map(c => c.hash));
-            let duplicateCount = 0;
-            const uniqueNew = [];
-
-            newItems.forEach(item => {
-                if(existingHashes.has(item.hash)) {
-                    duplicateCount++;
-                } else {
-                    uniqueNew.push(item);
-                }
-            });
-
-            if(duplicateCount > 0) {
-                if(confirm(`Trovati ${duplicateCount} duplicati nel file proprietario. Vuoi eliminare i doppioni (mantenendo i record esistenti) e importare solo i nuovi?`)) {
-                    propComments = [...propComments, ...uniqueNew];
-                } else {
-                    propComments = [...propComments, ...newItems];
-                }
-            } else {
-                propComments = [...propComments, ...newItems];
-            }
+    function handlePropImport(newItems) {
+        if(!propComments.length) propComments = newItems;
+        else {
+            const hashes = new Set(propComments.map(c => c.hash));
+            const unique = newItems.filter(i => !hashes.has(i.hash));
+            propComments = [...propComments, ...unique];
         }
         initPropDashboard();
     }
 
     function initPropDashboard() {
-        document.getElementById('uploadLabelProp').innerText = "Fatto!";
         document.getElementById('fileCountProp').innerText = `${propComments.length} commenti caricati.`;
         document.getElementById('appContentProp').classList.remove('hidden');
         updatePropUI();
     }
 
     function resetPropData() {
-        if(!confirm("Sicuro di voler azzerare tutti i dati Proprietari? L'azione è irreversibile.")) return;
-        
-        propComments = [];
-        propFiltered = [];
-        if(propChart) {
-            propChart.destroy();
-            propChart = null;
+        if(confirm("Reset Proprietari?")) {
+            propComments = []; propFiltered = [];
+            document.getElementById('appContentProp').classList.add('hidden');
+            document.getElementById('fileInputProp').value = '';
+            document.getElementById('fileCountProp').innerText = '';
+            localStorage.removeItem(STORAGE_KEY);
         }
-        
-        document.getElementById('fileInputProp').value = '';
-        document.getElementById('appContentProp').classList.add('hidden');
-        document.getElementById('uploadLabelProp').innerText = 'Seleziona File';
-        document.getElementById('fileCountProp').innerText = '';
-        
-        document.getElementById('commentsListProp').innerHTML = '';
-        document.getElementById('totalCommentsProp').innerText = '0';
-        localStorage.removeItem(STORAGE_KEY);
     }
 
     ['filterTextProp', 'filterSentimentProp', 'filterPlatformProp', 'sortProp'].forEach(id => {
-        document.getElementById(id).addEventListener('input', updatePropUI);
+        const el = document.getElementById(id);
+        if(el) el.addEventListener('input', updatePropUI);
     });
 
-    // Funzione principale che aggiorna tutto (lista + grafici)
     function updatePropUI() {
-        propFiltered = getPropFilteredData(); // Aggiorna la variabile globale filtrata
-        document.getElementById('totalCommentsProp').innerText = propFiltered.length;
-        renderPropList(propFiltered);
-        renderPropChart(propFiltered);
-    }
-
-    // Funzione helper per ottenere i dati filtrati
-    function getPropFilteredData() {
         const txt = document.getElementById('filterTextProp').value.toLowerCase();
         const sent = document.getElementById('filterSentimentProp').value;
         const plat = document.getElementById('filterPlatformProp').value;
         const sort = document.getElementById('sortProp').value;
 
-        let res = propComments.filter(c => {
+        propFiltered = propComments.filter(c => {
             if(txt && !c.msg.toLowerCase().includes(txt)) return false;
             if(sent !== 'all' && !c.sent.toLowerCase().includes(sent)) return false;
             if(plat !== 'all' && c.platform !== plat) return false;
             return true;
         });
 
-        // Ordinamento Proprietari
-        if(sort === 'dateDesc') res.sort((a,b) => b.date - a.date);
-        else if(sort === 'lengthDesc') res.sort((a,b) => b.msg.length - a.msg.length);
-        else if(sort === 'lengthAsc') res.sort((a,b) => a.msg.length - b.msg.length);
+        if(sort === 'dateDesc') propFiltered.sort((a,b) => b.date - a.date);
+        else if(sort === 'lengthDesc') propFiltered.sort((a,b) => b.msg.length - a.msg.length);
+        else if(sort === 'lengthAsc') propFiltered.sort((a,b) => a.msg.length - b.msg.length);
 
-        return res;
-    }
-
-    // Funzione leggera: aggiorna solo grafici e totali (usata quando si cambia sentiment)
-    function refreshPropStats() {
-        // Non ricalcoliamo tutto l'ordinamento, solo stats
         document.getElementById('totalCommentsProp').innerText = propFiltered.length;
-        renderPropChart(propFiltered);
-    }
-
-    function renderPropList(list) {
-        const container = document.getElementById('commentsListProp');
-        container.innerHTML = '';
-        
-        // Limitiamo render per performance, ma manteniamo indice corretto
-        list.slice(0, 100).forEach((c, index) => { 
-            
-            // Determina colore badge
-            let badgeClass = 'sentiment-neutral';
-            let sentLabel = 'Neutro';
-            if(c.sent.toLowerCase().includes('positive')) { badgeClass = 'sentiment-positive'; sentLabel = 'Positivo'; }
-            else if(c.sent.toLowerCase().includes('negative')) { badgeClass = 'sentiment-negative'; sentLabel = 'Negativo'; }
-
-            const div = document.createElement('div');
-            div.className = 'comment-item';
-            div.onclick = () => openPropModal(index); // Apre il modale all'indice corrispondente nella lista filtrata
-            
-            div.innerHTML = `
-                <div style="width: 100%;">
-                    <div style="font-size:0.8rem; color:#666; margin-bottom:5px; display:flex; align-items:center; justify-content:space-between;">
-                        <div>
-                            <span class="sentiment-badge ${badgeClass}">${sentLabel}</span>
-                            <span style="margin-left: 8px;">${formatItalianDate(c.date)} - <strong>${c.author}</strong></span>
-                        </div>
-                    </div>
-                    <div style="margin-top:5px;">${c.msg.substring(0, 120)}...</div>
-                </div>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    // Aggiornamento Sentiment da dentro il modale o lista
-    function changePropSentiment(newVal) {
-        if(!propFiltered.length) return;
-        const c = propFiltered[currentPropIdx];
-        
-        // Aggiorna dato originale (reference)
-        c.sent = newVal;
-        
-        // Aggiorna UI Modale (Select colore)
-        updatePropModalUIColor(newVal);
-        
-        // Aggiorna Lista e Grafici sotto (senza chiudere modale)
         renderPropList(propFiltered);
         renderPropChart(propFiltered);
     }
 
-    function updatePropModalUIColor(val) {
-        const sel = document.getElementById('modalSentSelectProp');
-        sel.value = val;
-        sel.classList.remove('sentiment-positive', 'sentiment-neutral', 'sentiment-negative');
-        if (val === 'Positive') sel.classList.add('sentiment-positive');
-        else if (val === 'Negative') sel.classList.add('sentiment-negative');
-        else sel.classList.add('sentiment-neutral');
+    function renderPropList(list) {
+        const cont = document.getElementById('commentsListProp');
+        cont.innerHTML = '';
+        list.slice(0, 100).forEach((c, idx) => {
+            let badge = c.sent.toLowerCase().includes('positive') ? 'sentiment-positive' : (c.sent.toLowerCase().includes('negative') ? 'sentiment-negative' : 'sentiment-neutral');
+            const d = document.createElement('div');
+            d.className = 'comment-item';
+            d.onclick = () => openPropModal(idx);
+            d.innerHTML = `<div>
+                <div style="font-size:0.8rem; color:#666; margin-bottom:5px;">
+                    <span class="sentiment-badge ${badge}">${c.sent}</span>
+                    <span style="margin-left:8px;">${formatItalianDate(c.date)} - <strong>${c.author}</strong></span>
+                </div>
+                <div style="margin-top:5px;">${c.msg.substring(0, 120)}...</div>
+            </div>`;
+            cont.appendChild(d);
+        });
     }
 
     function renderPropChart(list) {
         const ctx = document.getElementById('sentimentChartProp').getContext('2d');
         if(propChart) propChart.destroy();
-        
-        let counts = { Positive: 0, Neutral: 0, Negative: 0 };
-        list.forEach(c => {
-            let s = c.sent.toLowerCase();
-            if(s.includes('positive')) counts.Positive++;
-            else if(s.includes('negative')) counts.Negative++;
-            else counts.Neutral++;
+        let c = { Positive: 0, Neutral: 0, Negative: 0 };
+        list.forEach(i => {
+            let s = i.sent.toLowerCase();
+            if(s.includes('positive')) c.Positive++; else if(s.includes('negative')) c.Negative++; else c.Neutral++;
         });
-        
-        const total = list.length || 1;
-        const percs = [
-            Math.round(counts.Positive/total*100),
-            Math.round(counts.Neutral/total*100),
-            Math.round(counts.Negative/total*100)
-        ];
-
+        const tot = list.length || 1;
         propChart = new Chart(ctx, {
             type: 'doughnut',
-            data: {
-                labels: ['Positivo', 'Neutro', 'Negativo'],
-                datasets: [{
-                    data: [counts.Positive, counts.Neutral, counts.Negative],
-                    backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
-                    borderWidth: 0
-                }]
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: {display: false}, datalabels: { display: false } }, 
-                cutout: '60%' 
-            }
+            data: { labels: ['Positivo', 'Neutro', 'Negativo'], datasets: [{ data: [c.Positive, c.Neutral, c.Negative], backgroundColor: ['#28a745', '#ffc107', '#dc3545'], borderWidth: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false}, datalabels: {display: false} }, cutout: '60%' }
         });
-
         document.getElementById('legendProp').innerHTML = `
-            <div class="legend-item"><span class="legend-color" style="background:#28a745"></span>Positivo ${percs[0]}%</div>
-            <div class="legend-item"><span class="legend-color" style="background:#ffc107"></span>Neutro ${percs[1]}%</div>
-            <div class="legend-item"><span class="legend-color" style="background:#dc3545"></span>Negativo ${percs[2]}%</div>
+            <div class="legend-item"><span class="legend-color" style="background:#28a745"></span>Positivo ${Math.round(c.Positive/tot*100)}%</div>
+            <div class="legend-item"><span class="legend-color" style="background:#ffc107"></span>Neutro ${Math.round(c.Neutral/tot*100)}%</div>
+            <div class="legend-item"><span class="legend-color" style="background:#dc3545"></span>Negativo ${Math.round(c.Negative/tot*100)}%</div>
         `;
     }
 
     const modalProp = document.getElementById('editorModalProp');
-    
     function openPropModal(idx) {
         currentPropIdx = idx;
         const c = propFiltered[idx];
-        
-        // Update Content
-        document.getElementById('cardTextProp').innerText = c.msg;
+        document.getElementById('cardTextProp').innerText = smartTruncate(c.msg, 550); 
         document.getElementById('cardAuthorProp').innerText = c.author;
         document.getElementById('cardDateProp').innerText = formatItalianDate(c.date);
         
-        // Update Sentiment Select in Modal
-        let currentSent = 'Neutral';
-        if(c.sent.toLowerCase().includes('positive')) currentSent = 'Positive';
-        if(c.sent.toLowerCase().includes('negative')) currentSent = 'Negative';
-        updatePropModalUIColor(currentSent);
+        const sel = document.getElementById('modalSentSelectProp');
+        sel.value = c.sent.toLowerCase().includes('positive') ? 'Positive' : (c.sent.toLowerCase().includes('negative') ? 'Negative' : 'Neutral');
+        updateModalColorProp();
 
-        // Update Icon
-        const path = icons[c.platform] || icons.default;
-        const svgPath = document.querySelector('#cardIconProp path');
-        svgPath.setAttribute('d', path);
-        if(c.platform === 'facebook') svgPath.style.fill = '#1877F2';
-        else if(c.platform === 'instagram') svgPath.style.fill = '#E4405F';
-        else if(c.platform === 'twitter') svgPath.style.fill = '#000000';
-        else svgPath.style.fill = '#0146bc';
-
+        const p = document.querySelector('#cardIconProp path');
+        p.setAttribute('d', icons[c.platform] || icons.default);
+        p.style.fill = c.platform === 'facebook' ? '#1877F2' : (c.platform === 'instagram' ? '#E4405F' : (c.platform === 'twitter' ? '#000000' : '#0146bc'));
         modalProp.style.display = 'flex';
     }
 
-    // Modal Events Prop
-    document.getElementById('closeModalProp').onclick = () => modalProp.style.display = 'none';
-    
-    document.getElementById('modalPrevProp').onclick = () => {
-        if(currentPropIdx > 0) openPropModal(currentPropIdx - 1);
-    };
-    document.getElementById('modalNextProp').onclick = () => {
-        if(currentPropIdx < propFiltered.length - 1) openPropModal(currentPropIdx + 1);
-    };
-    document.getElementById('modalSentSelectProp').onchange = (e) => {
-        changePropSentiment(e.target.value);
-    };
+    function updateModalColorProp() {
+        const s = document.getElementById('modalSentSelectProp');
+        s.className = 'sentiment-select ' + (s.value === 'Positive' ? 'sentiment-positive' : (s.value === 'Negative' ? 'sentiment-negative' : 'sentiment-neutral'));
+    }
 
-    document.getElementById('toggleAuthorProp').onchange = (e) => {
-        document.getElementById('cardAuthorProp').style.display = e.target.checked ? 'block' : 'none';
+    document.getElementById('closeModalProp').onclick = () => modalProp.style.display = 'none';
+    document.getElementById('modalPrevProp').onclick = () => { if(currentPropIdx > 0) openPropModal(currentPropIdx - 1); };
+    document.getElementById('modalNextProp').onclick = () => { if(currentPropIdx < propFiltered.length - 1) openPropModal(currentPropIdx + 1); };
+    document.getElementById('modalSentSelectProp').onchange = (e) => {
+        propFiltered[currentPropIdx].sent = e.target.value;
+        updateModalColorProp();
+        updatePropUI();
     };
+    document.getElementById('toggleAuthorProp').onchange = (e) => document.getElementById('cardAuthorProp').style.display = e.target.checked ? 'block' : 'none';
     document.getElementById('dlBtnProp').onclick = () => dlCanvas('captureCardProp');
     document.getElementById('copyBtnProp').onclick = () => copyCanvas('captureCardProp', 'copyBtnProp');
+    
+    document.getElementById('delProp').onclick = () => {
+        if(!confirm("Eliminare definitivamente questo commento?")) return;
+        const itemToDelete = propFiltered[currentPropIdx];
+        propComments = propComments.filter(x => x !== itemToDelete);
+        updatePropUI();
+        if(propFiltered.length > 0) {
+            if(currentPropIdx >= propFiltered.length) currentPropIdx = propFiltered.length - 1;
+            openPropModal(currentPropIdx);
+        } else {
+            modalProp.style.display = 'none';
+        }
+    };
 
 
-    // ==========================================
-    // LOGICA TAB 2: ESTERNI
-    // ==========================================
-    let extData = [];
-    let extFiltered = [];
-    let extIdx = 0; // Index globale rispetto a extFiltered
-    let extCharts = {};
-    let currentCardImage = null; 
-    let isEditing = false;
-    let editTargetItem = null;
+    // ================== ESTERNI ==================
+    let extData = [], extFiltered = [], extIdx = 0, extCharts = {}, currentCardImage = null, isEditing = false, editTargetItem = null;
 
     document.getElementById('fileInputExt').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if(!file) return;
         const reader = new FileReader();
-        
-        document.getElementById('uploadLabelExt').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analisi in corso...';
-
         reader.onload = (evt) => {
             try {
                 const wb = XLSX.read(evt.target.result, {type:'array'});
                 const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-                const processed = processRawExtData(json);
-                handleDuplicateImport(processed);
-                document.getElementById('uploadLabelExt').innerHTML = '<i class="fas fa-check"></i> Fatto';
-            } catch(err) {
-                alert("Errore nella lettura del file. Verifica il formato.");
-                console.error(err);
-                document.getElementById('uploadLabelExt').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Errore';
-            }
+                handleExtImport(json.map(processExtRow));
+            } catch(e) { alert("Errore file"); }
         };
         reader.readAsArrayBuffer(file);
     });
 
-    function processRawExtData(json) {
-        return json.map(row => {
-            let rawDate = new Date();
-            const pub = row['published'];
-            if(pub) {
-                if(typeof pub === 'number') {
-                    rawDate = new Date((pub - (25567 + 2)) * 86400 * 1000);
-                } else if(typeof pub === 'string') {
-                    let d = new Date(pub);
-                    if(isNaN(d.getTime())) {
-                        d = new Date(pub.replace(/-/g, '/'));
-                    }
-                    if(!isNaN(d.getTime())) {
-                        rawDate = d;
-                    }
-                }
-            }
-            
-            let sourceRaw = row['source_type'] || 'WEB';
-            let channel = 'Web/News';
-            let iconClass = 'fas fa-globe';
-            let isSocial = false; 
-            
-            if(sourceRaw.includes('TWITTER')) { channel = 'X (Twitter)'; iconClass = 'fab fa-twitter'; isSocial = true; }
-            else if(sourceRaw.includes('FACEBOOK')) { channel = 'Facebook'; iconClass = 'fab fa-facebook'; isSocial = true; }
-            else if(sourceRaw.includes('INSTAGRAM')) { channel = 'Instagram'; iconClass = 'fab fa-instagram'; isSocial = true; }
-            else if(sourceRaw.includes('YOUTUBE')) { channel = 'YouTube'; iconClass = 'fab fa-youtube'; isSocial = true; }
-            else if(sourceRaw.includes('LINKEDIN')) { channel = 'LinkedIn'; iconClass = 'fab fa-linkedin'; isSocial = true; }
-            else if(sourceRaw.includes('BLUESKY')) { channel = 'BlueSky'; iconClass = 'fas fa-cloud'; isSocial = true; }
-            else if(sourceRaw.includes('TIKTOK')) { channel = 'TikTok'; iconClass = 'fab fa-tiktok'; isSocial = true; }
+    function processExtRow(row) {
+        let d = new Date();
+        if(row['published']) {
+            if(typeof row['published'] === 'number') d = new Date((row['published'] - 25569) * 86400 * 1000);
+            else d = new Date(row['published'].replace(/-/g, '/'));
+        }
+        let src = row['source_type'] || 'WEB', chan = 'Web/News', icon = 'fas fa-globe', isSoc = false;
+        if(src.includes('TWITTER')) { chan='X (Twitter)'; icon='fab fa-twitter'; isSoc=true; }
+        else if(src.includes('FACEBOOK')) { chan='Facebook'; icon='fab fa-facebook'; isSoc=true; }
+        else if(src.includes('INSTAGRAM')) { chan='Instagram'; icon='fab fa-instagram'; isSoc=true; }
+        else if(src.includes('YOUTUBE')) { chan='YouTube'; icon='fab fa-youtube'; isSoc=true; }
+        
+        let aut = row['extra_author_attributes.name'] || row['extra_author_attributes.short_name'] || row['extra_source_attributes.name'] || "Autore Sconosciuto";
+        let subAut = null;
+        if(!isSoc && row['host_url']) {
+            let h = row['host_url'].replace(/^https?:\/\//, '').replace(/^www\./, '').split('.')[0];
+            if(h) { aut = h.charAt(0).toUpperCase() + h.slice(1); subAut = row['extra_author_attributes.name']; }
+        }
 
-            let rawAuthor = "Autore Sconosciuto";
-            const name = row['extra_author_attributes.name'];
-            const shortName = row['extra_author_attributes.short_name'];
-            const sourceName = row['extra_source_attributes.name'];
+        let likes = parseInt(row['engagement'] || 0);
+        let foll = parseInt(row['source_extended_attributes.followers'] || row['reach'] || 0);
+        if(chan==='Facebook') foll = row['source_extended_attributes.facebook_followers'];
 
-            if (name && String(name).trim() !== "") rawAuthor = name;
-            else if (shortName) rawAuthor = shortName;
-            else if (sourceName) rawAuthor = sourceName;
+        let sentVal = parseInt(row['sentiment'] || 0);
+        let sent = sentVal > 0 ? 'Positivo' : (sentVal < 0 ? 'Negativo' : 'Neutro');
 
-            let displayAuthor = rawAuthor;
-            let subAuthor = null; 
-
-            if (!isSocial && row['host_url']) {
-                let host = String(row['host_url']).trim();
-                host = host.replace(/^https?:\/\//, '');
-                host = host.replace(/^www\./, '');
-                let parts = host.split('.');
-                let mainPart = parts[0]; 
-                
-                if(mainPart.length > 0) {
-                    mainPart = mainPart.charAt(0).toUpperCase() + mainPart.slice(1);
-                    displayAuthor = mainPart;
-                    subAuthor = rawAuthor; 
-                }
-            }
-
-            let likes = parseInt(row['engagement'] || 0);
-            
-            // --- Logica Audience Avanzata ---
-            let followers = 0;
-            let pvSem = parseInt(row['source_extended_attributes.semrush_pageviews'] || 0);
-            let pvAle = parseInt(row['source_extended_attributes.alexa_pageviews'] || 0);
-            let maxPageviews = Math.max(pvSem, pvAle);
-
-            if (channel === 'Facebook') followers = row['source_extended_attributes.facebook_followers'];
-            else if (channel.includes('X (Twitter)')) followers = row['source_extended_attributes.twitter_followers'];
-            else if (channel === 'Instagram') followers = row['source_extended_attributes.instagram_followers'];
-            else if (channel === 'YouTube') followers = row['source_extended_attributes.youtube_subscribers'] || row['source_extended_attributes.subscribers'];
-            
-            if (!followers && !isSocial) {
-                if (maxPageviews > 0) {
-                    followers = maxPageviews;
-                }
-            }
-
-            if (!followers) followers = row['source_extended_attributes.followers'] || row['reach'] || 0;
-            followers = parseInt(followers);
-            
-            let retweets = parseInt(row['article_extended_attributes.twitter_retweets'] || 0);
-            let pageviews = maxPageviews;
-
-            let sentVal = parseInt(row['sentiment'] || 0);
-            let sentiment = 'Neutro';
-            if(sentVal > 0) sentiment = 'Positivo';
-            if(sentVal < 0) sentiment = 'Negativo';
-            
-            const content = row['content'] || row['title'] || '';
-
-            return {
-                date: rawDate,
-                content: content,
-                author: displayAuthor,
-                subAuthor: subAuthor,
-                channel: channel,
-                isSocial: isSocial,
-                iconClass: iconClass,
-                likes: likes,
-                followers: followers,
-                retweets: retweets,
-                pageviews: pageviews,
-                sentimentVal: sentVal,
-                sentiment: sentiment,
-                mediaType: row['post_type'] || 'TEXT',
-                url: row['url'] || '#',
-                hash: generateHash(content, rawDate, displayAuthor)
-            };
-        });
+        return {
+            date: d, content: row['content'] || row['title'] || '', author: aut, subAuthor: subAut,
+            channel: chan, isSocial: isSoc, iconClass: icon, likes: likes, followers: parseInt(foll||0),
+            sentiment: sent, sentimentVal: sentVal, url: row['url'] || '#',
+            hash: generateHash(row['content']||'', d, aut)
+        };
     }
 
-    function handleDuplicateImport(newItems) {
-        if(extData.length === 0) {
-            extData = newItems;
-        } else {
-            const existingHashes = new Set(extData.map(d => d.hash));
-            const uniqueNew = [];
-            let duplicateCount = 0;
-            
-            newItems.forEach(item => {
-                if(existingHashes.has(item.hash)) {
-                    duplicateCount++;
-                } else {
-                    uniqueNew.push(item);
-                }
-            });
-
-            if(duplicateCount > 0) {
-                if(confirm(`Trovati ${duplicateCount} duplicati nel file importato. Vuoi eliminare i doppioni (mantenendo i record esistenti) e importare solo i nuovi?`)) {
-                    extData = [...extData, ...uniqueNew];
-                } else {
-                    extData = [...extData, ...newItems];
-                }
-            } else {
-                extData = [...extData, ...newItems];
-            }
+    function handleExtImport(items) {
+        if(!extData.length) extData = items;
+        else {
+            const hashes = new Set(extData.map(i => i.hash));
+            extData = [...extData, ...items.filter(i => !hashes.has(i.hash))];
         }
-        
         refreshExtDashboard();
     }
 
     function refreshExtDashboard() {
-        const channels = [...new Set(extData.map(d => d.channel))].sort();
-        const sel = document.getElementById('filterChanExt');
-        const currentVal = sel.value;
-        sel.innerHTML = '<option value="all">Tutti</option>';
-        channels.forEach(c => {
-            let opt = document.createElement('option');
-            opt.value = c; opt.innerText = c;
-            if(c === currentVal) opt.selected = true;
-            sel.appendChild(opt);
-        });
-
+        const s = document.getElementById('filterChanExt');
+        s.innerHTML = '<option value="all">Tutti</option>';
+        [...new Set(extData.map(d => d.channel))].sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
         document.getElementById('dashboardExt').classList.remove('hidden');
         updateExtUI();
     }
 
-    // --- MANUAL ENTRY & EDIT FUNCTIONS ---
-    const manualModal = document.getElementById('manualModal');
-    
-    function openManualModal() {
-        isEditing = false;
-        editTargetItem = null;
-        
-        document.getElementById('manContent').value = '';
-        document.getElementById('manDate').value = new Date().toISOString().slice(0,16);
-        document.getElementById('manChannel').value = '';
-        document.getElementById('manAuthor').value = '';
-        document.getElementById('manSentiment').value = "0";
-        document.getElementById('manLikes').value = 0;
-        document.getElementById('manFollowers').value = 0;
-        document.getElementById('manUrl').value = '';
-        
-        document.getElementById('urlWarning').style.display = 'none';
-        document.getElementById('manUrl').style.borderColor = 'var(--border-color)';
-        
-        document.getElementById('saveManualBtn').innerText = "Aggiungi al Dataset";
-        manualModal.style.display = 'flex';
-    }
-
-    // Edit aperto dal modale Ext
-    document.getElementById('editExt').onclick = function() {
-        if(!extFiltered.length) return;
-        const item = extFiltered[extIdx];
-        editTargetItem = item;
-        isEditing = true;
-
-        document.getElementById('manContent').value = item.content;
-        
-        const d = item.date;
-        const dateString = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0,16);
-        document.getElementById('manDate').value = dateString;
-        
-        document.getElementById('manChannel').value = item.channel;
-        document.getElementById('manAuthor').value = item.author;
-        document.getElementById('manSentiment').value = item.sentimentVal;
-        document.getElementById('manLikes').value = item.likes;
-        document.getElementById('manFollowers').value = item.followers;
-        document.getElementById('manUrl').value = item.url;
-        
-        document.getElementById('urlWarning').style.display = 'none';
-        document.getElementById('manUrl').style.borderColor = 'var(--border-color)';
-        
-        document.getElementById('saveManualBtn').innerText = "Salva Modifiche";
-        manualModal.style.display = 'flex';
-        // Chiudi temporaneamente modal viewer per edit
-        document.getElementById('editorModalExt').style.display = 'none';
-    };
-
-    function closeManualModal() { 
-        manualModal.style.display = 'none'; 
-        // Se stavo editando, riapro il viewer
-        if(isEditing) document.getElementById('editorModalExt').style.display = 'flex';
-    }
-
-    function checkUrlDuplicate() {
-        const urlInput = document.getElementById('manUrl');
-        const warningEl = document.getElementById('urlWarning');
-        const urlVal = urlInput.value.trim().toLowerCase();
-
-        if(urlVal.length < 5) {
-            warningEl.style.display = 'none';
-            urlInput.style.borderColor = 'var(--border-color)';
-            return;
-        }
-
-        let searchPool = extData;
-        if(isEditing && editTargetItem) {
-            searchPool = extData.filter(i => i !== editTargetItem);
-        }
-
-        const found = searchPool.find(d => d.url.trim().toLowerCase() === urlVal);
-
-        if(found) {
-            warningEl.innerText = `⚠️ Attenzione: Questo Link esiste già nel database (Autore: ${found.author})`;
-            warningEl.style.display = 'block';
-            urlInput.style.borderColor = 'var(--danger)';
-        } else {
-            warningEl.style.display = 'none';
-            urlInput.style.borderColor = 'var(--border-color)';
-        }
-    }
-
-    function saveManualPost() {
-        let content = document.getElementById('manContent').value;
-        let dateStr = document.getElementById('manDate').value;
-        const channel = document.getElementById('manChannel').value;
-        const urlStr = document.getElementById('manUrl').value;
-
-        if(!urlStr || !channel) {
-            alert("Compila i campi obbligatori (URL Originale, Canale, Sentiment)");
-            return;
-        }
-
-        if (!dateStr) dateStr = new Date().toISOString();
-        const date = new Date(dateStr);
-        let author = document.getElementById('manAuthor').value || "Autore Sconosciuto";
-        if (!content) content = ""; 
-
-        const sentVal = parseInt(document.getElementById('manSentiment').value);
-        let sentiment = 'Neutro';
-        if(sentVal > 0) sentiment = 'Positivo';
-        if(sentVal < 0) sentiment = 'Negativo';
-
-        let iconClass = 'fas fa-globe';
-        let isSocial = false;
-        const chLower = channel.toLowerCase();
-        if(chLower.includes('facebook')) { iconClass = 'fab fa-facebook'; isSocial = true; }
-        else if(chLower.includes('twitter') || chLower.includes(' x')) { iconClass = 'fab fa-twitter'; isSocial = true; }
-        else if(chLower.includes('instagram')) { iconClass = 'fab fa-instagram'; isSocial = true; }
-        else if(chLower.includes('linkedin')) { iconClass = 'fab fa-linkedin'; isSocial = true; }
-        else if(chLower.includes('youtube')) { iconClass = 'fab fa-youtube'; isSocial = true; }
-        else if(chLower.includes('tiktok')) { iconClass = 'fab fa-tiktok'; isSocial = true; }
-
-        const nContent = content.trim().toLowerCase();
-        const nAuthor = author.trim().toLowerCase();
-        const nUrl = urlStr.trim().toLowerCase();
-
-        let searchPool = extData;
-        if(isEditing && editTargetItem) {
-            searchPool = extData.filter(i => i !== editTargetItem);
-        }
-
-        const duplicateFound = searchPool.some(d => {
-            if(nContent && d.content.trim().toLowerCase() === nContent) return true;
-            if(nAuthor !== "autore sconosciuto" && d.author.trim().toLowerCase() === nAuthor) return true;
-            if(nUrl && nUrl.length > 5 && nUrl !== '#' && d.url.trim().toLowerCase() === nUrl) return true;
-            return false;
-        });
-
-        if(duplicateFound) {
-            if(!confirm("ATTENZIONE: Trovato un possibile duplicato!\n\nEsiste già un record con lo stesso Autore, Link o Contenuto nel database.\n\nVuoi procedere comunque col salvataggio?")) {
-                return; 
-            }
-        }
-
-        if(isEditing && editTargetItem) {
-            editTargetItem.content = content;
-            editTargetItem.date = date;
-            editTargetItem.channel = channel;
-            editTargetItem.author = author;
-            editTargetItem.sentimentVal = sentVal;
-            editTargetItem.sentiment = sentiment;
-            editTargetItem.likes = parseInt(document.getElementById('manLikes').value) || 0;
-            editTargetItem.followers = parseInt(document.getElementById('manFollowers').value) || 0;
-            editTargetItem.url = urlStr;
-            editTargetItem.iconClass = iconClass;
-            editTargetItem.isSocial = isSocial;
-            editTargetItem.hash = generateHash(content, date, author);
-            
-            refreshExtDashboard();
-            updateExtCard(); // Update modal
-        } else {
-            const newItem = {
-                date: date,
-                content: content,
-                author: author,
-                subAuthor: null,
-                channel: channel,
-                isSocial: isSocial,
-                iconClass: iconClass,
-                likes: parseInt(document.getElementById('manLikes').value) || 0,
-                followers: parseInt(document.getElementById('manFollowers').value) || 0,
-                retweets: 0,
-                pageviews: 0,
-                sentimentVal: sentVal,
-                sentiment: sentiment,
-                mediaType: 'TEXT',
-                url: urlStr,
-                hash: generateHash(content, date, author)
-            };
-            handleDuplicateImport([newItem]);
-        }
-        
-        closeManualModal();
-    }
-
-    document.getElementById('delExt').onclick = function() {
-        if(!extFiltered.length) return;
-        if(!confirm("Sei sicuro di voler eliminare questo record dal database? L'operazione non è reversibile.")) return;
-
-        const currentItem = extFiltered[extIdx];
-        extData = extData.filter(d => d !== currentItem);
-        currentCardImage = null;
-
-        if(extData.length === 0) {
-            document.getElementById('dashboardExt').classList.add('hidden');
-            document.getElementById('editorModalExt').style.display = 'none';
-            return;
-        }
-        
-        // Chiudi modale e ricarica
-        document.getElementById('editorModalExt').style.display = 'none';
-        refreshExtDashboard();
-    };
-
     function resetExtData() {
-        if(!confirm("Sicuro di voler azzerare tutti i dati Esterni (Excel + JSON + Manuali)? L'azione è irreversibile.")) return;
-
-        extData = [];
-        extFiltered = [];
-        extIdx = 0;
-        currentCardImage = null;
-
-        if(extCharts.sent) { extCharts.sent.destroy(); extCharts.sent = null; }
-        if(extCharts.chan) { extCharts.chan.destroy(); extCharts.chan = null; }
-
-        document.getElementById('fileInputExt').value = '';
-        document.getElementById('importJsonExt').value = '';
-        document.getElementById('dashboardExt').classList.add('hidden');
-        document.getElementById('commentsListExt').innerHTML = '';
-        document.getElementById('uploadLabelExt').innerHTML = '<i class="fas fa-file-excel"></i> Carica Export Excel';
-        localStorage.removeItem(STORAGE_KEY);
-    }
-
-    function exportExtJSON() {
-        if(extData.length === 0) { alert("Nessun dato da esportare"); return; }
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(extData));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href",     dataStr);
-        downloadAnchorNode.setAttribute("download", "integration_export.json");
-        document.body.appendChild(downloadAnchorNode); 
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-    }
-
-    function importExtJSON(input) {
-        const file = input.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const json = JSON.parse(e.target.result);
-                const processed = json.map(item => {
-                    item.date = new Date(item.date);
-                    return item;
-                });
-                handleDuplicateImport(processed);
-                alert("Importazione JSON completata!");
-            } catch(err) {
-                console.error(err);
-                alert("Errore file JSON");
-            }
-        };
-        reader.readAsText(file);
-    }
-
-    // --- FULL STATE BACKUP ---
-    function exportFullState() {
-        const state = {
-            proprietary: propComments,
-            external: extData,
-            timestamp: new Date()
-        };
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-        const link = document.createElement('a');
-        link.href = dataStr;
-        link.download = `full_backup_${new Date().toISOString().slice(0,10)}.json`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-    }
-
-    function importFullState(input) {
-        const file = input.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const state = JSON.parse(e.target.result);
-                if(state.proprietary) {
-                    propComments = state.proprietary.map(c => ({...c, date: new Date(c.date)}));
-                    initPropDashboard();
-                }
-                if(state.external) {
-                    extData = state.external.map(d => ({...d, date: new Date(d.date)}));
-                    refreshExtDashboard();
-                }
-                alert("Backup ripristinato con successo!");
-            } catch(err) {
-                console.error(err);
-                alert("Errore nel file di backup.");
-            }
-        };
-        reader.readAsText(file);
-    }
-
-    // Event listeners Esterni
-    ['filterSentExt', 'filterChanExt', 'sortExt'].forEach(id => {
-        document.getElementById(id).addEventListener('change', updateExtUI);
-    });
-    
-    document.getElementById('searchExt').addEventListener('input', updateExtUI);
-
-    // Toggles del modale esterno
-    ['showAuthorExt', 'showOrigAuthorExt', 'showLikesExt', 'showFollowersExt'].forEach(id => {
-        document.getElementById(id).addEventListener('change', updateExtCard);
-    });
-
-    document.getElementById('imgUploadExt').addEventListener('change', function(e) {
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                currentCardImage = evt.target.result;
-                updateExtCard();
-            };
-            reader.readAsDataURL(e.target.files[0]);
+        if(confirm("Reset Esterni?")) {
+            extData = []; extFiltered = [];
+            document.getElementById('dashboardExt').classList.add('hidden');
+            document.getElementById('fileInputExt').value = '';
+            localStorage.removeItem(STORAGE_KEY);
         }
+    }
+
+    ['filterSentExt', 'filterChanExt', 'sortExt', 'searchExt'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.addEventListener(id === 'searchExt' ? 'input' : 'change', updateExtUI);
     });
 
-    // Navigazione Modale Esterno
-    const modalExt = document.getElementById('editorModalExt');
-    document.getElementById('closeModalExt').onclick = () => modalExt.style.display = 'none';
-    
-    document.getElementById('modalPrevExt').onclick = () => { if(extIdx > 0) openExtModal(extIdx - 1); };
-    document.getElementById('modalNextExt').onclick = () => { if(extIdx < extFiltered.length - 1) openExtModal(extIdx + 1); };
-    
-    // Select Sentiment in Modale Ext
-    document.getElementById('modalSentSelectExt').onchange = (e) => {
-        updateCurrentExtSentiment(e.target.value);
-    };
-
-    document.getElementById('dlBtnExt').onclick = () => dlCanvas('captureCardExt');
-    document.getElementById('copyBtnExt').onclick = () => copyCanvas('captureCardExt', 'copyBtnExt');
-
-
-    // UPDATE UI ESTERNI
     function updateExtUI() {
-        const sFilter = document.getElementById('filterSentExt').value;
-        const cFilter = document.getElementById('filterChanExt').value;
+        const sent = document.getElementById('filterSentExt').value;
+        const chan = document.getElementById('filterChanExt').value;
+        const txt = document.getElementById('searchExt').value.toLowerCase();
         const sort = document.getElementById('sortExt').value;
-        const searchText = document.getElementById('searchExt').value.toLowerCase();
 
         extFiltered = extData.filter(d => {
-            if (searchText && !d.content.toLowerCase().includes(searchText) && !d.author.toLowerCase().includes(searchText)) {
-                return false;
-            }
-            let targetS = 'all';
-            if(sFilter === 'positive') targetS = 'Positivo';
-            if(sFilter === 'neutral') targetS = 'Neutro';
-            if(sFilter === 'negative') targetS = 'Negativo';
-            if(targetS !== 'all' && d.sentiment !== targetS) return false;
-            if(cFilter !== 'all' && d.channel !== cFilter) return false;
+            if(txt && !d.content.toLowerCase().includes(txt) && !d.author.toLowerCase().includes(txt)) return false;
+            if(sent !== 'all' && ((sent==='positive' && d.sentiment!=='Positivo') || (sent==='negative' && d.sentiment!=='Negativo') || (sent==='neutral' && d.sentiment!=='Neutro'))) return false;
+            if(chan !== 'all' && d.channel !== chan) return false;
             return true;
         });
 
-        // Sorting Logic
         if(sort === 'dateDesc') extFiltered.sort((a,b) => b.date - a.date);
         else if(sort === 'likesDesc') extFiltered.sort((a,b) => b.likes - a.likes);
         else if(sort === 'followersDesc') extFiltered.sort((a,b) => b.followers - a.followers);
-        else if(sort === 'viewsDesc') extFiltered.sort((a,b) => b.pageviews - a.pageviews);
-        // NUOVO SORTING PER LUNGHEZZA
         else if(sort === 'lengthDesc') extFiltered.sort((a,b) => b.content.length - a.content.length);
         else if(sort === 'lengthAsc') extFiltered.sort((a,b) => a.content.length - b.content.length);
 
         document.getElementById('totalContentExt').innerText = extFiltered.length;
-
-        updateExtCharts();
-        renderExtList(extFiltered); // Ora renderizziamo la lista, non solo la card
+        renderExtCharts();
+        renderExtList();
     }
 
-    function renderExtList(list) {
-        const container = document.getElementById('commentsListExt');
-        container.innerHTML = '';
-
-        list.slice(0, 100).forEach((item, index) => {
-            let badgeClass = 'sentiment-neutral';
-            if(item.sentiment === 'Positivo') badgeClass = 'sentiment-positive';
-            if(item.sentiment === 'Negativo') badgeClass = 'sentiment-negative';
-
-            const div = document.createElement('div');
-            div.className = 'comment-item';
-            div.onclick = () => openExtModal(index);
-            
-            div.innerHTML = `
-                <div style="width: 100%;">
-                    <div style="font-size:0.8rem; color:#666; margin-bottom:5px; display:flex; align-items:center; justify-content:space-between;">
-                        <div>
-                            <span class="sentiment-badge ${badgeClass}">${item.sentiment}</span>
-                            <span style="margin-left: 8px;">
-                                <i class="${item.iconClass}"></i> ${formatItalianDate(item.date)} - <strong>${item.author}</strong>
-                            </span>
-                        </div>
-                    </div>
-                    <div style="margin-top:5px;">${item.content.substring(0, 120)}${item.content.length>120?'...':''}</div>
+    function renderExtList() {
+        const c = document.getElementById('commentsListExt');
+        c.innerHTML = '';
+        extFiltered.slice(0, 100).forEach((item, idx) => {
+            let b = item.sentiment === 'Positivo' ? 'sentiment-positive' : (item.sentiment === 'Negativo' ? 'sentiment-negative' : 'sentiment-neutral');
+            const d = document.createElement('div');
+            d.className = 'comment-item';
+            d.onclick = () => openExtModal(idx);
+            d.innerHTML = `<div>
+                <div style="font-size:0.8rem; color:#666; margin-bottom:5px;">
+                    <span class="sentiment-badge ${b}">${item.sentiment}</span>
+                    <span style="margin-left:8px;"><i class="${item.iconClass}"></i> ${formatItalianDate(item.date)} - <strong>${item.author}</strong></span>
                 </div>
-            `;
-            container.appendChild(div);
+                <div style="margin-top:5px;">${item.content.substring(0, 120)}...</div>
+            </div>`;
+            c.appendChild(d);
         });
     }
 
-    function updateExtCharts() {
+    function renderExtCharts() {
         const ctxS = document.getElementById('sentimentChartExt').getContext('2d');
+        const ctxC = document.getElementById('channelChartExt').getContext('2d');
         if(extCharts.sent) extCharts.sent.destroy();
+        if(extCharts.chan) extCharts.chan.destroy();
 
-        let counts = { Positivo: 0, Neutro: 0, Negativo: 0 };
-        extFiltered.forEach(d => { counts[d.sentiment]++; });
-        
+        let sCounts = { Pos: 0, Neu: 0, Neg: 0 };
+        extFiltered.forEach(d => {
+            if(d.sentiment==='Positivo') sCounts.Pos++;
+            else if(d.sentiment==='Negativo') sCounts.Neg++;
+            else sCounts.Neu++;
+        });
+
         extCharts.sent = new Chart(ctxS, {
             type: 'doughnut',
-            data: {
-                labels: ['Positivo', 'Neutro', 'Negativo'],
-                datasets: [{
-                    data: [counts.Positivo, counts.Neutro, counts.Negativo],
-                    backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
-                    borderWidth: 0
-                }]
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: {display: false}, datalabels: { display: false } }, 
-                cutout: '60%' 
-            }
+            data: { labels: ['Positivo','Neutro','Negativo'], datasets: [{ data: [sCounts.Pos, sCounts.Neu, sCounts.Neg], backgroundColor: ['#28a745', '#ffc107', '#dc3545'], borderWidth:0 }] },
+            options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, datalabels:{display:false}}, cutout:'60%' }
         });
-
         document.getElementById('legendExt').innerHTML = `
-            <div class="legend-item"><span class="legend-color" style="background:#28a745"></span>Positivo ${Math.round(counts.Positivo/extFiltered.length*100)||0}%</div>
-            <div class="legend-item"><span class="legend-color" style="background:#ffc107"></span>Neutro ${Math.round(counts.Neutro/extFiltered.length*100)||0}%</div>
-            <div class="legend-item"><span class="legend-color" style="background:#dc3545"></span>Negativo ${Math.round(counts.Negativo/extFiltered.length*100)||0}%</div>
+            <div class="legend-item"><span class="legend-color" style="background:#28a745"></span>Positivo ${Math.round(sCounts.Pos/extFiltered.length*100)||0}%</div>
+            <div class="legend-item"><span class="legend-color" style="background:#ffc107"></span>Neutro ${Math.round(sCounts.Neu/extFiltered.length*100)||0}%</div>
+            <div class="legend-item"><span class="legend-color" style="background:#dc3545"></span>Negativo ${Math.round(sCounts.Neg/extFiltered.length*100)||0}%</div>
         `;
 
-        const ctxC = document.getElementById('channelChartExt').getContext('2d');
-        if(extCharts.chan) extCharts.chan.destroy();
+        let cCounts = {};
+        extFiltered.forEach(d => cCounts[d.channel] = (cCounts[d.channel]||0)+1);
         
-        let chanCounts = {};
-        extFiltered.forEach(d => { chanCounts[d.channel] = (chanCounts[d.channel]||0)+1; });
+        // SORTING (Alto -> Basso)
+        let sortedEntries = Object.entries(cCounts).sort((a,b) => b[1] - a[1]);
         
-        let aggregatedCounts = {};
-        let otherCount = 0;
-        
-        for (let [channel, count] of Object.entries(chanCounts)) {
-            if (count < 10) {
-                otherCount += count;
-            } else {
-                aggregatedCounts[channel] = count;
-            }
-        }
-        
-        let sortedEntries = Object.entries(aggregatedCounts).sort((a,b) => b[1] - a[1]);
-        if (otherCount > 0) {
-            sortedEntries.push(['Altro', otherCount]);
-        }
-
         let labels = sortedEntries.map(e => e[0]);
-        let dataVals = sortedEntries.map(e => e[1]);
-
-        const gradient = ctxC.createLinearGradient(0, 400, 0, 0); 
-        gradient.addColorStop(0, '#b0c8f8'); 
-        gradient.addColorStop(1, '#c5d5f8'); 
-
+        let data = sortedEntries.map(e => e[1]);
+        
         extCharts.chan = new Chart(ctxC, {
             type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Post',
-                    data: dataVals,
-                    backgroundColor: gradient, 
-                    borderRadius: 4,
-                    barPercentage: 0.9, 
-                    categoryPercentage: 0.9 
-                }]
-            },
+            data: { labels: labels, datasets: [{ data: data, backgroundColor: '#b0c8f8', borderRadius:4 }] },
             options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: {
-                    legend: { display: false },
-                    datalabels: {
-                        display: true, 
-                        anchor: 'end',
-                        align: 'end',
-                        offset: 4,
-                        color: '#666',
-                        font: { family: 'Avenir', weight: 'bold', size: 16 },
-                        formatter: function(value) { return formatCompactNumber(value); } 
-                    }
-                },
-                scales: {
-                    x: { grid: { display: false } }, 
-                    y: { display: false, grid: { display: false } } 
-                },
-                layout: { padding: { top: 25 } } 
+                responsive:true, maintainAspectRatio:false, 
+                plugins:{legend:{display:false}, datalabels:{anchor:'end', align:'end', formatter:formatCompactNumber}}, 
+                scales:{
+                    x:{grid:{display:false}}, 
+                    y:{display:false, grace: '15%'} // Grace added to prevent cutoff
+                } 
             }
         });
     }
 
-    // Apre il modale Esterno con i dati
+    // --- MODAL EXTERNAL LOGIC ---
+    const modalExt = document.getElementById('editorModalExt');
+    
     function openExtModal(idx) {
         extIdx = idx;
-        currentCardImage = null; // Reset image on new open usually, or keep logic if preferred
+        currentCardImage = null; // Reset image
         updateExtCard();
         modalExt.style.display = 'flex';
     }
 
-    // Aggiorna sentiment esterno
-    function updateCurrentExtSentiment(newVal) {
-        if(!extFiltered.length) return;
-        const item = extFiltered[extIdx];
-        
-        item.sentiment = newVal;
-        if(newVal === 'Positivo') item.sentimentVal = 1;
-        else if(newVal === 'Negativo') item.sentimentVal = -1;
-        else item.sentimentVal = 0;
-
-        // Update Modal UI
-        const sel = document.getElementById('modalSentSelectExt');
-        sel.value = newVal;
-        sel.classList.remove('sentiment-positive', 'sentiment-neutral', 'sentiment-negative');
-        if (newVal === 'Positivo') sel.classList.add('sentiment-positive');
-        else if (newVal === 'Negativo') sel.classList.add('sentiment-negative');
-        else sel.classList.add('sentiment-neutral');
-
-        updateExtCharts(); 
-        renderExtList(extFiltered); // Update list colors
-    }
-
-    // Genera HTML card Esterna (ora dentro il modale)
     function updateExtCard() {
-        if(extIdx < 0) extIdx = 0;
-        if(extIdx >= extFiltered.length) {
-             // Handle case where list empty or idx out of bounds
-             document.getElementById('previewAreaExt').innerHTML = 'Nessun dato';
-             return;
-        }
-
+        if(extIdx < 0 || extIdx >= extFiltered.length) return;
         const d = extFiltered[extIdx];
         
-        // Update sentiment select color in modal without triggering change event
         const sel = document.getElementById('modalSentSelectExt');
         sel.value = d.sentiment;
-        sel.classList.remove('sentiment-positive', 'sentiment-neutral', 'sentiment-negative');
-        if (d.sentiment === 'Positivo') sel.classList.add('sentiment-positive');
-        else if (d.sentiment === 'Negativo') sel.classList.add('sentiment-negative');
-        else sel.classList.add('sentiment-neutral');
+        sel.className = 'sentiment-select ' + (d.sentiment === 'Positivo' ? 'sentiment-positive' : (d.sentiment === 'Negativo' ? 'sentiment-negative' : 'sentiment-neutral'));
 
-        const container = document.getElementById('previewAreaExt');
-        
-        const showAuthor = document.getElementById('showAuthorExt').checked;
-        const showOrigAuthor = document.getElementById('showOrigAuthorExt').checked;
-        const showLikes = document.getElementById('showLikesExt').checked;
-        const showFollowers = document.getElementById('showFollowersExt').checked;
-
-        const actualShowLikes = showLikes && (d.likes >= 50);
-        const actualShowFollowers = showFollowers && (d.followers >= 50);
+        const cont = document.getElementById('previewAreaExt');
+        const showAut = document.getElementById('showAuthorExt').checked;
+        const showSrc = document.getElementById('showOrigAuthorExt').checked;
+        const showLikes = document.getElementById('showLikesExt').checked && d.likes >= 50;
+        const showFoll = document.getElementById('showFollowersExt').checked && d.followers >= 50;
 
         document.getElementById('linkExt').href = d.url;
-
-        let followerLabel = d.isSocial ? 'Followers' : 'Audience';
-
-        let iconHtml = `<i class="${d.iconClass} card-icon-fa"></i>`;
-        if(d.channel.includes('X (Twitter)')) {
-            iconHtml = `<svg class="card-icon" viewBox="0 0 24 24"><path d="${icons.twitter}"/></svg>`;
-        }
-
-        const imageHtml = currentCardImage ? `<img src="${currentCardImage}" class="card-custom-image">` : '';
-
-        let retweetHtml = '';
-        if (d.channel.includes('X') && actualShowLikes && d.retweets >= 50) {
-             retweetHtml = `
-                <div style="font-weight:bold; color:#17bf63; display:flex; align-items:center; gap:5px;">
-                    <i class="fas fa-retweet"></i> ${formatCompactNumber(d.retweets)}
-                </div>
-             `;
-        }
-
-        container.innerHTML = `
+        let iconHtml = d.channel.includes('Twitter') ? `<svg class="card-icon" viewBox="0 0 24 24"><path d="${icons.twitter}"/></svg>` : `<i class="${d.iconClass} card-icon-fa"></i>`;
+        
+        cont.innerHTML = `
             <div class="social-card" id="captureCardExt">
                 <div class="card-header">
-                    <div style="display:flex; align-items:center;">
-                        ${iconHtml}
-                        <span style="font-weight:bold; color:var(--brand-blue);" contenteditable="true">${d.channel}</span>
-                    </div>
+                    <div style="display:flex; align-items:center;">${iconHtml} <span style="font-weight:bold; color:var(--brand-blue);" contenteditable="true">${d.channel}</span></div>
                     <span class="card-date" contenteditable="true">${formatItalianDate(d.date)}</span>
                 </div>
-                
                 <div class="card-body">
-                    ${imageHtml}
-                    <div style="font-size:1.1rem; line-height:1.6;" contenteditable="true">${d.content.substring(0, 350)}${d.content.length>350?'...':''}</div>
+                    ${currentCardImage ? `<img src="${currentCardImage}" class="card-custom-image">` : ''}
+                    <div style="font-size:1.1rem; line-height:1.6;" contenteditable="true">${smartTruncate(d.content, 550)}</div>
                 </div>
-                
                 <div class="card-footer">
-                    <div style="display:flex; flex-direction:column; gap:2px;">
-                        ${showAuthor ? `<span style="font-weight:bold; font-size:1.3rem;" contenteditable="true">${d.author}</span>` : ''}
-                        ${(d.subAuthor && showOrigAuthor) ? `<span style="font-size:0.85rem; color:#999;" contenteditable="true">${d.subAuthor}</span>` : ''}
-                        ${actualShowFollowers ? `<span style="font-size:0.8rem; opacity:0.8; margin-top:3px;">${followerLabel}: ${formatCompactNumber(d.followers)}</span>` : ''}
+                    <div style="display:flex; flex-direction:column;">
+                        ${showAut ? `<span style="font-weight:bold; font-size:1.3rem;" contenteditable="true">${d.author}</span>` : ''}
+                        ${d.subAuthor && showSrc ? `<span style="font-size:0.85rem; color:#999;" contenteditable="true">${d.subAuthor}</span>` : ''}
+                        ${showFoll ? `<span style="font-size:0.8rem; opacity:0.8; margin-top:3px;">Audience: ${formatCompactNumber(d.followers)}</span>` : ''}
                     </div>
-                    
                     <div style="display:flex; gap:15px; align-items:center;">
-                        ${retweetHtml}
-                        ${actualShowLikes ? `
-                        <div style="font-weight:bold; color:#e0245e; display:flex; align-items:center; gap:5px;">
-                            <i class="fas fa-heart"></i> ${formatCompactNumber(d.likes)}
-                        </div>` : ''}
+                        ${showLikes ? `<div style="font-weight:bold; color:#e0245e;"><i class="fas fa-heart"></i> ${formatCompactNumber(d.likes)}</div>` : ''}
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
     }
 
+    document.getElementById('closeModalExt').onclick = () => modalExt.style.display = 'none';
+    document.getElementById('modalPrevExt').onclick = () => { if(extIdx > 0) openExtModal(extIdx - 1); };
+    document.getElementById('modalNextExt').onclick = () => { if(extIdx < extFiltered.length - 1) openExtModal(extIdx + 1); };
+    document.getElementById('modalSentSelectExt').onchange = (e) => {
+        const item = extFiltered[extIdx];
+        item.sentiment = e.target.value;
+        item.sentimentVal = item.sentiment === 'Positivo' ? 1 : (item.sentiment === 'Negativo' ? -1 : 0);
+        updateExtCard();
+        renderExtCharts();
+        renderExtList();
+    };
+
+    ['showAuthorExt', 'showOrigAuthorExt', 'showLikesExt', 'showFollowersExt'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.addEventListener('change', updateExtCard);
+    });
+
+    const imgUpload = document.getElementById('imgUploadExt');
+    if(imgUpload) {
+        imgUpload.addEventListener('change', (e) => {
+            if(e.target.files[0]) {
+                const r = new FileReader();
+                r.onload = (ev) => { currentCardImage = ev.target.result; updateExtCard(); };
+                r.readAsDataURL(e.target.files[0]);
+            }
+        });
+    }
+
+    document.getElementById('dlBtnExt').onclick = () => dlCanvas('captureCardExt');
+    document.getElementById('copyBtnExt').onclick = () => copyCanvas('captureCardExt', 'copyBtnExt');
+
+    // --- MANUAL / EDIT ---
+    const manModal = document.getElementById('manualModal');
+    function openManualModal() {
+        isEditing = false; editTargetItem = null;
+        document.getElementById('manContent').value = '';
+        document.getElementById('manDate').value = new Date().toISOString().slice(0,16);
+        document.getElementById('saveManualBtn').innerText = "Aggiungi al Dataset";
+        manModal.style.display = 'block'; 
+        manModal.style.display = 'flex';
+    }
+
+    document.getElementById('editExt').onclick = () => {
+        if(!extFiltered.length) return;
+        isEditing = true; editTargetItem = extFiltered[extIdx];
+        document.getElementById('manContent').value = editTargetItem.content;
+        const d = editTargetItem.date;
+        document.getElementById('manDate').value = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0,16);
+        document.getElementById('manChannel').value = editTargetItem.channel;
+        document.getElementById('manAuthor').value = editTargetItem.author;
+        document.getElementById('manLikes').value = editTargetItem.likes;
+        document.getElementById('manFollowers').value = editTargetItem.followers;
+        document.getElementById('manUrl').value = editTargetItem.url;
+        document.getElementById('saveManualBtn').innerText = "Salva Modifiche";
+        modalExt.style.display = 'none';
+        manModal.style.display = 'flex';
+    };
+
+    // LOGICA ELIMINA ESTERNI (NON CHIUDE MODALE)
+    document.getElementById('delExt').onclick = () => {
+        if(!confirm("Eliminare definitivamente questo record?")) return;
+        
+        const itemToDelete = extFiltered[extIdx];
+        extData = extData.filter(x => x !== itemToDelete);
+        
+        // Refresh UI
+        updateExtUI(); // Questo aggiorna extFiltered
+
+        // Navigazione
+        if(extFiltered.length > 0) {
+            if(extIdx >= extFiltered.length) extIdx = extFiltered.length - 1;
+            openExtModal(extIdx);
+        } else {
+            modalExt.style.display = 'none';
+        }
+    };
+
+    function closeManualModal() { 
+        manModal.style.display = 'none';
+        if(isEditing) modalExt.style.display = 'flex';
+    }
+
+    function saveManualPost() {
+        const cont = document.getElementById('manContent').value;
+        const date = new Date(document.getElementById('manDate').value);
+        const chan = document.getElementById('manChannel').value;
+        const url = document.getElementById('manUrl').value;
+        const aut = document.getElementById('manAuthor').value || "Autore Sconosciuto";
+        const likes = parseInt(document.getElementById('manLikes').value)||0;
+        const foll = parseInt(document.getElementById('manFollowers').value)||0;
+        const sVal = parseInt(document.getElementById('manSentiment').value);
+        const sent = sVal > 0 ? 'Positivo' : (sVal < 0 ? 'Negativo' : 'Neutro');
+
+        if(!url || !chan) return alert("URL e Canale obbligatori");
+
+        const item = {
+            date: date, content: cont, author: aut, channel: chan, likes: likes, followers: foll,
+            sentiment: sent, sentimentVal: sVal, url: url, hash: generateHash(cont, date, aut),
+            iconClass: chan.toLowerCase().includes('twitter')?'fab fa-twitter':'fas fa-globe', isSocial: true
+        };
+
+        if(isEditing && editTargetItem) {
+            Object.assign(editTargetItem, item);
+            refreshExtDashboard();
+            updateExtCard();
+        } else {
+            handleExtImport([item]);
+        }
+        closeManualModal();
+    }
+
+    function exportExtJSON() {
+        const a = document.createElement('a');
+        a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(extData));
+        a.download = "export.json";
+        a.click();
+    }
+    
+    function importExtJSON(inp) {
+        if(inp.files[0]) {
+            const r = new FileReader();
+            r.onload = (e) => {
+                try { handleExtImport(JSON.parse(e.target.result).map(x => ({...x, date: new Date(x.date)}))); }
+                catch(e){alert("Errore JSON");}
+            };
+            r.readAsText(inp.files[0]);
+        }
+    }
+
+    function exportFullState() {
+        const a = document.createElement('a');
+        a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({proprietary:propComments, external:extData}));
+        a.download = "backup.json";
+        a.click();
+    }
+
+    function importFullState(inp) {
+        if(inp.files[0]) {
+            const r = new FileReader();
+            r.onload = (e) => {
+                try {
+                    const d = JSON.parse(e.target.result);
+                    if(d.proprietary) { propComments=d.proprietary.map(x=>({...x,date:new Date(x.date)})); initPropDashboard(); }
+                    if(d.external) { extData=d.external.map(x=>({...x,date:new Date(x.date)})); refreshExtDashboard(); }
+                } catch(e){alert("Errore Backup");}
+            };
+            r.readAsText(inp.files[0]);
+        }
+    }
 </script>
 </body>
 </html>
