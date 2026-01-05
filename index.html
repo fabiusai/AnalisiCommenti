@@ -342,7 +342,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v6.2 Nav Fix & Filename</span>
+    <span class="app-version">v6.3 Fixed External Modal</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -647,11 +647,9 @@
         }
     });
     
-    // KEYBOARD NAVIGATION (FIXED BLUR)
     document.addEventListener('keydown', function(e) {
         if (e.target.matches('input, textarea') || e.target.isContentEditable) return;
         
-        // Prop Modal Navigation
         if (document.getElementById('editorModalProp').style.display === 'flex') {
             if (e.key === 'ArrowLeft') {
                 if (currentPropIdx > 0) openPropModal(currentPropIdx - 1);
@@ -659,7 +657,6 @@
                 if (currentPropIdx < propFiltered.length - 1) openPropModal(currentPropIdx + 1);
             }
         }
-        // Ext Modal Navigation
         else if (document.getElementById('editorModalExt').style.display === 'flex') {
             if (e.key === 'ArrowLeft') {
                 if (extIdx > 0) openExtModal(extIdx - 1);
@@ -669,7 +666,6 @@
         }
     });
 
-    // ================== PROPRIETARI ==================
     let propComments = [], propFiltered = [], propChart = null, currentPropIdx = 0;
 
     document.getElementById('fileInputProp').addEventListener('change', function(e) {
@@ -825,13 +821,12 @@
     document.getElementById('modalPrevProp').onclick = () => { if(currentPropIdx > 0) openPropModal(currentPropIdx - 1); };
     document.getElementById('modalNextProp').onclick = () => { if(currentPropIdx < propFiltered.length - 1) openPropModal(currentPropIdx + 1); };
     
-    // NEW RADIO LISTENER PROP with BLUR FIX
     document.querySelectorAll('input[name="sentProp"]').forEach(r => {
         r.addEventListener('change', (e) => {
             if(!propFiltered.length) return;
             propFiltered[currentPropIdx].sent = e.target.value;
             updatePropUI();
-            e.target.blur(); // Rimuove il focus per evitare conflitti con le frecce
+            e.target.blur(); 
         });
     });
 
@@ -853,7 +848,6 @@
     };
 
 
-    // ================== ESTERNI ==================
     let extData = [], extFiltered = [], extIdx = 0, extCharts = {}, currentCardImage = null, isEditing = false, editTargetItem = null;
 
     document.getElementById('fileInputExt').addEventListener('change', function(e) {
@@ -1024,12 +1018,11 @@
         });
     }
 
-    // --- MODAL EXTERNAL LOGIC ---
     const modalExt = document.getElementById('editorModalExt');
     
     function openExtModal(idx) {
         extIdx = idx;
-        currentCardImage = null; // Reset image
+        currentCardImage = null; 
         updateExtCard();
         modalExt.style.display = 'flex';
     }
@@ -1038,9 +1031,8 @@
         if(extIdx < 0 || extIdx >= extFiltered.length) return;
         const d = extFiltered[extIdx];
         
-        document.getElementById('counterExt').innerText = `${extFiltered.length - idx}`;
+        document.getElementById('counterExt').innerText = `${extFiltered.length - extIdx}`;
 
-        // Set Radio
         const r = document.querySelector(`input[name="sentExt"][value="${d.sentiment}"]`);
         if(r) r.checked = true;
 
@@ -1080,7 +1072,6 @@
     document.getElementById('modalPrevExt').onclick = () => { if(extIdx > 0) openExtModal(extIdx - 1); };
     document.getElementById('modalNextExt').onclick = () => { if(extIdx < extFiltered.length - 1) openExtModal(extIdx + 1); };
     
-    // NEW RADIO LISTENER EXT with BLUR FIX
     document.querySelectorAll('input[name="sentExt"]').forEach(r => {
         r.addEventListener('change', (e) => {
             const item = extFiltered[extIdx];
@@ -1089,7 +1080,7 @@
             updateExtCard();
             renderExtCharts();
             renderExtList();
-            e.target.blur(); // Rimuove il focus
+            e.target.blur(); 
         });
     });
 
@@ -1112,7 +1103,6 @@
     document.getElementById('dlBtnExt').onclick = () => dlCanvas('captureCardExt');
     document.getElementById('copyBtnExt').onclick = () => copyCanvas('captureCardExt', 'copyBtnExt');
 
-    // --- MANUAL / EDIT ---
     const manModal = document.getElementById('manualModal');
     function openManualModal() {
         isEditing = false; editTargetItem = null;
