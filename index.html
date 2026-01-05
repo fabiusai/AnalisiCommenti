@@ -112,16 +112,16 @@
         .modal-footer-custom { padding: 1rem 2rem 1.5rem 2rem; flex-shrink: 0; text-align: right; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #eee; margin-top: auto; }
         .close { font-size: 1.5rem; font-weight: bold; cursor: pointer; color: #aaa; }
         
-        /* Scrollable Card Container - FIXED VISUALIZATION */
+        /* Scrollable Card Container */
         #cardPreviewContainer, #cardPreviewContainerExt { 
             flex-grow: 1; 
             overflow-y: auto; 
             background-color: #e0e0e0; 
             padding: 20px; 
             display: flex; 
-            flex-direction: column; /* Impostato a colonna */
-            justify-content: flex-start; /* Parte dall'alto, non dal centro verticale */
-            align-items: center; /* Centrato orizzontalmente */
+            flex-direction: column; 
+            justify-content: flex-start;
+            align-items: center;
             min-height: 200px;
         }
         
@@ -131,7 +131,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-family: 'Roboto', sans-serif; 
             position: relative; overflow: hidden; display: flex; flex-direction: column; text-align: left;
             flex-shrink: 0; 
-            margin: auto; /* Margine automatico per centrare se piccolo, scrollare se grande */
+            margin: auto; 
         }
         .social-card .card-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 25px 25px 10px 25px; }
         .social-card .card-icon { width: 24px; height: 24px; fill: var(--brand-blue); flex-shrink: 0; margin-right: 10px; }
@@ -153,28 +153,32 @@
         .modal-nav-btn { background: none; border: 1px solid #ccc; border-radius: 4px; padding: 5px 12px; cursor: pointer; }
         .modal-nav-btn:hover { background: #eee; }
 
+        .nav-counter { font-size: 0.9rem; font-weight: 500; color: #555; background: #fff; padding: 6px 12px; border-radius: 15px; border: 1px solid #ddd; margin: 0 5px; }
         .hidden { display: none !important; }
 
-        .sentiment-select-wrapper { display: inline-block; position: relative; }
-        .sentiment-select { 
-            appearance: none; -webkit-appearance: none; border: 2px solid transparent; 
-            border-radius: 12px; padding: 4px 24px 4px 10px; font-size: 0.85rem; 
-            font-weight: bold; color: white; cursor: pointer; text-align: center;
+        /* --- NEW RADIO GROUP STYLES --- */
+        .sent-radio-group { display: inline-flex; background: #f0f0f0; border-radius: 20px; padding: 3px; gap: 2px; }
+        .sent-radio-option { position: relative; margin: 0; }
+        .sent-radio-option input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+        .sent-radio-option span {
+            display: inline-block; padding: 4px 12px; border-radius: 16px;
+            font-size: 0.85rem; font-weight: 500; color: #666; cursor: pointer;
+            transition: all 0.2s; user-select: none;
         }
-        .sentiment-select:focus { outline: none; box-shadow: 0 0 0 2px rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.5); }
-        .sentiment-select option { color: #333; background: white; padding: 5px; }
-        .sentiment-arrow { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid white; }
-        
-        .modal-settings-bar { display: flex; gap: 15px; font-size: 0.9rem; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
+        .sent-radio-option:hover span { background: #e0e0e0; }
+        .sent-radio-option input:checked + span { font-weight: bold; color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        /* Colors */
+        .sent-radio-option.opt-pos input:checked + span { background-color: var(--success); }
+        .sent-radio-option.opt-neu input:checked + span { background-color: var(--warning); color: #333; }
+        .sent-radio-option.opt-neg input:checked + span { background-color: var(--danger); }
 
+        .modal-settings-bar { display: flex; gap: 15px; font-size: 0.9rem; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         footer { margin-top: auto; background-color: white; border-top: 1px solid var(--border-color); padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #888; display: flex; justify-content: space-between; }
-        
-        /* Flex header title for button */
         .box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
     </style>
 </head>
@@ -338,7 +342,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v5.8 Layout & Sort Fixed</span>
+    <span class="app-version">v6.2 Nav Fix & Filename</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -350,14 +354,21 @@
         <div class="modal-tools-top">
             <div class="modal-nav-bar">
                 <button class="modal-nav-btn" id="modalPrevProp"><i class="fas fa-chevron-left"></i> Prec</button>
-                <div class="sentiment-select-wrapper">
-                    <select id="modalSentSelectProp" class="sentiment-select">
-                        <option value="Positive">😊 Positivo</option>
-                        <option value="Neutral">😐 Neutro</option>
-                        <option value="Negative">😡 Negativo</option>
-                    </select>
-                    <div class="sentiment-arrow"></div>
+                
+                <div class="sent-radio-group">
+                    <label class="sent-radio-option opt-pos">
+                        <input type="radio" name="sentProp" value="Positive"><span>😊 Pos</span>
+                    </label>
+                    <label class="sent-radio-option opt-neu">
+                        <input type="radio" name="sentProp" value="Neutral"><span>😐 Neu</span>
+                    </label>
+                    <label class="sent-radio-option opt-neg">
+                        <input type="radio" name="sentProp" value="Negative"><span>😡 Neg</span>
+                    </label>
                 </div>
+
+                <span id="counterProp" class="nav-counter"></span>
+                
                 <button class="modal-nav-btn" id="modalNextProp">Succ <i class="fas fa-chevron-right"></i></button>
             </div>
             <div style="text-align:center;">
@@ -402,14 +413,21 @@
         <div class="modal-tools-top">
             <div class="modal-nav-bar">
                 <button class="modal-nav-btn" id="modalPrevExt"><i class="fas fa-chevron-left"></i> Prec</button>
-                <div class="sentiment-select-wrapper">
-                    <select id="modalSentSelectExt" class="sentiment-select">
-                        <option value="Positivo">😊 Positivo</option>
-                        <option value="Neutro">😐 Neutro</option>
-                        <option value="Negativo">😡 Negativo</option>
-                    </select>
-                    <div class="sentiment-arrow"></div>
+                
+                <div class="sent-radio-group">
+                    <label class="sent-radio-option opt-pos">
+                        <input type="radio" name="sentExt" value="Positivo"><span>😊 Pos</span>
+                    </label>
+                    <label class="sent-radio-option opt-neu">
+                        <input type="radio" name="sentExt" value="Neutro"><span>😐 Neu</span>
+                    </label>
+                    <label class="sent-radio-option opt-neg">
+                        <input type="radio" name="sentExt" value="Negativo"><span>😡 Neg</span>
+                    </label>
                 </div>
+
+                <span id="counterExt" class="nav-counter"></span>
+
                 <button class="modal-nav-btn" id="modalNextExt">Succ <i class="fas fa-chevron-right"></i></button>
             </div>
             
@@ -473,7 +491,11 @@
                 </div>
                 <div class="form-group">
                     <label>Sentiment *</label>
-                    <select id="manSentiment"><option value="0">Neutro</option><option value="1">Positivo</option><option value="-1">Negativo</option></select>
+                    <div class="sent-radio-group" style="width:100%; justify-content:center; background:white; border:1px solid #ddd;">
+                       <label class="sent-radio-option opt-pos"><input type="radio" name="manSent" value="1"><span>Positivo</span></label>
+                       <label class="sent-radio-option opt-neu"><input type="radio" name="manSent" value="0" checked><span>Neutro</span></label>
+                       <label class="sent-radio-option opt-neg"><input type="radio" name="manSent" value="-1"><span>Negativo</span></label>
+                    </div>
                 </div>
             </div>
             <div class="form-row">
@@ -551,7 +573,6 @@
         });
     }
     
-    // Funzione download grafico PNG
     function downloadChart(chartId) {
         const c = document.getElementById(chartId);
         const link = document.createElement('a');
@@ -622,6 +643,28 @@
                 };
                 reader.readAsDataURL(items[i].getAsFile());
                 e.preventDefault(); break;
+            }
+        }
+    });
+    
+    // KEYBOARD NAVIGATION (FIXED BLUR)
+    document.addEventListener('keydown', function(e) {
+        if (e.target.matches('input, textarea') || e.target.isContentEditable) return;
+        
+        // Prop Modal Navigation
+        if (document.getElementById('editorModalProp').style.display === 'flex') {
+            if (e.key === 'ArrowLeft') {
+                if (currentPropIdx > 0) openPropModal(currentPropIdx - 1);
+            } else if (e.key === 'ArrowRight') {
+                if (currentPropIdx < propFiltered.length - 1) openPropModal(currentPropIdx + 1);
+            }
+        }
+        // Ext Modal Navigation
+        else if (document.getElementById('editorModalExt').style.display === 'flex') {
+            if (e.key === 'ArrowLeft') {
+                if (extIdx > 0) openExtModal(extIdx - 1);
+            } else if (e.key === 'ArrowRight') {
+                if (extIdx < extFiltered.length - 1) openExtModal(extIdx + 1);
             }
         }
     });
@@ -764,10 +807,13 @@
         document.getElementById('cardTextProp').innerText = smartTruncate(c.msg, 550); 
         document.getElementById('cardAuthorProp').innerText = c.author;
         document.getElementById('cardDateProp').innerText = formatItalianDate(c.date);
+        document.getElementById('counterProp').innerText = `${propFiltered.length - idx}`;
         
-        const sel = document.getElementById('modalSentSelectProp');
-        sel.value = c.sent.toLowerCase().includes('positive') ? 'Positive' : (c.sent.toLowerCase().includes('negative') ? 'Negative' : 'Neutral');
-        updateModalColorProp();
+        let val = 'Neutral';
+        if(c.sent.toLowerCase().includes('positive')) val = 'Positive';
+        else if(c.sent.toLowerCase().includes('negative')) val = 'Negative';
+        const r = document.querySelector(`input[name="sentProp"][value="${val}"]`);
+        if(r) r.checked = true;
 
         const p = document.querySelector('#cardIconProp path');
         p.setAttribute('d', icons[c.platform] || icons.default);
@@ -775,19 +821,20 @@
         modalProp.style.display = 'flex';
     }
 
-    function updateModalColorProp() {
-        const s = document.getElementById('modalSentSelectProp');
-        s.className = 'sentiment-select ' + (s.value === 'Positive' ? 'sentiment-positive' : (s.value === 'Negative' ? 'sentiment-negative' : 'sentiment-neutral'));
-    }
-
     document.getElementById('closeModalProp').onclick = () => modalProp.style.display = 'none';
     document.getElementById('modalPrevProp').onclick = () => { if(currentPropIdx > 0) openPropModal(currentPropIdx - 1); };
     document.getElementById('modalNextProp').onclick = () => { if(currentPropIdx < propFiltered.length - 1) openPropModal(currentPropIdx + 1); };
-    document.getElementById('modalSentSelectProp').onchange = (e) => {
-        propFiltered[currentPropIdx].sent = e.target.value;
-        updateModalColorProp();
-        updatePropUI();
-    };
+    
+    // NEW RADIO LISTENER PROP with BLUR FIX
+    document.querySelectorAll('input[name="sentProp"]').forEach(r => {
+        r.addEventListener('change', (e) => {
+            if(!propFiltered.length) return;
+            propFiltered[currentPropIdx].sent = e.target.value;
+            updatePropUI();
+            e.target.blur(); // Rimuove il focus per evitare conflitti con le frecce
+        });
+    });
+
     document.getElementById('toggleAuthorProp').onchange = (e) => document.getElementById('cardAuthorProp').style.display = e.target.checked ? 'block' : 'none';
     document.getElementById('dlBtnProp').onclick = () => dlCanvas('captureCardProp');
     document.getElementById('copyBtnProp').onclick = () => copyCanvas('captureCardProp', 'copyBtnProp');
@@ -958,7 +1005,6 @@
         let cCounts = {};
         extFiltered.forEach(d => cCounts[d.channel] = (cCounts[d.channel]||0)+1);
         
-        // SORTING (Alto -> Basso)
         let sortedEntries = Object.entries(cCounts).sort((a,b) => b[1] - a[1]);
         
         let labels = sortedEntries.map(e => e[0]);
@@ -972,7 +1018,7 @@
                 plugins:{legend:{display:false}, datalabels:{anchor:'end', align:'end', formatter:formatCompactNumber}}, 
                 scales:{
                     x:{grid:{display:false}}, 
-                    y:{display:false, grace: '15%'} // Grace added to prevent cutoff
+                    y:{display:false, grace: '15%'} 
                 } 
             }
         });
@@ -992,9 +1038,11 @@
         if(extIdx < 0 || extIdx >= extFiltered.length) return;
         const d = extFiltered[extIdx];
         
-        const sel = document.getElementById('modalSentSelectExt');
-        sel.value = d.sentiment;
-        sel.className = 'sentiment-select ' + (d.sentiment === 'Positivo' ? 'sentiment-positive' : (d.sentiment === 'Negativo' ? 'sentiment-negative' : 'sentiment-neutral'));
+        document.getElementById('counterExt').innerText = `${extFiltered.length - idx}`;
+
+        // Set Radio
+        const r = document.querySelector(`input[name="sentExt"][value="${d.sentiment}"]`);
+        if(r) r.checked = true;
 
         const cont = document.getElementById('previewAreaExt');
         const showAut = document.getElementById('showAuthorExt').checked;
@@ -1031,14 +1079,19 @@
     document.getElementById('closeModalExt').onclick = () => modalExt.style.display = 'none';
     document.getElementById('modalPrevExt').onclick = () => { if(extIdx > 0) openExtModal(extIdx - 1); };
     document.getElementById('modalNextExt').onclick = () => { if(extIdx < extFiltered.length - 1) openExtModal(extIdx + 1); };
-    document.getElementById('modalSentSelectExt').onchange = (e) => {
-        const item = extFiltered[extIdx];
-        item.sentiment = e.target.value;
-        item.sentimentVal = item.sentiment === 'Positivo' ? 1 : (item.sentiment === 'Negativo' ? -1 : 0);
-        updateExtCard();
-        renderExtCharts();
-        renderExtList();
-    };
+    
+    // NEW RADIO LISTENER EXT with BLUR FIX
+    document.querySelectorAll('input[name="sentExt"]').forEach(r => {
+        r.addEventListener('change', (e) => {
+            const item = extFiltered[extIdx];
+            item.sentiment = e.target.value;
+            item.sentimentVal = item.sentiment === 'Positivo' ? 1 : (item.sentiment === 'Negativo' ? -1 : 0);
+            updateExtCard();
+            renderExtCharts();
+            renderExtList();
+            e.target.blur(); // Rimuove il focus
+        });
+    });
 
     ['showAuthorExt', 'showOrigAuthorExt', 'showLikesExt', 'showFollowersExt'].forEach(id => {
         const el = document.getElementById(id);
@@ -1066,6 +1119,10 @@
         document.getElementById('manContent').value = '';
         document.getElementById('manDate').value = new Date().toISOString().slice(0,16);
         document.getElementById('saveManualBtn').innerText = "Aggiungi al Dataset";
+        
+        const r = document.querySelector('input[name="manSent"][value="0"]');
+        if(r) r.checked = true;
+
         manModal.style.display = 'block'; 
         manModal.style.display = 'flex';
     }
@@ -1082,21 +1139,22 @@
         document.getElementById('manFollowers').value = editTargetItem.followers;
         document.getElementById('manUrl').value = editTargetItem.url;
         document.getElementById('saveManualBtn').innerText = "Salva Modifiche";
+        
+        let val = '0';
+        if(editTargetItem.sentimentVal > 0) val = '1';
+        if(editTargetItem.sentimentVal < 0) val = '-1';
+        const r = document.querySelector(`input[name="manSent"][value="${val}"]`);
+        if(r) r.checked = true;
+
         modalExt.style.display = 'none';
         manModal.style.display = 'flex';
     };
 
-    // LOGICA ELIMINA ESTERNI (NON CHIUDE MODALE)
     document.getElementById('delExt').onclick = () => {
         if(!confirm("Eliminare definitivamente questo record?")) return;
-        
         const itemToDelete = extFiltered[extIdx];
         extData = extData.filter(x => x !== itemToDelete);
-        
-        // Refresh UI
-        updateExtUI(); // Questo aggiorna extFiltered
-
-        // Navigazione
+        updateExtUI();
         if(extFiltered.length > 0) {
             if(extIdx >= extFiltered.length) extIdx = extFiltered.length - 1;
             openExtModal(extIdx);
@@ -1118,7 +1176,8 @@
         const aut = document.getElementById('manAuthor').value || "Autore Sconosciuto";
         const likes = parseInt(document.getElementById('manLikes').value)||0;
         const foll = parseInt(document.getElementById('manFollowers').value)||0;
-        const sVal = parseInt(document.getElementById('manSentiment').value);
+        
+        const sVal = parseInt(document.querySelector('input[name="manSent"]:checked').value);
         const sent = sVal > 0 ? 'Positivo' : (sVal < 0 ? 'Negativo' : 'Neutro');
 
         if(!url || !chan) return alert("URL e Canale obbligatori");
@@ -1158,9 +1217,18 @@
     }
 
     function exportFullState() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hour = String(now.getHours()).padStart(2, '0');
+        const minute = String(now.getMinutes()).padStart(2, '0');
+        
+        const filename = `AnalisiSentiment_${year}_${month}_${day}_${hour}_${minute}.json`;
+
         const a = document.createElement('a');
         a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({proprietary:propComments, external:extData}));
-        a.download = "backup.json";
+        a.download = filename;
         a.click();
     }
 
