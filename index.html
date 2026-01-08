@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
         :root {
@@ -63,7 +63,9 @@
         .btn-copy { background-color: var(--brand-lightblue); color: white; }
         .btn-danger { background-color: white; color: var(--danger); border: 1px solid var(--danger); padding: 10px 20px; }
         .btn-danger:hover { background-color: var(--danger); color: white; }
-        .btn-sm { padding: 4px 8px; font-size: 0.7rem; margin-left: auto; }
+        .btn-sm { padding: 4px 8px; font-size: 0.7rem; margin-left: 5px; }
+        .btn-outline { background: white; border: 1px solid #ccc; color: #555; }
+        .btn-outline:hover { background: #eee; }
 
         .btn-link { background: none; color: var(--brand-blue); text-decoration: underline; border: none; padding: 0; font-size: 0.9rem; cursor: pointer; }
         .btn-upload-img { background-color: #e2e6ea; color: #333; margin-right: 10px; padding: 5px 10px; border-radius: 4px; }
@@ -180,6 +182,9 @@
         
         footer { margin-top: auto; background-color: white; border-top: 1px solid var(--border-color); padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #888; display: flex; justify-content: space-between; }
         .box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        
+        .btn-group { display: flex; gap: 5px; align-items: center; }
+        .chart-control { margin-right: 10px; display: flex; align-items: center; gap: 5px; font-size: 0.85rem; color: #666; }
     </style>
 </head>
 <body>
@@ -216,7 +221,9 @@
                 <div class="card-box">
                     <div class="box-header">
                         <h3 class="section-title" style="margin:0;">Sentiment Overview</h3>
-                        <button class="btn btn-secondary btn-sm" onclick="downloadChart('sentimentChartProp')"><i class="fas fa-camera"></i> Scarica PNG</button>
+                        <div class="btn-group">
+                            <button class="btn btn-outline btn-sm" onclick="downloadChart('sentimentChartProp')"><i class="fas fa-camera"></i> PNG</button>
+                        </div>
                     </div>
                     <div style="margin-bottom: 1rem;"><strong>Totale Commenti:</strong> <span id="totalCommentsProp">0</span></div>
                     <div class="chart-wrapper"><canvas id="sentimentChartProp"></canvas></div>
@@ -285,18 +292,42 @@
                 <div class="card-box" style="margin-bottom: 2rem;">
                     <div class="box-header">
                         <h3 class="section-title" style="margin:0;">Sentiment Analysis</h3>
-                        <button class="btn btn-secondary btn-sm" onclick="downloadChart('sentimentChartExt')"><i class="fas fa-camera"></i> Scarica PNG</button>
+                        <div class="btn-group">
+                            <button class="btn btn-outline btn-sm" onclick="downloadChart('sentimentChartExt')"><i class="fas fa-camera"></i> PNG</button>
+                        </div>
                     </div>
                     <div style="margin-bottom: 1rem;"><strong>Totale Contenuti:</strong> <span id="totalContentExt">0</span></div>
                     <div class="chart-wrapper"><canvas id="sentimentChartExt"></canvas></div>
                     <div id="legendExt" class="custom-legend"></div>
                 </div>
-                <div class="card-box">
+                <div class="card-box" style="margin-bottom: 2rem;">
                     <div class="box-header">
                         <h3 class="section-title" style="margin:0;">Canali e siti</h3>
-                        <button class="btn btn-secondary btn-sm" onclick="downloadChart('channelChartExt')"><i class="fas fa-camera"></i> Scarica PNG</button>
+                        <div class="btn-group">
+                            <div class="chart-control">
+                                <label for="threshChan">Soglia:</label>
+                                <input type="number" id="threshChan" value="30" min="0" class="filter-input" style="width:60px; padding:2px 5px;">
+                            </div>
+                            <button class="btn btn-secondary btn-sm" onclick="copyChartData('channel')"><i class="fas fa-table"></i> Dati</button>
+                            <button class="btn btn-outline btn-sm" onclick="downloadChart('channelChartExt')"><i class="fas fa-camera"></i> PNG</button>
+                        </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="channelChartExt"></canvas></div>
+                </div>
+                <div class="card-box">
+                    <div class="box-header">
+                        <h3 class="section-title" style="margin:0;">Engagement & Like Totali</h3>
+                        <div class="btn-group">
+                            <div class="chart-control">
+                                <label for="threshEng">Soglia:</label>
+                                <input type="number" id="threshEng" value="30" min="0" class="filter-input" style="width:60px; padding:2px 5px;">
+                            </div>
+                            <button class="btn btn-secondary btn-sm" onclick="copyChartData('engagement')"><i class="fas fa-table"></i> Dati</button>
+                            <button class="btn btn-outline btn-sm" onclick="downloadChart('engagementChartExt')"><i class="fas fa-camera"></i> PNG</button>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 1rem;"><strong>Totale Like/Reazioni:</strong> <span id="totalLikesExt">0</span></div>
+                    <div class="chart-wrapper"><canvas id="engagementChartExt"></canvas></div>
                 </div>
             </div>
 
@@ -342,7 +373,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v6.3 Fixed External Modal</span>
+    <span class="app-version">v6.9 Split Thresholds & Persistence</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -354,31 +385,19 @@
         <div class="modal-tools-top">
             <div class="modal-nav-bar">
                 <button class="modal-nav-btn" id="modalPrevProp"><i class="fas fa-chevron-left"></i> Prec</button>
-                
                 <div class="sent-radio-group">
-                    <label class="sent-radio-option opt-pos">
-                        <input type="radio" name="sentProp" value="Positive"><span>😊 Pos</span>
-                    </label>
-                    <label class="sent-radio-option opt-neu">
-                        <input type="radio" name="sentProp" value="Neutral"><span>😐 Neu</span>
-                    </label>
-                    <label class="sent-radio-option opt-neg">
-                        <input type="radio" name="sentProp" value="Negative"><span>😡 Neg</span>
-                    </label>
+                    <label class="sent-radio-option opt-pos"><input type="radio" name="sentProp" value="Positive"><span>😊 Pos</span></label>
+                    <label class="sent-radio-option opt-neu"><input type="radio" name="sentProp" value="Neutral"><span>😐 Neu</span></label>
+                    <label class="sent-radio-option opt-neg"><input type="radio" name="sentProp" value="Negative"><span>😡 Neg</span></label>
                 </div>
-
                 <span id="counterProp" class="nav-counter"></span>
-                
                 <button class="modal-nav-btn" id="modalNextProp">Succ <i class="fas fa-chevron-right"></i></button>
             </div>
             <div style="text-align:center;">
                 <input type="checkbox" id="toggleAuthorProp" checked> <label for="toggleAuthorProp">Mostra Nome Autore</label>
-                <button id="delProp" class="btn btn-danger" style="margin-left: 10px; padding: 4px 10px; font-size: 0.8rem;">
-                    <i class="fas fa-trash-alt"></i> Elimina
-                </button>
+                <button id="delProp" class="btn btn-danger" style="margin-left: 10px; padding: 4px 10px; font-size: 0.8rem;"><i class="fas fa-trash-alt"></i> Elimina</button>
             </div>
         </div>
-
         <div id="cardPreviewContainer">
             <div class="social-card" id="captureCardProp">
                 <div class="card-header">
@@ -387,15 +406,10 @@
                     </div>
                     <span class="card-date" id="cardDateProp">DD/MM/YYYY</span>
                 </div>
-                <div class="card-body">
-                    <div id="cardTextProp" contenteditable="true">Testo...</div>
-                </div>
-                <div class="card-footer">
-                    <div id="cardAuthorProp">Nome Autore</div>
-                </div>
+                <div class="card-body"><div id="cardTextProp" contenteditable="true">Testo...</div></div>
+                <div class="card-footer"><div id="cardAuthorProp">Nome Autore</div></div>
             </div>
         </div>
-
         <div class="modal-footer-custom">
             <button class="btn btn-copy" id="copyBtnProp"><i class="fas fa-copy"></i> Copia Card</button>
             <button class="btn btn-download" id="dlBtnProp"><i class="fas fa-download"></i> Scarica Card</button>
@@ -409,35 +423,23 @@
             <h2 style="color: var(--brand-blue);">Editor Card Esterni</h2>
             <span class="close" id="closeModalExt">&times;</span>
         </div>
-
         <div class="modal-tools-top">
             <div class="modal-nav-bar">
                 <button class="modal-nav-btn" id="modalPrevExt"><i class="fas fa-chevron-left"></i> Prec</button>
-                
                 <div class="sent-radio-group">
-                    <label class="sent-radio-option opt-pos">
-                        <input type="radio" name="sentExt" value="Positivo"><span>😊 Pos</span>
-                    </label>
-                    <label class="sent-radio-option opt-neu">
-                        <input type="radio" name="sentExt" value="Neutro"><span>😐 Neu</span>
-                    </label>
-                    <label class="sent-radio-option opt-neg">
-                        <input type="radio" name="sentExt" value="Negativo"><span>😡 Neg</span>
-                    </label>
+                    <label class="sent-radio-option opt-pos"><input type="radio" name="sentExt" value="Positivo"><span>😊 Pos</span></label>
+                    <label class="sent-radio-option opt-neu"><input type="radio" name="sentExt" value="Neutro"><span>😐 Neu</span></label>
+                    <label class="sent-radio-option opt-neg"><input type="radio" name="sentExt" value="Negativo"><span>😡 Neg</span></label>
                 </div>
-
                 <span id="counterExt" class="nav-counter"></span>
-
                 <button class="modal-nav-btn" id="modalNextExt">Succ <i class="fas fa-chevron-right"></i></button>
             </div>
-            
             <div class="modal-settings-bar">
                 <label><input type="checkbox" id="showAuthorExt" checked> Autore</label>
                 <label><input type="checkbox" id="showOrigAuthorExt" checked> Fonte</label>
                 <label><input type="checkbox" id="showLikesExt" checked> Like</label>
                 <label><input type="checkbox" id="showFollowersExt" checked> Follower</label>
             </div>
-            
             <div style="text-align:center; margin-top:10px;">
                 <label for="imgUploadExt" class="btn btn-upload-img" style="cursor:pointer; font-size:0.8rem;"><i class="fas fa-image"></i> Carica Immagine (o Incolla CTRL+V)</label>
                 <input type="file" id="imgUploadExt" accept="image/*" style="display:none;">
@@ -448,11 +450,7 @@
                 </div>
             </div>
         </div>
-
-        <div id="cardPreviewContainerExt">
-            <div id="previewAreaExt"></div>
-        </div>
-
+        <div id="cardPreviewContainerExt"><div id="previewAreaExt"></div></div>
         <div class="modal-footer-custom">
             <button id="copyBtnExt" class="btn btn-copy"><i class="fas fa-copy"></i> Copia Card</button>
             <button id="dlBtnExt" class="btn btn-download"><i class="fas fa-download"></i> Scarica Card</button>
@@ -467,30 +465,14 @@
             <span class="close" onclick="closeManualModal()">&times;</span>
         </div>
         <div style="padding: 0 2rem 2rem 2rem;">
-            <div class="form-group">
-                <label>Testo del Post</label>
-                <textarea id="manContent" rows="4"></textarea>
+            <div class="form-group"><label>Testo del Post</label><textarea id="manContent" rows="4"></textarea></div>
+            <div class="form-row">
+                <div class="form-group"><label>Data</label><input type="datetime-local" id="manDate"></div>
+                <div class="form-group"><label>Canale / Sito *</label><input type="text" id="manChannel" list="channelListHint" placeholder="Es. Facebook"><datalist id="channelListHint"><option value="Facebook"><option value="Instagram"><option value="TikTok"><option value="X (Twitter)"><option value="LinkedIn"><option value="YouTube"><option value="Web/News"></datalist></div>
             </div>
             <div class="form-row">
-                <div class="form-group">
-                    <label>Data</label>
-                    <input type="datetime-local" id="manDate">
-                </div>
-                <div class="form-group">
-                    <label>Canale / Sito *</label>
-                    <input type="text" id="manChannel" list="channelListHint" placeholder="Es. Facebook">
-                    <datalist id="channelListHint">
-                        <option value="Facebook"><option value="Instagram"><option value="TikTok"><option value="X (Twitter)"><option value="LinkedIn"><option value="YouTube"><option value="Web/News">
-                    </datalist>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Autore</label>
-                    <input type="text" id="manAuthor" placeholder="Nome autore o pagina">
-                </div>
-                <div class="form-group">
-                    <label>Sentiment *</label>
+                <div class="form-group"><label>Autore</label><input type="text" id="manAuthor" placeholder="Nome autore o pagina"></div>
+                <div class="form-group"><label>Sentiment *</label>
                     <div class="sent-radio-group" style="width:100%; justify-content:center; background:white; border:1px solid #ddd;">
                        <label class="sent-radio-option opt-pos"><input type="radio" name="manSent" value="1"><span>Positivo</span></label>
                        <label class="sent-radio-option opt-neu"><input type="radio" name="manSent" value="0" checked><span>Neutro</span></label>
@@ -499,23 +481,11 @@
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group">
-                    <label>Likes / Engagement</label>
-                    <input type="number" id="manLikes" value="0">
-                </div>
-                <div class="form-group">
-                    <label>Followers / Reach</label>
-                    <input type="number" id="manFollowers" value="0">
-                </div>
+                <div class="form-group"><label>Likes / Engagement</label><input type="number" id="manLikes" value="0"></div>
+                <div class="form-group"><label>Followers / Reach</label><input type="number" id="manFollowers" value="0"></div>
             </div>
-            <div class="form-group">
-                <label>URL Originale *</label>
-                <input type="text" id="manUrl" placeholder="https://..." oninput="checkUrlDuplicate()">
-                <small id="urlWarning" style="color: var(--danger); display: none; font-weight: bold; margin-top: 5px;"></small>
-            </div>
-            <div style="text-align: right; margin-top: 20px;">
-                <button class="btn btn-download" id="saveManualBtn" onclick="saveManualPost()">Aggiungi al Dataset</button>
-            </div>
+            <div class="form-group"><label>URL Originale *</label><input type="text" id="manUrl" placeholder="https://..." oninput="checkUrlDuplicate()"><small id="urlWarning" style="color: var(--danger); display: none; font-weight: bold; margin-top: 5px;"></small></div>
+            <div style="text-align: right; margin-top: 20px;"><button class="btn btn-download" id="saveManualBtn" onclick="saveManualPost()">Aggiungi al Dataset</button></div>
         </div>
     </div>
 </div>
@@ -529,6 +499,34 @@
         twitter: "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z",
         default: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"
     };
+    
+    const brandColors = {
+        'Facebook': '#1877F2',
+        'Instagram': '#E1306C',
+        'X (Twitter)': '#000000',
+        'Twitter': '#1DA1F2',
+        'LinkedIn': '#0077b5',
+        'YouTube': '#FF0000',
+        'TikTok': '#000000',
+        'Web/News': '#808080',
+        'Altro': '#555555'
+    };
+
+    const brandIconsUnicode = {
+        'Facebook': '\uf09a', // fab fa-facebook
+        'Instagram': '\uf16d', // fab fa-instagram
+        'X (Twitter)': '\ue61b', // x-twitter
+        'Twitter': '\uf099',
+        'LinkedIn': '\uf0e1',
+        'YouTube': '\uf167',
+        'TikTok': '\ue07b',
+        'Web/News': '\uf0ac',
+        'Altro': '\uf141'
+    };
+
+    function getBrandColor(channel) {
+        return brandColors[channel] || '#b0c8f8';
+    }
 
     function switchTab(name) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -579,6 +577,52 @@
         link.download = `grafico-${Date.now()}.png`;
         link.href = c.toDataURL('image/png', 1.0);
         link.click();
+    }
+
+    function copyChartData(type) {
+        if(!extFiltered || extFiltered.length === 0) return alert("Nessun dato disponibile");
+        
+        let output = "";
+        
+        if (type === 'channel') {
+            const threshold = parseInt(document.getElementById('threshChan').value) || 0;
+            let cCounts = {};
+            extFiltered.forEach(d => cCounts[d.channel] = (cCounts[d.channel]||0)+1);
+            let agg = [];
+            let other = 0;
+            Object.entries(cCounts).forEach(([k, v]) => {
+                if(v < threshold) other += v; else agg.push([k,v]);
+            });
+            if(other > 0) agg.push(['Altro', other]);
+            agg.sort((a,b) => b[1] - a[1]);
+            
+            output = "Canale\tNumero Contenuti\n";
+            agg.forEach(([k, v]) => output += `${k}\t${v}\n`);
+            
+        } else if (type === 'engagement') {
+            const threshold = parseInt(document.getElementById('threshEng').value) || 0;
+            let lCounts = {};
+            extFiltered.forEach(d => {
+                if(d.channel !== 'Web/News') { 
+                    lCounts[d.channel] = (lCounts[d.channel]||0) + d.likes;
+                }
+            });
+            let agg = [];
+            let other = 0;
+            Object.entries(lCounts).forEach(([k, v]) => {
+                if(v < threshold) other += v; else agg.push([k,v]);
+            });
+            if(other > 0) agg.push(['Altro', other]);
+            agg.sort((a,b) => b[1] - a[1]);
+            output = "Canale\tLike Totali\n";
+            agg.forEach(([k, v]) => output += `${k}\t${v}\n`);
+        }
+
+        navigator.clipboard.writeText(output).then(() => {
+            alert("Dati copiati negli appunti! Puoi incollarli in Excel.");
+        }, () => {
+            alert("Errore nella copia. Verifica i permessi.");
+        });
     }
 
     function copyCanvas(id, btnId) {
@@ -649,20 +693,12 @@
     
     document.addEventListener('keydown', function(e) {
         if (e.target.matches('input, textarea') || e.target.isContentEditable) return;
-        
         if (document.getElementById('editorModalProp').style.display === 'flex') {
-            if (e.key === 'ArrowLeft') {
-                if (currentPropIdx > 0) openPropModal(currentPropIdx - 1);
-            } else if (e.key === 'ArrowRight') {
-                if (currentPropIdx < propFiltered.length - 1) openPropModal(currentPropIdx + 1);
-            }
-        }
-        else if (document.getElementById('editorModalExt').style.display === 'flex') {
-            if (e.key === 'ArrowLeft') {
-                if (extIdx > 0) openExtModal(extIdx - 1);
-            } else if (e.key === 'ArrowRight') {
-                if (extIdx < extFiltered.length - 1) openExtModal(extIdx + 1);
-            }
+            if (e.key === 'ArrowLeft') { if (currentPropIdx > 0) openPropModal(currentPropIdx - 1); } 
+            else if (e.key === 'ArrowRight') { if (currentPropIdx < propFiltered.length - 1) openPropModal(currentPropIdx + 1); }
+        } else if (document.getElementById('editorModalExt').style.display === 'flex') {
+            if (e.key === 'ArrowLeft') { if (extIdx > 0) openExtModal(extIdx - 1); } 
+            else if (e.key === 'ArrowRight') { if (extIdx < extFiltered.length - 1) openExtModal(extIdx + 1); }
         }
     });
 
@@ -804,13 +840,11 @@
         document.getElementById('cardAuthorProp').innerText = c.author;
         document.getElementById('cardDateProp').innerText = formatItalianDate(c.date);
         document.getElementById('counterProp').innerText = `${propFiltered.length - idx}`;
-        
         let val = 'Neutral';
         if(c.sent.toLowerCase().includes('positive')) val = 'Positive';
         else if(c.sent.toLowerCase().includes('negative')) val = 'Negative';
         const r = document.querySelector(`input[name="sentProp"][value="${val}"]`);
         if(r) r.checked = true;
-
         const p = document.querySelector('#cardIconProp path');
         p.setAttribute('d', icons[c.platform] || icons.default);
         p.style.fill = c.platform === 'facebook' ? '#1877F2' : (c.platform === 'instagram' ? '#E4405F' : (c.platform === 'twitter' ? '#000000' : '#0146bc'));
@@ -820,7 +854,6 @@
     document.getElementById('closeModalProp').onclick = () => modalProp.style.display = 'none';
     document.getElementById('modalPrevProp').onclick = () => { if(currentPropIdx > 0) openPropModal(currentPropIdx - 1); };
     document.getElementById('modalNextProp').onclick = () => { if(currentPropIdx < propFiltered.length - 1) openPropModal(currentPropIdx + 1); };
-    
     document.querySelectorAll('input[name="sentProp"]').forEach(r => {
         r.addEventListener('change', (e) => {
             if(!propFiltered.length) return;
@@ -829,11 +862,9 @@
             e.target.blur(); 
         });
     });
-
     document.getElementById('toggleAuthorProp').onchange = (e) => document.getElementById('cardAuthorProp').style.display = e.target.checked ? 'block' : 'none';
     document.getElementById('dlBtnProp').onclick = () => dlCanvas('captureCardProp');
     document.getElementById('copyBtnProp').onclick = () => copyCanvas('captureCardProp', 'copyBtnProp');
-    
     document.getElementById('delProp').onclick = () => {
         if(!confirm("Eliminare definitivamente questo commento?")) return;
         const itemToDelete = propFiltered[currentPropIdx];
@@ -909,8 +940,17 @@
 
     function refreshExtDashboard() {
         const s = document.getElementById('filterChanExt');
+        // MODIFICA PER PERSISTENZA FILTRI: salvo il valore corrente
+        const currentSelection = s.value;
+        
         s.innerHTML = '<option value="all">Tutti</option>';
         [...new Set(extData.map(d => d.channel))].sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
+        
+        // MODIFICA PER PERSISTENZA FILTRI: ripristino il valore se esiste ancora
+        if(currentSelection && [...s.options].some(o => o.value === currentSelection)) {
+            s.value = currentSelection;
+        }
+
         document.getElementById('dashboardExt').classList.remove('hidden');
         updateExtUI();
     }
@@ -924,9 +964,10 @@
         }
     }
 
-    ['filterSentExt', 'filterChanExt', 'sortExt', 'searchExt'].forEach(id => {
+    ['filterSentExt', 'filterChanExt', 'sortExt', 'searchExt', 'threshChan', 'threshEng'].forEach(id => {
         const el = document.getElementById(id);
-        if(el) el.addEventListener(id === 'searchExt' ? 'input' : 'change', updateExtUI);
+        if(el) el.addEventListener(id === 'searchExt' || id.startsWith('thresh') ? 'input' : 'change', 
+            id.startsWith('thresh') ? renderExtCharts : updateExtUI);
     });
 
     function updateExtUI() {
@@ -972,12 +1013,53 @@
         });
     }
 
+    // PLUGIN CUSTOM PER ETICHETTE ASSE X SU DUE RIGHE (ICONA + TESTO)
+    const customLabelsPlugin = {
+        id: 'customLabelsPlugin',
+        afterDraw: (chart) => {
+            if (chart.config.type !== 'bar') return;
+            const ctx = chart.ctx;
+            const xAxis = chart.scales.x;
+            const yAxis = chart.scales.y;
+
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+
+            chart.data.labels.forEach((label, index) => {
+                const x = xAxis.getPixelForTick(index);
+                const y = xAxis.bottom;
+
+                // 1. Draw Icon
+                const color = getBrandColor(label);
+                const iconChar = brandIconsUnicode[label] || '\uf141';
+                
+                ctx.font = '900 18px "Font Awesome 6 Brands", "Font Awesome 6 Free"';
+                ctx.fillStyle = color;
+                ctx.fillText(iconChar, x, y + 5);
+
+                // 2. Draw Text (Title Case)
+                let display = label.toLowerCase();
+                display = display.charAt(0).toUpperCase() + display.slice(1);
+                
+                ctx.font = '12px "Avenir Next LT Pro", "Avenir Next", "Helvetica", Arial, sans-serif';
+                ctx.fillStyle = '#333333';
+                ctx.fillText(display, x, y + 28);
+            });
+            ctx.restore();
+        }
+    };
+
     function renderExtCharts() {
         const ctxS = document.getElementById('sentimentChartExt').getContext('2d');
         const ctxC = document.getElementById('channelChartExt').getContext('2d');
+        const ctxE = document.getElementById('engagementChartExt').getContext('2d');
+
         if(extCharts.sent) extCharts.sent.destroy();
         if(extCharts.chan) extCharts.chan.destroy();
+        if(extCharts.eng) extCharts.eng.destroy();
 
+        // 1. Sentiment Chart
         let sCounts = { Pos: 0, Neu: 0, Neg: 0 };
         extFiltered.forEach(d => {
             if(d.sentiment==='Positivo') sCounts.Pos++;
@@ -996,25 +1078,80 @@
             <div class="legend-item"><span class="legend-color" style="background:#dc3545"></span>Negativo ${Math.round(sCounts.Neg/extFiltered.length*100)||0}%</div>
         `;
 
+        // 2. Channel Chart (con Aggregazione Dinamica Separata)
+        const threshC = parseInt(document.getElementById('threshChan').value) || 0;
         let cCounts = {};
         extFiltered.forEach(d => cCounts[d.channel] = (cCounts[d.channel]||0)+1);
         
-        let sortedEntries = Object.entries(cCounts).sort((a,b) => b[1] - a[1]);
+        let cAggEntries = [];
+        let cOtherSum = 0;
+        Object.entries(cCounts).forEach(([chan, val]) => {
+            if(val < threshC) cOtherSum += val;
+            else cAggEntries.push([chan, val]);
+        });
+        if(cOtherSum > 0) cAggEntries.push(['Altro', cOtherSum]);
+        cAggEntries.sort((a,b) => b[1] - a[1]);
         
-        let labels = sortedEntries.map(e => e[0]);
-        let data = sortedEntries.map(e => e[1]);
+        let chanLabels = cAggEntries.map(e => e[0]); 
+        let chanData = cAggEntries.map(e => e[1]);
         
         extCharts.chan = new Chart(ctxC, {
             type: 'bar',
-            data: { labels: labels, datasets: [{ data: data, backgroundColor: '#b0c8f8', borderRadius:4 }] },
+            data: { labels: chanLabels, datasets: [{ data: chanData, backgroundColor: '#b0c8f8', borderRadius:4 }] },
             options: { 
-                responsive:true, maintainAspectRatio:false, 
-                plugins:{legend:{display:false}, datalabels:{anchor:'end', align:'end', formatter:formatCompactNumber}}, 
+                responsive:true, maintainAspectRatio:false, layout: { padding: { bottom: 60 } },
+                plugins:{ legend:{display:false}, datalabels:{anchor:'end', align:'end', formatter:formatCompactNumber}, customLabelsPlugin }, 
                 scales:{
-                    x:{grid:{display:false}}, 
+                    x:{
+                        grid:{display:false}, 
+                        ticks: { display: false } // Hide default ticks, use custom plugin
+                    }, 
                     y:{display:false, grace: '15%'} 
                 } 
+            },
+            plugins: [ChartDataLabels, customLabelsPlugin]
+        });
+
+        // 3. Engagement Chart (con Aggregazione Dinamica Separata)
+        const threshE = parseInt(document.getElementById('threshEng').value) || 0;
+        let lCounts = {};
+        let totalLikes = 0;
+        extFiltered.forEach(d => {
+            if(d.channel !== 'Web/News') {
+                lCounts[d.channel] = (lCounts[d.channel]||0) + d.likes;
+                totalLikes += d.likes;
             }
+        });
+        document.getElementById('totalLikesExt').innerText = formatCompactNumber(totalLikes);
+
+        let aggEntries = [];
+        let otherSum = 0;
+        Object.entries(lCounts).forEach(([chan, val]) => {
+            if(val < threshE) otherSum += val;
+            else aggEntries.push([chan, val]);
+        });
+        if(otherSum > 0) aggEntries.push(['Altro', otherSum]);
+        
+        aggEntries.sort((a,b) => b[1] - a[1]);
+
+        let engLabels = aggEntries.map(e => e[0]); 
+        let engData = aggEntries.map(e => e[1]);
+
+        extCharts.eng = new Chart(ctxE, {
+            type: 'bar',
+            data: { labels: engLabels, datasets: [{ data: engData, backgroundColor: '#b0c8f8', borderRadius:4 }] },
+            options: { 
+                responsive:true, maintainAspectRatio:false, layout: { padding: { bottom: 60 } },
+                plugins:{ legend:{display:false}, datalabels:{anchor:'end', align:'end', formatter:formatCompactNumber}, customLabelsPlugin }, 
+                scales:{
+                    x:{
+                        grid:{display:false}, 
+                        ticks: { display: false } // Hide default ticks
+                    }, 
+                    y:{display:false, grace: '15%'} 
+                } 
+            },
+            plugins: [ChartDataLabels, customLabelsPlugin]
         });
     }
 
@@ -1030,18 +1167,14 @@
     function updateExtCard() {
         if(extIdx < 0 || extIdx >= extFiltered.length) return;
         const d = extFiltered[extIdx];
-        
         document.getElementById('counterExt').innerText = `${extFiltered.length - extIdx}`;
-
         const r = document.querySelector(`input[name="sentExt"][value="${d.sentiment}"]`);
         if(r) r.checked = true;
-
         const cont = document.getElementById('previewAreaExt');
         const showAut = document.getElementById('showAuthorExt').checked;
         const showSrc = document.getElementById('showOrigAuthorExt').checked;
         const showLikes = document.getElementById('showLikesExt').checked && d.likes >= 50;
         const showFoll = document.getElementById('showFollowersExt').checked && d.followers >= 50;
-
         document.getElementById('linkExt').href = d.url;
         let iconHtml = d.channel.includes('Twitter') ? `<svg class="card-icon" viewBox="0 0 24 24"><path d="${icons.twitter}"/></svg>` : `<i class="${d.iconClass} card-icon-fa"></i>`;
         
@@ -1071,7 +1204,6 @@
     document.getElementById('closeModalExt').onclick = () => modalExt.style.display = 'none';
     document.getElementById('modalPrevExt').onclick = () => { if(extIdx > 0) openExtModal(extIdx - 1); };
     document.getElementById('modalNextExt').onclick = () => { if(extIdx < extFiltered.length - 1) openExtModal(extIdx + 1); };
-    
     document.querySelectorAll('input[name="sentExt"]').forEach(r => {
         r.addEventListener('change', (e) => {
             const item = extFiltered[extIdx];
@@ -1109,10 +1241,8 @@
         document.getElementById('manContent').value = '';
         document.getElementById('manDate').value = new Date().toISOString().slice(0,16);
         document.getElementById('saveManualBtn').innerText = "Aggiungi al Dataset";
-        
         const r = document.querySelector('input[name="manSent"][value="0"]');
         if(r) r.checked = true;
-
         manModal.style.display = 'block'; 
         manModal.style.display = 'flex';
     }
@@ -1129,13 +1259,11 @@
         document.getElementById('manFollowers').value = editTargetItem.followers;
         document.getElementById('manUrl').value = editTargetItem.url;
         document.getElementById('saveManualBtn').innerText = "Salva Modifiche";
-        
         let val = '0';
         if(editTargetItem.sentimentVal > 0) val = '1';
         if(editTargetItem.sentimentVal < 0) val = '-1';
         const r = document.querySelector(`input[name="manSent"][value="${val}"]`);
         if(r) r.checked = true;
-
         modalExt.style.display = 'none';
         manModal.style.display = 'flex';
     };
@@ -1166,18 +1294,14 @@
         const aut = document.getElementById('manAuthor').value || "Autore Sconosciuto";
         const likes = parseInt(document.getElementById('manLikes').value)||0;
         const foll = parseInt(document.getElementById('manFollowers').value)||0;
-        
         const sVal = parseInt(document.querySelector('input[name="manSent"]:checked').value);
         const sent = sVal > 0 ? 'Positivo' : (sVal < 0 ? 'Negativo' : 'Neutro');
-
         if(!url || !chan) return alert("URL e Canale obbligatori");
-
         const item = {
             date: date, content: cont, author: aut, channel: chan, likes: likes, followers: foll,
             sentiment: sent, sentimentVal: sVal, url: url, hash: generateHash(cont, date, aut),
             iconClass: chan.toLowerCase().includes('twitter')?'fab fa-twitter':'fas fa-globe', isSocial: true
         };
-
         if(isEditing && editTargetItem) {
             Object.assign(editTargetItem, item);
             refreshExtDashboard();
@@ -1213,9 +1337,7 @@
         const day = String(now.getDate()).padStart(2, '0');
         const hour = String(now.getHours()).padStart(2, '0');
         const minute = String(now.getMinutes()).padStart(2, '0');
-        
         const filename = `AnalisiSentiment_${year}_${month}_${day}_${hour}_${minute}.json`;
-
         const a = document.createElement('a');
         a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({proprietary:propComments, external:extData}));
         a.download = filename;
