@@ -48,7 +48,19 @@
         .tab-content.active { display: block; }
 
         main { flex: 1; padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; }
-        .section-title { font-size: 1.2rem; color: var(--brand-blue); margin-bottom: 1rem; border-left: 4px solid var(--brand-yellow); padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .section-title { 
+            font-size: 1.2rem; 
+            color: var(--brand-blue); 
+            margin-bottom: 0.5rem; 
+            margin-top: 0;
+            border-left: 6px solid var(--brand-yellow) !important; 
+            padding-left: 12px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            line-height: 1.2;
+            display: block;
+        }
 
         .upload-container { background: white; padding: 2rem; border-radius: 4px; border: 1px solid var(--border-color); text-align: center; margin-bottom: 2rem; transition: border-color 0.3s; position: relative; }
         .upload-container:hover { border-color: var(--brand-blue); }
@@ -63,34 +75,28 @@
         .btn-copy { background-color: var(--brand-lightblue); color: white; }
         .btn-danger { background-color: white; color: var(--danger); border: 1px solid var(--danger); padding: 10px 20px; }
         .btn-danger:hover { background-color: var(--danger); color: white; }
+        .btn-success { background-color: var(--success); color: white; }
         .btn-sm { padding: 4px 8px; font-size: 0.7rem; margin-left: 5px; }
         .btn-outline { background: white; border: 1px solid #ccc; color: #555; }
         .btn-outline:hover { background: #eee; }
 
         .btn-link { background: none; color: var(--brand-blue); text-decoration: underline; border: none; padding: 0; font-size: 0.9rem; cursor: pointer; }
-        .btn-upload-img { background-color: #e2e6ea; color: #333; margin-right: 10px; padding: 5px 10px; border-radius: 4px; }
+        .btn-upload-img { background-color: #e2e6ea; color: #333; margin-right: 5px; padding: 5px 10px; border-radius: 4px; }
         
-        /* LAYOUT 50% - 50% */
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        .dashboard-grid { display: grid; grid-template-columns: 32% 68%; gap: 2rem; margin-bottom: 2rem; }
+        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
         
-        /* MODIFICA: Layout specifico per Dashboard Esterna (32% - 68%) */
-        #dashboardExt { grid-template-columns: 32% 68%; }
-        
-        @media (max-width: 900px) { 
-            .dashboard-grid, #dashboardExt { grid-template-columns: 1fr; } 
-        }
-        
-        .card-box { background: white; padding: 1.5rem; border-radius: 4px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+        .card-box { background: white; padding: 1.5rem; border-radius: 4px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; position: relative;}
         .chart-wrapper { position: relative; height: 300px; width: 100%; display: flex; justify-content: center; margin-bottom: 1rem; }
-        .custom-legend { display: flex; justify-content: center; gap: 25px; margin-top: 15px; flex-wrap: wrap; }
+        
+        .custom-legend { display: flex; justify-content: center; gap: 15px; margin-top: 10px; flex-wrap: nowrap; white-space: nowrap; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; }
         .legend-item { text-align: center; font-family: var(--font-legend); }
-        .legend-color { width: 12px; height: 12px; display: inline-block; border-radius: 50%; margin-right: 6px; position: relative; top: 1px;}
+        .legend-color { width: 12px; height: 12px; display: inline-block; border-radius: 50%; margin-right: 4px; position: relative; top: 1px;}
         
         .filters-container { background: var(--bg-light); border-radius: 4px; margin-bottom: 1rem; border: 1px solid var(--border-color); overflow: hidden; padding: 1rem; }
         .filter-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 10px; align-items: end; }
         .filter-select, .filter-input { padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; width: 100%; font-family: inherit; }
         
-        /* Lista Commenti */
         .comments-list { background: white; border: 1px solid var(--border-color); border-radius: 4px; max-height: 500px; overflow-y: auto; }
         .comment-item { padding: 1rem; border-bottom: 1px solid var(--bg-light); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; transition: background 0.2s; cursor: pointer; }
         .comment-item:hover { background-color: #f9f9f9; }
@@ -100,58 +106,23 @@
         .sentiment-neutral { background-color: var(--warning); color: #333; }
         .sentiment-negative { background-color: var(--danger); }
 
-        /* --- MODAL STYLE --- */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        
-        .modal-content { 
-            background-color: white; 
-            border-radius: 4px; 
-            width: 90%; 
-            max-width: 650px; 
-            border-top: 5px solid var(--brand-blue); 
-            max-height: 95vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-        }
-        
+        .modal-content { background-color: white; border-radius: 4px; width: 90%; max-width: 650px; border-top: 5px solid var(--brand-blue); max-height: 95vh; display: flex; flex-direction: column; overflow: hidden; }
         .modal-header { padding: 1.5rem 2rem 1rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .modal-tools-top { padding: 0 2rem 1rem 2rem; flex-shrink: 0; }
         .modal-footer-custom { padding: 1rem 2rem 1.5rem 2rem; flex-shrink: 0; text-align: right; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #eee; margin-top: auto; }
         .close { font-size: 1.5rem; font-weight: bold; cursor: pointer; color: #aaa; }
         
-        /* Scrollable Card Container */
-        #cardPreviewContainer, #cardPreviewContainerExt { 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            background-color: #e0e0e0; 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-start;
-            align-items: center;
-            min-height: 200px;
-        }
+        #cardPreviewContainer, #cardPreviewContainerExt { flex-grow: 1; overflow-y: auto; background-color: #e0e0e0; padding: 20px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 200px; }
         
-        /* Social Card Styles */
-        .social-card { 
-            background: white; width: 100%; max-width: 450px; border-radius: 8px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-family: 'Roboto', sans-serif; 
-            position: relative; overflow: hidden; display: flex; flex-direction: column; text-align: left;
-            flex-shrink: 0; 
-            margin: auto; 
-        }
+        .social-card { background: white; width: 100%; max-width: 450px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-family: 'Roboto', sans-serif; position: relative; overflow: hidden; display: flex; flex-direction: column; text-align: left; flex-shrink: 0; margin: auto; }
         .social-card .card-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 25px 25px 10px 25px; }
         .social-card .card-icon { width: 24px; height: 24px; fill: var(--brand-blue); flex-shrink: 0; margin-right: 10px; }
         .social-card .card-icon-fa { font-size: 24px; color: var(--brand-blue); margin-right: 10px; }
         .social-card .card-date { font-size: 0.8rem; color: #999; margin-left: auto; white-space: nowrap; }
         .social-card .card-body { padding: 10px 25px 20px 25px; font-size: 1.1rem; line-height: 1.5; color: #222; flex-grow: 1; }
         .card-custom-image { width: 100%; height: auto; border-radius: 4px; margin-bottom: 15px; display: block; object-fit: cover; max-height: 250px; }
-        .social-card .card-footer { 
-            margin-top: auto; border-top: 1px solid #eee; padding: 15px 25px; 
-            font-size: 0.9rem; font-weight: 500; color: var(--brand-blue); 
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        .social-card .card-footer { margin-top: auto; border-top: 1px solid #eee; padding: 15px 25px; font-size: 0.9rem; font-weight: 500; color: var(--brand-blue); display: flex; justify-content: space-between; align-items: center; }
         .social-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background-color: var(--brand-blue); }
 
         [contenteditable="true"] { cursor: text; border: 1px dashed transparent; transition: all 0.2s; min-width: 20px; display: inline-block; }
@@ -160,22 +131,15 @@
         .modal-nav-bar { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 15px; border: 1px solid #eee; }
         .modal-nav-btn { background: none; border: 1px solid #ccc; border-radius: 4px; padding: 5px 12px; cursor: pointer; }
         .modal-nav-btn:hover { background: #eee; }
-
         .nav-counter { font-size: 0.9rem; font-weight: 500; color: #555; background: #fff; padding: 6px 12px; border-radius: 15px; border: 1px solid #ddd; margin: 0 5px; }
         .hidden { display: none !important; }
 
-        /* --- NEW RADIO GROUP STYLES --- */
         .sent-radio-group { display: inline-flex; background: #f0f0f0; border-radius: 20px; padding: 3px; gap: 2px; }
         .sent-radio-option { position: relative; margin: 0; }
         .sent-radio-option input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
-        .sent-radio-option span {
-            display: inline-block; padding: 4px 12px; border-radius: 16px;
-            font-size: 0.85rem; font-weight: 500; color: #666; cursor: pointer;
-            transition: all 0.2s; user-select: none;
-        }
+        .sent-radio-option span { display: inline-block; padding: 4px 12px; border-radius: 16px; font-size: 0.85rem; font-weight: 500; color: #666; cursor: pointer; transition: all 0.2s; user-select: none; }
         .sent-radio-option:hover span { background: #e0e0e0; }
         .sent-radio-option input:checked + span { font-weight: bold; color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        /* Colors */
         .sent-radio-option.opt-pos input:checked + span { background-color: var(--success); }
         .sent-radio-option.opt-neu input:checked + span { background-color: var(--warning); color: #333; }
         .sent-radio-option.opt-neg input:checked + span { background-color: var(--danger); }
@@ -187,10 +151,32 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         footer { margin-top: auto; background-color: white; border-top: 1px solid var(--border-color); padding: 1rem 2rem; text-align: center; font-size: 0.8rem; color: #888; display: flex; justify-content: space-between; }
-        .box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
         
-        .btn-group { display: flex; gap: 5px; align-items: center; }
-        .chart-control { margin-right: 10px; display: flex; align-items: center; gap: 5px; font-size: 0.85rem; color: #666; }
+        .chart-toolbar-wrapper {
+            background-color: var(--bg-light); 
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            text-align: right;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .chart-toolbar {
+            background-color: white;
+            border-radius: 20px;
+            padding: 5px 15px;
+            display: inline-flex;
+            gap: 10px;
+            align-items: center;
+            font-size: 0.85rem;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .chart-control { display: flex; align-items: center; gap: 5px; color: #666; }
+        
+        .chart-capture-zone { background: white; padding: 15px 10px; border-radius: 4px; }
+        
+        .counter-small { font-size: 0.7rem; color: #888; background: #eee; padding: 2px 6px; border-radius: 4px; float: right; margin-left: 10px; }
     </style>
 </head>
 <body>
@@ -213,7 +199,7 @@
 <main>
     <div id="tab-proprietary" class="tab-content active">
         <section class="upload-container">
-            <h2 style="margin-bottom: 15px; color: var(--brand-blue);">Importazione Dati Proprietari</h2>
+            <h2 style="margin-bottom: 15px; color: var(--brand-blue); border:none; padding:0;">Importazione Dati Proprietari</h2>
             <div style="display:flex; justify-content:center; gap:10px; align-items:center; flex-wrap:wrap;">
                 <label for="fileInputProp" class="custom-file-upload" id="uploadLabelProp">Seleziona File</label>
                 <input type="file" id="fileInputProp" accept=".xlsx, .xls, .csv" multiple>
@@ -225,15 +211,18 @@
         <div id="appContentProp" class="hidden">
             <div class="dashboard-grid">
                 <div class="card-box">
-                    <div class="box-header">
-                        <h3 class="section-title" style="margin:0;">Sentiment Overview</h3>
-                        <div class="btn-group">
-                            <button class="btn btn-outline btn-sm" onclick="downloadChart('sentimentChartProp')"><i class="fas fa-camera"></i> PNG</button>
+                    <div class="chart-toolbar-wrapper">
+                        <div class="chart-toolbar">
+                            <button class="btn btn-secondary btn-sm" onclick="copyChartData('sentimentProp')"><i class="fas fa-table"></i> Dati</button>
+                            <button class="btn btn-outline btn-sm" onclick="downloadDivAsImage('export-sentimentProp', 'Sentiment_Proprietari')"><i class="fas fa-camera"></i> PNG</button>
                         </div>
                     </div>
-                    <div style="margin-bottom: 1rem;"><strong>Totale Commenti:</strong> <span id="totalCommentsProp">0</span></div>
-                    <div class="chart-wrapper"><canvas id="sentimentChartProp"></canvas></div>
-                    <div id="legendProp" class="custom-legend"></div>
+                    <div id="export-sentimentProp" class="chart-capture-zone">
+                        <h3 class="section-title">Sentiment Overview</h3>
+                        <div style="margin-bottom: 1rem;"><strong>Totale Commenti:</strong> <span id="totalCommentsProp">0</span></div>
+                        <div class="chart-wrapper"><canvas id="sentimentChartProp"></canvas></div>
+                        <div id="legendProp" class="custom-legend"></div>
+                    </div>
                 </div>
                 
                 <div class="card-box">
@@ -277,7 +266,7 @@
 
     <div id="tab-external" class="tab-content">
         <section class="upload-container">
-            <h2 style="margin-bottom: 15px; color: var(--brand-blue);">Importazione Web & Social Esterni</h2>
+            <h2 style="margin-bottom: 15px; color: var(--brand-blue); border:none; padding:0;">Importazione Web & Social Esterni</h2>
             <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; align-items:center;">
                 <label for="fileInputExt" class="custom-file-upload" id="uploadLabelExt"><i class="fas fa-file-excel"></i> Carica Export Excel</label>
                 <input type="file" id="fileInputExt" accept=".xlsx, .xls, .csv">
@@ -296,44 +285,53 @@
         <div id="dashboardExt" class="dashboard-grid hidden">
             <div class="left-column">
                 <div class="card-box" style="margin-bottom: 2rem;">
-                    <div class="box-header">
-                        <h3 class="section-title" style="margin:0;">Sentiment Analysis</h3>
-                        <div class="btn-group">
-                            <button class="btn btn-outline btn-sm" onclick="downloadChart('sentimentChartExt')"><i class="fas fa-camera"></i> PNG</button>
+                    <div class="chart-toolbar-wrapper">
+                        <div class="chart-toolbar">
+                            <button class="btn btn-secondary btn-sm" onclick="copyChartData('sentimentExt')"><i class="fas fa-table"></i> Dati</button>
+                            <button class="btn btn-outline btn-sm" onclick="downloadDivAsImage('export-sentimentExt', 'Sentiment_Esterni')"><i class="fas fa-camera"></i> PNG</button>
                         </div>
                     </div>
-                    <div style="margin-bottom: 1rem;"><strong>Totale Contenuti:</strong> <span id="totalContentExt">0</span></div>
-                    <div class="chart-wrapper"><canvas id="sentimentChartExt"></canvas></div>
-                    <div id="legendExt" class="custom-legend"></div>
+                    <div id="export-sentimentExt" class="chart-capture-zone">
+                        <h3 class="section-title">Sentiment Analysis</h3>
+                        <div class="chart-wrapper"><canvas id="sentimentChartExt"></canvas></div>
+                        <div id="legendExt" class="custom-legend"></div>
+                    </div>
                 </div>
+
                 <div class="card-box" style="margin-bottom: 2rem;">
-                    <div class="box-header">
-                        <h3 class="section-title" style="margin:0;">Canali e siti</h3>
-                        <div class="btn-group">
+                    <div class="chart-toolbar-wrapper">
+                        <div class="chart-toolbar">
                             <div class="chart-control">
                                 <label for="threshChan">Soglia:</label>
                                 <input type="number" id="threshChan" value="30" min="0" class="filter-input" style="width:60px; padding:2px 5px;">
                             </div>
                             <button class="btn btn-secondary btn-sm" onclick="copyChartData('channel')"><i class="fas fa-table"></i> Dati</button>
-                            <button class="btn btn-outline btn-sm" onclick="downloadChart('channelChartExt')"><i class="fas fa-camera"></i> PNG</button>
+                            <button class="btn btn-outline btn-sm" onclick="downloadDivAsImage('export-channelExt', 'Canali_Esterni')"><i class="fas fa-camera"></i> PNG</button>
                         </div>
                     </div>
-                    <div class="chart-wrapper"><canvas id="channelChartExt"></canvas></div>
+                    <div id="export-channelExt" class="chart-capture-zone">
+                        <h3 class="section-title">Canali e siti</h3>
+                        <div style="margin-bottom: 1rem;"><strong>Totale Contenuti:</strong> <span id="totalContentExt">0</span></div>
+                        <div class="chart-wrapper"><canvas id="channelChartExt"></canvas></div>
+                    </div>
                 </div>
+
                 <div class="card-box">
-                    <div class="box-header">
-                        <h3 class="section-title" style="margin:0;">Engagement & Like Totali</h3>
-                        <div class="btn-group">
+                    <div class="chart-toolbar-wrapper">
+                        <div class="chart-toolbar">
                             <div class="chart-control">
                                 <label for="threshEng">Soglia:</label>
                                 <input type="number" id="threshEng" value="30" min="0" class="filter-input" style="width:60px; padding:2px 5px;">
                             </div>
                             <button class="btn btn-secondary btn-sm" onclick="copyChartData('engagement')"><i class="fas fa-table"></i> Dati</button>
-                            <button class="btn btn-outline btn-sm" onclick="downloadChart('engagementChartExt')"><i class="fas fa-camera"></i> PNG</button>
+                            <button class="btn btn-outline btn-sm" onclick="downloadDivAsImage('export-engagementExt', 'Engagement_Esterni')"><i class="fas fa-camera"></i> PNG</button>
                         </div>
                     </div>
-                    <div style="margin-bottom: 1rem;"><strong>Totale Like/Reazioni:</strong> <span id="totalLikesExt">0</span></div>
-                    <div class="chart-wrapper"><canvas id="engagementChartExt"></canvas></div>
+                    <div id="export-engagementExt" class="chart-capture-zone">
+                        <h3 class="section-title">Engagement & Like Totali</h3>
+                        <div style="margin-bottom: 1rem;"><strong>Totale Like/Reazioni:</strong> <span id="totalLikesExt">0</span></div>
+                        <div class="chart-wrapper"><canvas id="engagementChartExt"></canvas></div>
+                    </div>
                 </div>
             </div>
 
@@ -379,7 +377,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v6.10 Square Layout & Split Thresholds</span>
+    <span class="app-version">v6.15 Robust Import</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -449,6 +447,9 @@
             <div style="text-align:center; margin-top:10px;">
                 <label for="imgUploadExt" class="btn btn-upload-img" style="cursor:pointer; font-size:0.8rem;"><i class="fas fa-image"></i> Carica Immagine (o Incolla CTRL+V)</label>
                 <input type="file" id="imgUploadExt" accept="image/*" style="display:none;">
+                <button class="btn btn-secondary" onclick="manualSaveImage()" style="padding: 5px 10px;" title="Salva immagine corrente nel record"><i class="fas fa-save"></i></button>
+                <button id="btnRemoveImg" class="btn btn-danger" style="display:none; padding: 5px 10px;" onclick="removeCardImage()"><i class="fas fa-trash"></i></button>
+                
                 <a href="#" id="linkExt" target="_blank" class="btn-link" style="margin-left:10px;">Apri Originale <i class="fas fa-external-link-alt"></i></a>
                 <div style="margin-top:5px;">
                     <button id="editExt" class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" title="Modifica Dati Record"><i class="fas fa-edit"></i> Edit Dati</button>
@@ -499,6 +500,16 @@
 <script>
     Chart.register(ChartDataLabels);
     
+    // FORMATTAZIONE NUMERI ITALIANA (Virgola e K/M semplificato)
+    function formatNumberIT(num) {
+         if (!num || isNaN(num)) return "0";
+         if (num > 199) {
+             if (num >= 1000000) return (num / 1000000).toFixed(2).replace('.', ',') + 'M';
+             if (num >= 1000) return (num / 1000).toFixed(2).replace('.', ',') + 'K';
+         }
+         return num.toString().replace('.', ',');
+    }
+
     const icons = {
         facebook: "M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.15 5.96C15.21 5.96 16.12 6.04 16.12 6.04V8.51H15.01C13.77 8.51 13.38 9.28 13.38 10.07V12.06H16.15L15.71 14.96H13.38V21.96C18.16 21.21 21.82 17.06 21.82 12.06C21.82 6.53 17.32 2.04 12 2.04Z",
         instagram: "M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4C4,18.39 5.61,20 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6C20,5.61 18.39,4 16.4,4H7.6M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z",
@@ -519,9 +530,9 @@
     };
 
     const brandIconsUnicode = {
-        'Facebook': '\uf09a', // fab fa-facebook
-        'Instagram': '\uf16d', // fab fa-instagram
-        'X (Twitter)': '\ue61b', // x-twitter
+        'Facebook': '\uf09a', 
+        'Instagram': '\uf16d', 
+        'X (Twitter)': '\ue61b', 
         'Twitter': '\uf099',
         'LinkedIn': '\uf0e1',
         'YouTube': '\uf167',
@@ -539,11 +550,6 @@
         document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
         document.getElementById('tab-' + name).classList.add('active');
         document.querySelectorAll('.tab-button')[name === 'proprietary' ? 0 : 1].classList.add('active');
-    }
-
-    function formatCompactNumber(n) {
-        if (!n || isNaN(n)) return "0";
-        return Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(n);
     }
 
     function formatItalianDate(d) {
@@ -566,6 +572,10 @@
 
     function dlCanvas(id) {
         const el = document.getElementById(id);
+        const btnId = id === 'captureCardProp' ? 'dlBtnProp' : 'dlBtnExt';
+        const btn = document.getElementById(btnId);
+        const origText = btn.innerHTML;
+
         const editables = el.querySelectorAll('[contenteditable="true"]');
         editables.forEach(e => e.setAttribute('contenteditable', 'false'));
         html2canvas(el, { scale: 2 }).then(canvas => {
@@ -574,6 +584,18 @@
             link.href = canvas.toDataURL();
             link.click();
             editables.forEach(e => e.setAttribute('contenteditable', 'true'));
+            btn.innerHTML = '<i class="fas fa-check"></i> Salvato!';
+            setTimeout(() => btn.innerHTML = origText, 2000);
+        });
+    }
+    
+    function downloadDivAsImage(divId, filenamePrefix) {
+        const el = document.getElementById(divId);
+        html2canvas(el, { scale: 2 }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `${filenamePrefix}-${Date.now()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
         });
     }
     
@@ -586,8 +608,24 @@
     }
 
     function copyChartData(type) {
+        if (type === 'sentimentProp' || type === 'sentimentExt') {
+            const isProp = type === 'sentimentProp';
+            const list = isProp ? propFiltered : extFiltered;
+            if(!list || list.length === 0) return alert("Nessun dato");
+            let sCounts = { Pos: 0, Neu: 0, Neg: 0 };
+            list.forEach(i => {
+                let sent = isProp ? i.sent : i.sentiment; 
+                if (sent.toLowerCase().includes('positive') || sent === 'Positivo') sCounts.Pos++;
+                else if (sent.toLowerCase().includes('negative') || sent === 'Negativo') sCounts.Neg++;
+                else sCounts.Neu++;
+            });
+            let output = "Sentiment\tValore\n";
+            output += `Positivo\t${sCounts.Pos}\nNeutro\t${sCounts.Neu}\nNegativo\t${sCounts.Neg}\n`;
+            navigator.clipboard.writeText(output).then(() => alert("Dati copiati!"), () => alert("Errore copia"));
+            return;
+        }
+
         if(!extFiltered || extFiltered.length === 0) return alert("Nessun dato disponibile");
-        
         let output = "";
         
         if (type === 'channel') {
@@ -601,7 +639,6 @@
             });
             if(other > 0) agg.push(['Altro', other]);
             agg.sort((a,b) => b[1] - a[1]);
-            
             output = "Canale\tNumero Contenuti\n";
             agg.forEach(([k, v]) => output += `${k}\t${v}\n`);
             
@@ -686,6 +723,7 @@
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     currentCardImage = ev.target.result;
+                    if(isEditing && editTargetItem) editTargetItem.customImage = currentCardImage;
                     updateExtCard();
                     const btn = document.querySelector('label[for="imgUploadExt"]');
                     btn.innerHTML = '<i class="fas fa-check"></i> Incollato!';
@@ -793,7 +831,7 @@
         else if(sort === 'lengthDesc') propFiltered.sort((a,b) => b.msg.length - a.msg.length);
         else if(sort === 'lengthAsc') propFiltered.sort((a,b) => a.msg.length - b.msg.length);
 
-        document.getElementById('totalCommentsProp').innerText = propFiltered.length;
+        document.getElementById('totalCommentsProp').innerText = formatNumberIT(propFiltered.length);
         renderPropList(propFiltered);
         renderPropChart(propFiltered);
     }
@@ -801,7 +839,7 @@
     function renderPropList(list) {
         const cont = document.getElementById('commentsListProp');
         cont.innerHTML = '';
-        list.slice(0, 100).forEach((c, idx) => {
+        list.forEach((c, idx) => {
             let badge = c.sent.toLowerCase().includes('positive') ? 'sentiment-positive' : (c.sent.toLowerCase().includes('negative') ? 'sentiment-negative' : 'sentiment-neutral');
             const d = document.createElement('div');
             d.className = 'comment-item';
@@ -810,6 +848,7 @@
                 <div style="font-size:0.8rem; color:#666; margin-bottom:5px;">
                     <span class="sentiment-badge ${badge}">${c.sent}</span>
                     <span style="margin-left:8px;">${formatItalianDate(c.date)} - <strong>${c.author}</strong></span>
+                    <span class="counter-small">${idx + 1} di ${list.length}</span>
                 </div>
                 <div style="margin-top:5px;">${c.msg.substring(0, 120)}...</div>
             </div>`;
@@ -931,10 +970,12 @@
             date: d, content: row['content'] || row['title'] || '', author: aut, subAuthor: subAut,
             channel: chan, isSocial: isSoc, iconClass: icon, likes: likes, followers: parseInt(foll||0),
             sentiment: sent, sentimentVal: sentVal, url: row['url'] || '#',
-            hash: generateHash(row['content']||'', d, aut)
+            hash: generateHash(row['content']||'', d, aut),
+            customImage: null 
         };
     }
 
+    // MODIFICA CRUCIALE PER GESTIRE I BACKUP COME IMPORT
     function handleExtImport(items) {
         if(!extData.length) extData = items;
         else {
@@ -946,13 +987,11 @@
 
     function refreshExtDashboard() {
         const s = document.getElementById('filterChanExt');
-        // MODIFICA PER PERSISTENZA FILTRI: salvo il valore corrente
         const currentSelection = s.value;
         
         s.innerHTML = '<option value="all">Tutti</option>';
         [...new Set(extData.map(d => d.channel))].sort().forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
         
-        // MODIFICA PER PERSISTENZA FILTRI: ripristino il valore se esiste ancora
         if(currentSelection && [...s.options].some(o => o.value === currentSelection)) {
             s.value = currentSelection;
         }
@@ -995,7 +1034,7 @@
         else if(sort === 'lengthDesc') extFiltered.sort((a,b) => b.content.length - a.content.length);
         else if(sort === 'lengthAsc') extFiltered.sort((a,b) => a.content.length - b.content.length);
 
-        document.getElementById('totalContentExt').innerText = extFiltered.length;
+        document.getElementById('totalContentExt').innerText = formatNumberIT(extFiltered.length);
         renderExtCharts();
         renderExtList();
     }
@@ -1003,7 +1042,7 @@
     function renderExtList() {
         const c = document.getElementById('commentsListExt');
         c.innerHTML = '';
-        extFiltered.slice(0, 100).forEach((item, idx) => {
+        extFiltered.forEach((item, idx) => {
             let b = item.sentiment === 'Positivo' ? 'sentiment-positive' : (item.sentiment === 'Negativo' ? 'sentiment-negative' : 'sentiment-neutral');
             const d = document.createElement('div');
             d.className = 'comment-item';
@@ -1012,6 +1051,7 @@
                 <div style="font-size:0.8rem; color:#666; margin-bottom:5px;">
                     <span class="sentiment-badge ${b}">${item.sentiment}</span>
                     <span style="margin-left:8px;"><i class="${item.iconClass}"></i> ${formatItalianDate(item.date)} - <strong>${item.author}</strong></span>
+                    <span class="counter-small">${idx + 1} di ${extFiltered.length}</span>
                 </div>
                 <div style="margin-top:5px;">${item.content.substring(0, 120)}...</div>
             </div>`;
@@ -1019,7 +1059,6 @@
         });
     }
 
-    // PLUGIN CUSTOM PER ETICHETTE ASSE X SU DUE RIGHE (ICONA + TESTO)
     const customLabelsPlugin = {
         id: 'customLabelsPlugin',
         afterDraw: (chart) => {
@@ -1035,8 +1074,6 @@
             chart.data.labels.forEach((label, index) => {
                 const x = xAxis.getPixelForTick(index);
                 const y = xAxis.bottom;
-
-                // 1. Draw Icon
                 const color = getBrandColor(label);
                 const iconChar = brandIconsUnicode[label] || '\uf141';
                 
@@ -1044,7 +1081,6 @@
                 ctx.fillStyle = color;
                 ctx.fillText(iconChar, x, y + 5);
 
-                // 2. Draw Text (Title Case)
                 let display = label.toLowerCase();
                 display = display.charAt(0).toUpperCase() + display.slice(1);
                 
@@ -1065,7 +1101,6 @@
         if(extCharts.chan) extCharts.chan.destroy();
         if(extCharts.eng) extCharts.eng.destroy();
 
-        // 1. Sentiment Chart
         let sCounts = { Pos: 0, Neu: 0, Neg: 0 };
         extFiltered.forEach(d => {
             if(d.sentiment==='Positivo') sCounts.Pos++;
@@ -1084,7 +1119,6 @@
             <div class="legend-item"><span class="legend-color" style="background:#dc3545"></span>Negativo ${Math.round(sCounts.Neg/extFiltered.length*100)||0}%</div>
         `;
 
-        // 2. Channel Chart (con Aggregazione Dinamica Separata)
         const threshC = parseInt(document.getElementById('threshChan').value) || 0;
         let cCounts = {};
         extFiltered.forEach(d => cCounts[d.channel] = (cCounts[d.channel]||0)+1);
@@ -1106,19 +1140,15 @@
             data: { labels: chanLabels, datasets: [{ data: chanData, backgroundColor: '#b0c8f8', borderRadius:4, barPercentage: 0.9, categoryPercentage: 0.95 }] },
             options: { 
                 responsive:true, maintainAspectRatio:false, layout: { padding: { bottom: 60 } },
-                plugins:{ legend:{display:false}, datalabels:{anchor:'end', align:'end', formatter:formatCompactNumber}, customLabelsPlugin }, 
+                plugins:{ legend:{display:false}, datalabels:{anchor:'end', align:'end', formatter:(v)=>formatNumberIT(v)}, customLabelsPlugin }, 
                 scales:{
-                    x:{
-                        grid:{display:false}, 
-                        ticks: { display: false } // Hide default ticks, use custom plugin
-                    }, 
+                    x:{ grid:{display:false}, ticks: { display: false } }, 
                     y:{display:false, grace: '15%'} 
                 } 
             },
             plugins: [ChartDataLabels, customLabelsPlugin]
         });
 
-        // 3. Engagement Chart (con Aggregazione Dinamica Separata)
         const threshE = parseInt(document.getElementById('threshEng').value) || 0;
         let lCounts = {};
         let totalLikes = 0;
@@ -1128,7 +1158,7 @@
                 totalLikes += d.likes;
             }
         });
-        document.getElementById('totalLikesExt').innerText = formatCompactNumber(totalLikes);
+        document.getElementById('totalLikesExt').innerText = formatNumberIT(totalLikes);
 
         let aggEntries = [];
         let otherSum = 0;
@@ -1148,12 +1178,9 @@
             data: { labels: engLabels, datasets: [{ data: engData, backgroundColor: '#b0c8f8', borderRadius:4, barPercentage: 0.9, categoryPercentage: 0.95 }] },
             options: { 
                 responsive:true, maintainAspectRatio:false, layout: { padding: { bottom: 60 } },
-                plugins:{ legend:{display:false}, datalabels:{anchor:'end', align:'end', formatter:formatCompactNumber}, customLabelsPlugin }, 
+                plugins:{ legend:{display:false}, datalabels:{anchor:'end', align:'end', formatter:(v)=>formatNumberIT(v)}, customLabelsPlugin }, 
                 scales:{
-                    x:{
-                        grid:{display:false}, 
-                        ticks: { display: false } // Hide default ticks
-                    }, 
+                    x:{ grid:{display:false}, ticks: { display: false } }, 
                     y:{display:false, grace: '15%'} 
                 } 
             },
@@ -1165,9 +1192,31 @@
     
     function openExtModal(idx) {
         extIdx = idx;
-        currentCardImage = null; 
+        const d = extFiltered[extIdx];
+        currentCardImage = d.customImage || null; 
         updateExtCard();
         modalExt.style.display = 'flex';
+    }
+
+    function removeCardImage() {
+        if(!confirm("Rimuovere davvero l'immagine?")) return;
+        currentCardImage = null;
+        if(isEditing && editTargetItem) {
+            editTargetItem.customImage = null;
+        }
+        updateExtCard();
+    }
+    
+    function manualSaveImage() {
+        if(!currentCardImage) return alert("Nessuna immagine da salvare");
+        if(isEditing && editTargetItem) {
+            if(confirm("Salvare l'immagine corrente su questa scheda?")) {
+                editTargetItem.customImage = currentCardImage;
+                alert("Immagine salvata nel record!");
+            }
+        } else {
+            alert("Immagine pronta per la nuova scheda.");
+        }
     }
 
     function updateExtCard() {
@@ -1184,6 +1233,10 @@
         document.getElementById('linkExt').href = d.url;
         let iconHtml = d.channel.includes('Twitter') ? `<svg class="card-icon" viewBox="0 0 24 24"><path d="${icons.twitter}"/></svg>` : `<i class="${d.iconClass} card-icon-fa"></i>`;
         
+        document.getElementById('btnRemoveImg').style.display = currentCardImage ? 'inline-block' : 'none';
+
+        const labelFollower = (d.isSocial) ? "Followers" : "Audience";
+
         cont.innerHTML = `
             <div class="social-card" id="captureCardExt">
                 <div class="card-header">
@@ -1198,10 +1251,10 @@
                     <div style="display:flex; flex-direction:column;">
                         ${showAut ? `<span style="font-weight:bold; font-size:1.3rem;" contenteditable="true">${d.author}</span>` : ''}
                         ${d.subAuthor && showSrc ? `<span style="font-size:0.85rem; color:#999;" contenteditable="true">${d.subAuthor}</span>` : ''}
-                        ${showFoll ? `<span style="font-size:0.8rem; opacity:0.8; margin-top:3px;">Audience: ${formatCompactNumber(d.followers)}</span>` : ''}
+                        ${showFoll ? `<span style="font-size:0.8rem; opacity:0.8; margin-top:3px;">${labelFollower}: ${formatNumberIT(d.followers)}</span>` : ''}
                     </div>
                     <div style="display:flex; gap:15px; align-items:center;">
-                        ${showLikes ? `<div style="font-weight:bold; color:#e0245e;"><i class="fas fa-heart"></i> ${formatCompactNumber(d.likes)}</div>` : ''}
+                        ${showLikes ? `<div style="font-weight:bold; color:#e0245e;"><i class="fas fa-heart"></i> ${formatNumberIT(d.likes)}</div>` : ''}
                     </div>
                 </div>
             </div>`;
@@ -1232,7 +1285,11 @@
         imgUpload.addEventListener('change', (e) => {
             if(e.target.files[0]) {
                 const r = new FileReader();
-                r.onload = (ev) => { currentCardImage = ev.target.result; updateExtCard(); };
+                r.onload = (ev) => { 
+                    currentCardImage = ev.target.result;
+                    if(isEditing && editTargetItem) editTargetItem.customImage = currentCardImage;
+                    updateExtCard(); 
+                };
                 r.readAsDataURL(e.target.files[0]);
             }
         });
@@ -1244,6 +1301,7 @@
     const manModal = document.getElementById('manualModal');
     function openManualModal() {
         isEditing = false; editTargetItem = null;
+        currentCardImage = null; 
         document.getElementById('manContent').value = '';
         document.getElementById('manDate').value = new Date().toISOString().slice(0,16);
         document.getElementById('saveManualBtn').innerText = "Aggiungi al Dataset";
@@ -1303,17 +1361,22 @@
         const sVal = parseInt(document.querySelector('input[name="manSent"]:checked').value);
         const sent = sVal > 0 ? 'Positivo' : (sVal < 0 ? 'Negativo' : 'Neutro');
         if(!url || !chan) return alert("URL e Canale obbligatori");
-        const item = {
-            date: date, content: cont, author: aut, channel: chan, likes: likes, followers: foll,
-            sentiment: sent, sentimentVal: sVal, url: url, hash: generateHash(cont, date, aut),
-            iconClass: chan.toLowerCase().includes('twitter')?'fab fa-twitter':'fas fa-globe', isSocial: true
-        };
-        if(isEditing && editTargetItem) {
-            Object.assign(editTargetItem, item);
+        
+        if(!isEditing) {
+            const item = {
+                date: date, content: cont, author: aut, channel: chan, likes: likes, followers: foll,
+                sentiment: sent, sentimentVal: sVal, url: url, hash: generateHash(cont, date, aut),
+                iconClass: chan.toLowerCase().includes('twitter')?'fab fa-twitter':'fas fa-globe', isSocial: true,
+                customImage: null 
+            };
+            handleExtImport([item]);
+        } else {
+            Object.assign(editTargetItem, {
+               date: date, content: cont, author: aut, channel: chan, likes: likes, followers: foll,
+               sentiment: sent, sentimentVal: sVal, url: url
+            });
             refreshExtDashboard();
             updateExtCard();
-        } else {
-            handleExtImport([item]);
         }
         closeManualModal();
     }
@@ -1325,12 +1388,35 @@
         a.click();
     }
     
+    // FUNZIONE DI IMPORTAZIONE INTELLIGENTE
     function importExtJSON(inp) {
         if(inp.files[0]) {
             const r = new FileReader();
             r.onload = (e) => {
-                try { handleExtImport(JSON.parse(e.target.result).map(x => ({...x, date: new Date(x.date)}))); }
-                catch(e){alert("Errore JSON");}
+                try {
+                    const json = JSON.parse(e.target.result);
+                    let items = [];
+                    
+                    // Rileva se è un backup completo o un export semplice
+                    if(Array.isArray(json)) {
+                        items = json;
+                    } else if(json.external && Array.isArray(json.external)) {
+                        items = json.external;
+                    } else {
+                        throw new Error("Formato non riconosciuto");
+                    }
+
+                    handleExtImport(items.map(x => ({
+                        ...x, 
+                        date: new Date(x.date),
+                        customImage: x.customImage || null,
+                        likes: x.likes || 0,
+                        followers: x.followers || 0
+                    })));
+                } catch(e) { 
+                    alert("Errore nel file JSON: Assicurati che sia un export valido.");
+                    console.error(e); 
+                }
             };
             r.readAsText(inp.files[0]);
         }
@@ -1357,8 +1443,20 @@
                 try {
                     const d = JSON.parse(e.target.result);
                     if(d.proprietary) { propComments=d.proprietary.map(x=>({...x,date:new Date(x.date)})); initPropDashboard(); }
-                    if(d.external) { extData=d.external.map(x=>({...x,date:new Date(x.date)})); refreshExtDashboard(); }
-                } catch(e){alert("Errore Backup");}
+                    if(d.external) { 
+                        extData = d.external.map(x=>({
+                            ...x,
+                            date: new Date(x.date),
+                            customImage: x.customImage || null,
+                            likes: x.likes || 0,
+                            followers: x.followers || 0
+                        })); 
+                        refreshExtDashboard(); 
+                    }
+                } catch(e){
+                    console.error(e);
+                    alert("Errore Backup");
+                }
             };
             r.readAsText(inp.files[0]);
         }
