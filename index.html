@@ -377,7 +377,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v6.15 Robust Import</span>
+    <span class="app-version">v6.17 Fix Import Logic</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -639,6 +639,7 @@
             });
             if(other > 0) agg.push(['Altro', other]);
             agg.sort((a,b) => b[1] - a[1]);
+            
             output = "Canale\tNumero Contenuti\n";
             agg.forEach(([k, v]) => output += `${k}\t${v}\n`);
             
@@ -723,11 +724,11 @@
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     currentCardImage = ev.target.result;
-                    if(isEditing && editTargetItem) editTargetItem.customImage = currentCardImage;
+                    // Solo anteprima. Utente deve cliccare Salva.
                     updateExtCard();
                     const btn = document.querySelector('label[for="imgUploadExt"]');
-                    btn.innerHTML = '<i class="fas fa-check"></i> Incollato!';
-                    setTimeout(() => btn.innerHTML = '<i class="fas fa-image"></i> Carica Immagine (o Incolla CTRL+V)', 1500);
+                    btn.innerHTML = '<i class="fas fa-check"></i> Incollato! (Clicca Salva)';
+                    setTimeout(() => btn.innerHTML = '<i class="fas fa-image"></i> Carica Immagine (o Incolla CTRL+V)', 2500);
                 };
                 reader.readAsDataURL(items[i].getAsFile());
                 e.preventDefault(); break;
@@ -975,7 +976,41 @@
         };
     }
 
-    // MODIFICA CRUCIALE PER GESTIRE I BACKUP COME IMPORT
+    // NUOVA FUNZIONE DI IMPORTAZIONE INTELLIGENTE
+    function importExtJSON(inp) {
+        if(inp.files[0]) {
+            const r = new FileReader();
+            r.onload = (e) => {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    let items = [];
+                    
+                    // Rileva se è un backup completo (oggetto) o un export semplice (array)
+                    if(Array.isArray(json)) {
+                        items = json;
+                    } else if(json.external && Array.isArray(json.external)) {
+                        // Caso backup completo caricato nel posto sbagliato -> lo gestiamo comunque!
+                        items = json.external;
+                    } else {
+                        throw new Error("Formato JSON non riconosciuto");
+                    }
+
+                    handleExtImport(items.map(x => ({
+                        ...x, 
+                        date: new Date(x.date),
+                        customImage: x.customImage || null,
+                        likes: x.likes || 0,
+                        followers: x.followers || 0
+                    })));
+                } catch(e) { 
+                    alert("Errore nel file JSON. Controlla il formato.");
+                    console.error(e); 
+                }
+            };
+            r.readAsText(inp.files[0]);
+        }
+    }
+
     function handleExtImport(items) {
         if(!extData.length) extData = items;
         else {
@@ -1201,21 +1236,21 @@
     function removeCardImage() {
         if(!confirm("Rimuovere davvero l'immagine?")) return;
         currentCardImage = null;
-        if(isEditing && editTargetItem) {
-            editTargetItem.customImage = null;
+        if (extIdx >= 0 && extIdx < extFiltered.length) {
+            extFiltered[extIdx].customImage = null;
         }
         updateExtCard();
     }
     
     function manualSaveImage() {
         if(!currentCardImage) return alert("Nessuna immagine da salvare");
-        if(isEditing && editTargetItem) {
-            if(confirm("Salvare l'immagine corrente su questa scheda?")) {
-                editTargetItem.customImage = currentCardImage;
+        if (extIdx >= 0 && extIdx < extFiltered.length) {
+             if(confirm("Salvare l'immagine corrente su questa scheda?")) {
+                extFiltered[extIdx].customImage = currentCardImage;
                 alert("Immagine salvata nel record!");
             }
         } else {
-            alert("Immagine pronta per la nuova scheda.");
+            alert("Errore: Nessuna scheda selezionata");
         }
     }
 
@@ -1287,10 +1322,13 @@
                 const r = new FileReader();
                 r.onload = (ev) => { 
                     currentCardImage = ev.target.result;
-                    if(isEditing && editTargetItem) editTargetItem.customImage = currentCardImage;
-                    updateExtCard(); 
+                    // Solo anteprima. Utente deve cliccare Salva.
+                    updateExtCard();
+                    const btn = document.querySelector('label[for="imgUploadExt"]');
+                    btn.innerHTML = '<i class="fas fa-check"></i> Incollato! (Clicca Salva)';
+                    setTimeout(() => btn.innerHTML = '<i class="fas fa-image"></i> Carica Immagine (o Incolla CTRL+V)', 2500);
                 };
-                r.readAsDataURL(e.target.files[0]);
+                reader.readAsDataURL(e.target.files[0]);
             }
         });
     }
@@ -1386,40 +1424,6 @@
         a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(extData));
         a.download = "export.json";
         a.click();
-    }
-    
-    // FUNZIONE DI IMPORTAZIONE INTELLIGENTE
-    function importExtJSON(inp) {
-        if(inp.files[0]) {
-            const r = new FileReader();
-            r.onload = (e) => {
-                try {
-                    const json = JSON.parse(e.target.result);
-                    let items = [];
-                    
-                    // Rileva se è un backup completo o un export semplice
-                    if(Array.isArray(json)) {
-                        items = json;
-                    } else if(json.external && Array.isArray(json.external)) {
-                        items = json.external;
-                    } else {
-                        throw new Error("Formato non riconosciuto");
-                    }
-
-                    handleExtImport(items.map(x => ({
-                        ...x, 
-                        date: new Date(x.date),
-                        customImage: x.customImage || null,
-                        likes: x.likes || 0,
-                        followers: x.followers || 0
-                    })));
-                } catch(e) { 
-                    alert("Errore nel file JSON: Assicurati che sia un export valido.");
-                    console.error(e); 
-                }
-            };
-            r.readAsText(inp.files[0]);
-        }
     }
 
     function exportFullState() {
