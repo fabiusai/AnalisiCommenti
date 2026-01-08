@@ -72,7 +72,13 @@
         
         /* LAYOUT 50% - 50% */
         .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
-        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        
+        /* MODIFICA: Layout specifico per Dashboard Esterna (32% - 68%) */
+        #dashboardExt { grid-template-columns: 32% 68%; }
+        
+        @media (max-width: 900px) { 
+            .dashboard-grid, #dashboardExt { grid-template-columns: 1fr; } 
+        }
         
         .card-box { background: white; padding: 1.5rem; border-radius: 4px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
         .chart-wrapper { position: relative; height: 300px; width: 100%; display: flex; justify-content: center; margin-bottom: 1rem; }
@@ -373,7 +379,7 @@
 
 <footer>
     <span>Internal Use Only</span>
-    <span class="app-version">v6.9 Split Thresholds & Persistence</span>
+    <span class="app-version">v6.10 Square Layout & Split Thresholds</span>
 </footer>
 
 <div id="editorModalProp" class="modal">
@@ -1097,7 +1103,7 @@
         
         extCharts.chan = new Chart(ctxC, {
             type: 'bar',
-            data: { labels: chanLabels, datasets: [{ data: chanData, backgroundColor: '#b0c8f8', borderRadius:4 }] },
+            data: { labels: chanLabels, datasets: [{ data: chanData, backgroundColor: '#b0c8f8', borderRadius:4, barPercentage: 0.9, categoryPercentage: 0.95 }] },
             options: { 
                 responsive:true, maintainAspectRatio:false, layout: { padding: { bottom: 60 } },
                 plugins:{ legend:{display:false}, datalabels:{anchor:'end', align:'end', formatter:formatCompactNumber}, customLabelsPlugin }, 
@@ -1139,7 +1145,7 @@
 
         extCharts.eng = new Chart(ctxE, {
             type: 'bar',
-            data: { labels: engLabels, datasets: [{ data: engData, backgroundColor: '#b0c8f8', borderRadius:4 }] },
+            data: { labels: engLabels, datasets: [{ data: engData, backgroundColor: '#b0c8f8', borderRadius:4, barPercentage: 0.9, categoryPercentage: 0.95 }] },
             options: { 
                 responsive:true, maintainAspectRatio:false, layout: { padding: { bottom: 60 } },
                 plugins:{ legend:{display:false}, datalabels:{anchor:'end', align:'end', formatter:formatCompactNumber}, customLabelsPlugin }, 
