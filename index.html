@@ -202,7 +202,7 @@
             <h2 style="margin-bottom: 15px; color: var(--brand-blue); border:none; padding:0;">Importazione Dati Proprietari</h2>
             <div style="display:flex; justify-content:center; gap:10px; align-items:center; flex-wrap:wrap;">
                 <label for="fileInputProp" class="custom-file-upload" id="uploadLabelProp">Seleziona File</label>
-                <input type="file" id="fileInputProp" accept=".xlsx, .xls, .csv" multiple>
+                <input type="file" id="fileInputProp" accept=".xlsx, .xls, .csv, .json" multiple>
                 <button onclick="resetPropData()" class="btn btn-danger" style="margin-top: 5px;"><i class="fas fa-trash-alt"></i> Reset</button>
             </div>
             <p id="fileCountProp" style="margin-top: 10px; font-size: 0.9rem; color: var(--brand-blue);"></p>
@@ -755,32 +755,72 @@
         let loaded = 0, batch = [];
         Array.from(f).forEach(file => {
             const reader = new FileReader();
+            const isJson = file.name.toLowerCase().endsWith('.json');
+            
             reader.onload = (evt) => {
                 try {
-                    const wb = XLSX.read(evt.target.result, {type: 'array'});
-                    const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval:""});
-                    json.forEach(row => {
-                        if(row['Comment Message']) {
-                            let d = new Date();
-                            if(row['Created Time']) d = typeof row['Created Time'] === 'number' ? new Date((row['Created Time'] - 25569) * 86400 * 1000) : new Date(row['Created Time']);
+                    if (isJson) {
+                        const jsonData = JSON.parse(evt.target.result);
+                        jsonData.forEach(post => {
                             let plat = 'other';
-                            if(row['Comment Link']) {
-                                if(row['Comment Link'].includes('facebook')) plat = 'facebook';
-                                else if(row['Comment Link'].includes('instagram')) plat = 'instagram';
-                                else if(row['Comment Link'].includes('twitter')) plat = 'twitter';
+                            const linkOrChan = (post['Link'] || post['Canale'] || '').toLowerCase();
+                            if(linkOrChan.includes('facebook')) plat = 'facebook';
+                            else if(linkOrChan.includes('instagram')) plat = 'instagram';
+                            else if(linkOrChan.includes('twitter') || linkOrChan.includes(' x ')) plat = 'twitter';
+                            
+                            if (post.Commenti && Array.isArray(post.Commenti)) {
+                                post.Commenti.forEach(c => {
+                                    if(c['Testo']) {
+                                        let d = new Date();
+                                        if (c['Data']) {
+                                            const m = c['Data'].match(/(\d{2})\/(\d{2})\/(\d{4}),\s(\d{2}):(\d{2})/);
+                                            if (m) d = new Date(m[3], m[2] - 1, m[1], m[4], m[5]);
+                                        }
+                                        let sent = 'Neutral';
+                                        const originalSent = (c['Sentiment'] || '').toLowerCase();
+                                        if (originalSent === 'positivo') sent = 'Positive';
+                                        else if (originalSent === 'negativo') sent = 'Negative';
+
+                                        batch.push({
+                                            msg: c['Testo'], sent: sent,
+                                            date: d, author: c['Autore'] || 'Utente', platform: plat,
+                                            hash: generateHash(c['Testo'], d, c['Autore'])
+                                        });
+                                    }
+                                });
                             }
-                            batch.push({
-                                msg: row['Comment Message'], sent: row['Sentiment'] || 'Neutral',
-                                date: d, author: row['Comment User Name'] || 'Utente', platform: plat,
-                                hash: generateHash(row['Comment Message'], d, row['Comment User Name'])
-                            });
-                        }
-                    });
+                        });
+                    } else {
+                        const wb = XLSX.read(evt.target.result, {type: 'array'});
+                        const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval:""});
+                        json.forEach(row => {
+                            if(row['Comment Message']) {
+                                let d = new Date();
+                                if(row['Created Time']) d = typeof row['Created Time'] === 'number' ? new Date((row['Created Time'] - 25569) * 86400 * 1000) : new Date(row['Created Time']);
+                                let plat = 'other';
+                                if(row['Comment Link']) {
+                                    if(row['Comment Link'].includes('facebook')) plat = 'facebook';
+                                    else if(row['Comment Link'].includes('instagram')) plat = 'instagram';
+                                    else if(row['Comment Link'].includes('twitter')) plat = 'twitter';
+                                }
+                                batch.push({
+                                    msg: row['Comment Message'], sent: row['Sentiment'] || 'Neutral',
+                                    date: d, author: row['Comment User Name'] || 'Utente', platform: plat,
+                                    hash: generateHash(row['Comment Message'], d, row['Comment User Name'])
+                                });
+                            }
+                        });
+                    }
                 } catch (e) { console.error(e); }
                 loaded++;
                 if(loaded === f.length) handlePropImport(batch);
             };
-            reader.readAsArrayBuffer(file);
+            
+            if (isJson) {
+                reader.readAsText(file);
+            } else {
+                reader.readAsArrayBuffer(file);
+            }
         });
     });
 
